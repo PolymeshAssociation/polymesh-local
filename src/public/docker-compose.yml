@@ -1,0 +1,22 @@
+version: '2'
+services:
+  polymesh-node:
+    image: 'polymathnet/polymesh:${POLYMESH_VERSION}-debian'
+    network_mode: bridge
+    ports:
+      - '9933:9933'
+      - '9944:9944'
+      - '30333:30333'
+    volumes:
+      - '${SNAPSHOT_PATH}:/var/lib/fork.json'
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=/var/lib/fork.json',
+        '--alice',
+        '--rpc-external',
+        '--ws-external',
+        '--rpc-cors=all',
+        '--force-authoring',
+      ]

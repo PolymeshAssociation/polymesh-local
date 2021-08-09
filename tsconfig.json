@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "importHelpers": true,
+    "module": "commonjs",
+    "outDir": "lib",
+    "rootDir": "src",
+    "strict": true,
+    "target": "es2017",      
+    "baseUrl": ".",   
+    "declarationMap": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "strictPropertyInitialization": false,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "lib": ["es2017", "dom"],
+    "typeRoots": ["./node_modules/@types", "./src/typings"]
+  },
+  "include": [
+    "src/**/*"
+  ],
+}
