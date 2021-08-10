@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v1.0.2...v1.1.0) (2021-08-10)
+
+
+### Features
+
+* 🎸 add 3.1.0 snapshots and restrict version values ([cd727e9](https://github.com/PolymathNetwork/polymesh-local/commit/cd727e99ed712817e870a3d5d8b254f518c7c05d))
+
 ## [1.0.2](https://github.com/PolymathNetwork/polymesh-local/compare/v1.0.1...v1.0.2) (2021-08-10)
 
 
