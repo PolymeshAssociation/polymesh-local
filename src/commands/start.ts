@@ -4,10 +4,9 @@ import compose from 'docker-compose';
 import fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
-import { publicPath, snapshotsPath } from 'src/consts';
 
 import { stopContainers } from '../common/containers';
-import { delay } from '../utils';
+import { chainNetworkData, publicPath, snapshotsPath } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -65,8 +64,13 @@ export default class Start extends Command {
     cli.action.start('connecting to the local node');
     let status = 0;
     const startTime = new Date().getTime();
+
+    const { host, port } = chainNetworkData;
+    const url = `http://${host}:${port}`;
+
+    // wait for the node to accept incoming connections
     for (let i = 0; i < iterations && status !== 400; i += 1) {
-      ({ status } = await fetch('http://localhost:9944').catch(err => {
+      ({ status } = await fetch(url).catch(err => {
         if (err.code === 'ECONNRESET') {
           return { status: 0 };
         }
@@ -74,20 +78,22 @@ export default class Start extends Command {
         throw err;
       }));
 
+      // if the chain is ready, or if we have timed out, we break out of the loop
       if (status === 400 || new Date().getTime() - startTime > seconds * 1000) {
         break;
       }
 
-      await delay(2000);
+      await cli.wait(2000);
     }
 
     if (status !== 400) {
       await stopContainers();
       return this.error('timed out while connecting to the node', { exit: 2 });
     }
-
     cli.action.stop();
 
+    this.log('\n');
+    this.log(`local polymesh node listening at wss://${host}:${port}`);
     this.log('happy testing!');
   }
 }

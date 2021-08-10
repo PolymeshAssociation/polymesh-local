@@ -19,7 +19,8 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "lib": ["es2017", "dom"],
-    "typeRoots": ["./node_modules/@types", "./src/typings"]
+    "typeRoots": ["./node_modules/@types", "./src/typings"],
+    "composite": true,
   },
   "include": [
     "src/**/*"
