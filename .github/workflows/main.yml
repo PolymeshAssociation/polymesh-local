@@ -22,7 +22,7 @@ jobs:
         run: yarn lint
 
   release:
-    name: Releasing project
+    name: Building and releasing project
     runs-on: ubuntu-latest
     needs: [lint]
     steps:
@@ -33,6 +33,9 @@ jobs:
           cache: 'yarn'
       - name: install dependencies
         run: yarn --frozen-lockfile
+      - name: build
+        run: |
+          yarn build:ts
       - name: release
         env:
           GITHUB_TOKEN: ${{ secrets.JERE_RELEASE_TOKEN }}
