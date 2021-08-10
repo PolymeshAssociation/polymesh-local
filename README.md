@@ -19,7 +19,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/1.0.0 linux-x64 node-v14.17.4
+polymesh-local/1.0.0 darwin-x64 node-v14.17.0
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
