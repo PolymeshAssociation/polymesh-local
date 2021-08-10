@@ -7,6 +7,8 @@ Polymesh local environment for development and e2e testing
 [![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
 [![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymathNetwork/polymesh-local/blob/master/package.json)
 
+_NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
+
 <!-- toc -->
 
 - [Usage](#usage)
