@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/PolymathNetwork/polymesh-local/compare/v1.0.1...v1.0.2) (2021-08-10)
+
+
+### Bug Fixes
+
+* 🐛 add npmignore and modify prepack script ([2074483](https://github.com/PolymathNetwork/polymesh-local/commit/20744839d74dfc85afdfa6c08e47bf2e46397606))
+
 ## [1.0.1](https://github.com/PolymathNetwork/polymesh-local/compare/v1.0.0...v1.0.1) (2021-08-10)
 
 
