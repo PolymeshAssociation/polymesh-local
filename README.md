@@ -10,36 +10,33 @@ Polymesh local environment for development and e2e testing
 _NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
 
 <!-- toc -->
-
-- [Usage](#usage)
-- [Commands](#commands)
+* [polymesh-local](#polymesh-local)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/1.0.1 linux-x64 node-v14.17.4
+polymesh-local/1.0.2 linux-x64 node-v14.17.4
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-
-- [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
-- [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
-- [`polymesh-local stop`](#polymesh-local-stop)
+* [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
+* [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
+* [`polymesh-local stop`](#polymesh-local-stop)
 
 ## `polymesh-local help [COMMAND]`
 
@@ -76,7 +73,7 @@ OPTIONS
   -v, --version=version    [default: 3.0.0] version of the containers to run
 ```
 
-_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.1/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.2/src/commands/start.ts)_
 
 ## `polymesh-local stop`
 
@@ -87,6 +84,5 @@ USAGE
   $ polymesh-local stop
 ```
 
-_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.1/src/commands/stop.ts)_
-
+_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.2/src/commands/stop.ts)_
 <!-- commandsstop -->
