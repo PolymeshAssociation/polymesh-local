@@ -19,7 +19,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/1.0.0 linux-x64 node-v14.17.4
+polymesh-local/1.0.1 linux-x64 node-v14.17.4
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -67,7 +67,7 @@ OPTIONS
   -v, --version=version    [default: 3.0.0] version of the containers to run
 ```
 
-_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.0/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.1/src/commands/start.ts)_
 
 ## `polymesh-local stop`
 
@@ -78,5 +78,5 @@ USAGE
   $ polymesh-local stop
 ```
 
-_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.0/src/commands/stop.ts)_
+_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.1/src/commands/stop.ts)_
 <!-- commandsstop -->
