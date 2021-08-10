@@ -19,7 +19,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/0.0.0 darwin-x64 node-v14.17.0
+polymesh-local/1.0.0 linux-x64 node-v14.17.4
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -28,28 +28,9 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`polymesh-local hello [FILE]`](#polymesh-local-hello-file)
 * [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
-
-## `polymesh-local hello [FILE]`
-
-describe the command here
-
-```
-USAGE
-  $ polymesh-local hello [FILE]
-
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
-
-EXAMPLE
-  $ polymesh-local hello
-  hello world from ./src/hello.ts!
-```
-
-_See code: [src/commands/hello.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v0.0.0/src/commands/hello.ts)_
+* [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
+* [`polymesh-local stop`](#polymesh-local-stop)
 
 ## `polymesh-local help [COMMAND]`
 
@@ -67,4 +48,35 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
+
+## `polymesh-local start [OPTIONS]`
+
+start all containers
+
+```
+USAGE
+  $ polymesh-local start [OPTIONS]
+
+OPTIONS
+  -h, --help               show CLI help
+  -s, --snapshot=snapshot  path to a custom snapshot file
+
+  -t, --timeout=timeout    [default: 60] maximum amount of seconds to wait for the local node to be able to receive
+                           connections
+
+  -v, --version=version    [default: 3.0.0] version of the containers to run
+```
+
+_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.0/src/commands/start.ts)_
+
+## `polymesh-local stop`
+
+stop all containers started with the "start" command
+
+```
+USAGE
+  $ polymesh-local stop
+```
+
+_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.0.0/src/commands/stop.ts)_
 <!-- commandsstop -->
