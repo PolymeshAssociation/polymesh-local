@@ -17,8 +17,9 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '3.0.0',
+      default: '3.1.0',
       description: 'version of the containers to run',
+      options: ['3.0.0', '3.1.0'],
     }),
     snapshot: flags.string({ char: 's', description: 'path to a custom snapshot file' }),
     timeout: flags.string({
@@ -34,10 +35,6 @@ export default class Start extends Command {
     const { flags: commandFlags } = this.parse(Start);
 
     const { version, snapshot, timeout } = commandFlags;
-
-    if (!version.match(/[0-9]+\.[0-9]+\.[0-9]+/)) {
-      return this.error('"version" must be a semantic version string (i.e 3.1.2)', { exit: 2 });
-    }
 
     const snapshotPath = snapshot || path.resolve(snapshotsPath, `${version}.json`);
 
