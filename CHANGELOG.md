@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/PolymathNetwork/polymesh-local/compare/v1.0.0...v1.0.1) (2021-08-10)
+
+
+### Bug Fixes
+
+* 🐛 add build step to the release pipeline ([4fa3d97](https://github.com/PolymathNetwork/polymesh-local/commit/4fa3d975619917918d85f5ed89ecff75072f2419))
+
 # 1.0.0 (2021-08-10)
 
 
