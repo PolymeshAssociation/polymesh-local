@@ -15,8 +15,9 @@ services:
         '/var/lib/polymesh',
         '--chain=/var/lib/fork.json',
         '--alice',
-        '--rpc-external',
-        '--ws-external',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
         '--rpc-cors=all',
         '--force-authoring',
       ]

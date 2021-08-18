@@ -19,7 +19,7 @@ export default class Start extends Command {
       char: 'v',
       default: '3.1.0',
       description: 'version of the containers to run',
-      options: ['3.0.0', '3.1.0'],
+      options: ['3.0.0', '3.1.0', '3.2.0'],
     }),
     snapshot: flags.string({ char: 's', description: 'path to a custom snapshot file' }),
     timeout: flags.string({
@@ -31,7 +31,7 @@ export default class Start extends Command {
   };
 
   async run(): Promise<void> {
-    const iterations = 5;
+    const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
 
     const { version, snapshot, timeout } = commandFlags;
