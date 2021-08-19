@@ -1,14 +1,12 @@
-import { SingleBar, Presets } from 'cli-progress';
-import { HttpProvider } from '@polkadot/rpc-provider';
 import { ApiPromise } from '@polkadot/api';
+import { HttpProvider } from '@polkadot/rpc-provider';
 import { xxhashAsHex } from '@polkadot/util-crypto';
-import * as fs from 'fs';
 import chalk from 'chalk';
+import { execFileSync, execSync, spawn } from 'child_process';
+import { Presets, SingleBar } from 'cli-progress';
+import * as fs from 'fs';
 import * as path from 'path';
-import { execFile, execFileSync, execSync, spawn, spawnSync } from 'child_process';
 import { argv } from 'process';
-import { Readable } from 'stream';
-require('dotenv').config();
 
 const tmpDir = path.join(__dirname, 'tmp');
 if (!fs.existsSync(tmpDir)) {
@@ -19,7 +17,6 @@ const SKIP_BUILD = false;
 
 const hexPath = path.join(tmpDir, 'runtime.hex');
 const originalSpecPath = path.join(tmpDir, 'genesis.json');
-const storagePath = path.join(tmpDir, 'storage.json');
 const polymeshPath = path.join(tmpDir, 'polymesh');
 const schemaPath = path.join(polymeshPath, 'polymesh_schema.json');
 const binaryPath = path.join(polymeshPath, 'target/release/polymesh');
@@ -32,11 +29,10 @@ const wasmPath = path.join(
 // Using http endpoint since substrate's Ws endpoint has a size limit.
 const provider = new HttpProvider('http://localhost:9933');
 // The storage download will be split into 256^chunksLevel chunks.
-const chunksLevel = parseInt(process.env.FORK_CHUNKS_LEVEL!) || 1;
+const chunksLevel = 1;
 const totalChunks = Math.pow(256, chunksLevel);
 
 let chunksFetched = 0;
-let separator = false;
 const progressBar = new SingleBar({}, Presets.shades_classic);
 
 /**
@@ -52,7 +48,7 @@ const progressBar = new SingleBar({}, Presets.shades_classic);
  * For module hashing, do it via xxhashAsHex,
  * e.g. console.log(xxhashAsHex('System', 128)).
  */
-let prefixes = [
+const prefixes = [
   '0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9' /* System.Account */,
 ];
 const skippedModulesPrefix = [
@@ -81,7 +77,7 @@ function runChain() {
     spawn(
       binaryPath,
       [
-        //'--tmp',
+        // '--tmp',
         '-d',
         `chain_data/node_${i}`,
         '--rpc-methods=unsafe',
@@ -112,7 +108,7 @@ function runTests() {
   execSync('npm test', { stdio: 'inherit', cwd });
 }
 
-const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 async function main() {
   const tag = argv[2];
@@ -158,22 +154,14 @@ async function main() {
       )
     );
     progressBar.start(totalChunks, 0);
-    const streamIn = Readable.from(
-      (async function* () {
-        yield '[';
-        yield* fetchChunks('0x', chunksLevel);
-        yield ']';
-      })()
-    );
-    const streamOut = fs.createWriteStream(storagePath, { flags: 'w' });
-    streamIn.pipe(streamOut);
-    await new Promise(res => streamOut.once('close', res));
+    const storage: [string, string][] = [];
+    await fetchChunks('0x', chunksLevel, storage);
     progressBar.stop();
 
     const metadata = await api.rpc.state.getMetadata();
     // Populate the prefixes array
     const modules = JSON.parse(metadata.asLatest.modules.toString());
-    modules.forEach((module: any) => {
+    modules.forEach((module: { storage?: { prefix: string } }) => {
       if (module.storage) {
         if (!skippedModulesPrefix.includes(module.storage.prefix)) {
           prefixes.push(xxhashAsHex(module.storage.prefix, 128));
@@ -185,9 +173,8 @@ async function main() {
     execSync(binaryPath + ' build-spec --chain testnet-dev --raw > ' + originalSpecPath);
     execSync(binaryPath + ' build-spec --chain testnet-dev --raw > ' + forkedSpecPath);
 
-    let storage: [string, string][] = JSON.parse(fs.readFileSync(storagePath, 'utf8'));
-    let originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
-    let forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
+    const originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
+    const forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
 
     // Modify chain name and id
     forkedSpec.name = originalSpec.name + '-fork';
@@ -227,21 +214,19 @@ async function main() {
 
 main();
 
-async function* fetchChunks(
-  prefix: string,
-  levelsRemaining: number
-): AsyncGenerator<string, void, void> {
+async function fetchChunks(prefix: string, levelsRemaining: number, storage: [string, string][]) {
   if (levelsRemaining <= 0) {
     const pairs = await provider.send('state_getPairs', [prefix]);
-    if (pairs.length > 0) {
-      separator ? yield ',' : (separator = true);
-      yield JSON.stringify(pairs).slice(1, -1);
-    }
+    storage.push(...pairs);
     progressBar.update(++chunksFetched);
     return;
   }
 
+  const promises = [];
   for (let i = 0; i < 256; i++) {
-    yield* fetchChunks(prefix + i.toString(16).padStart(2, '0'), levelsRemaining - 1);
+    promises.push(
+      fetchChunks(prefix + i.toString(16).padStart(2, '0'), levelsRemaining - 1, storage)
+    );
   }
+  await Promise.all(promises);
 }
