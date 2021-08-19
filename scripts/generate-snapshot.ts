@@ -14,6 +14,7 @@ if (!fs.existsSync(tmpDir)) {
 }
 
 const SKIP_BUILD = false;
+const SKIP_TESTS = false;
 
 const hexPath = path.join(tmpDir, 'runtime.hex');
 const originalSpecPath = path.join(tmpDir, 'genesis.json');
@@ -69,6 +70,7 @@ function pullPolymesh(tag: string) {
 }
 
 function buildPolymesh() {
+  execSync('scripts/init.sh', { cwd: polymeshPath, stdio: 'inherit' });
   execSync('cargo build --release', { cwd: polymeshPath, stdio: 'inherit' });
 }
 
@@ -131,7 +133,9 @@ async function main() {
   const chainChildren = runChain();
   try {
     await sleep(10000);
-    runTests();
+    if (!SKIP_TESTS) {
+      runTests();
+    }
 
     execSync('cat ' + wasmPath + ' | hexdump -ve \'/1 "%02x"\' > ' + hexPath);
 
