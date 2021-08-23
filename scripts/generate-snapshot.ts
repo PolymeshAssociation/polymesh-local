@@ -3,6 +3,7 @@ import { HttpProvider } from '@polkadot/rpc-provider';
 import { xxhashAsHex } from '@polkadot/util-crypto';
 import chalk from 'chalk';
 import { execFileSync, execSync, spawn } from 'child_process';
+import fetch from 'node-fetch';
 import { Presets, SingleBar } from 'cli-progress';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -69,6 +70,36 @@ function pullPolymesh(tag: string) {
   });
 }
 
+async function fetchRelease(tag: string) {
+  const version = tag.replace('v', '');
+  const binary = fetch(
+    `https://github.com/PolymathNetwork/Polymesh/releases/download/${tag}/polymesh-${version}-linux-amd64.tgz`
+  );
+
+  const runtime = fetch(
+    `https://github.com/PolymathNetwork/Polymesh/releases/download/${tag}/polymesh_runtime-${version}.tgz`
+  );
+
+  const binaryDir = path.dirname(binaryPath);
+  if (!fs.existsSync(binaryDir)) {
+    fs.mkdirSync(binaryDir, { recursive: true });
+  }
+
+  const runtimeDir = path.dirname(wasmPath);
+  if (!fs.existsSync(runtimeDir)) {
+    fs.mkdirSync(runtimeDir, { recursive: true });
+  }
+
+  fs.writeFileSync(path.join(binaryDir, 'binary.tgz'), await (await binary).buffer());
+  fs.writeFileSync(path.join(runtimeDir, 'runtime.tgz'), await (await runtime).buffer());
+
+  execSync('tar -xf binary.tgz', { cwd: binaryDir });
+  execSync('tar -xf runtime.tgz', { cwd: runtimeDir });
+
+  execSync(`mv polymesh-${version}-linux-amd64 ${binaryPath}`, { cwd: binaryDir });
+  execSync(`mv polymesh_runtime_testnet-${version}.wasm ${wasmPath}`, { cwd: runtimeDir });
+}
+
 function buildPolymesh() {
   execSync('scripts/init.sh', { cwd: polymeshPath, stdio: 'inherit' });
   execSync('cargo build --release', { cwd: polymeshPath, stdio: 'inherit' });
@@ -126,7 +157,12 @@ async function main() {
       fs.rmSync(polymeshPath, { recursive: true });
     }
     pullPolymesh(tag);
-    buildPolymesh();
+    try {
+      await fetchRelease(tag);
+    } catch {
+      console.log('Could not fetch release from github, building binary instead');
+      buildPolymesh();
+    }
     execFileSync('chmod', ['+x', binaryPath]);
   }
 
