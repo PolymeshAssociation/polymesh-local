@@ -18,11 +18,11 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '3.1.0',
+      default: '3.2.0',
       description: 'version of the containers to run',
-      options: ['3.0.0', '3.1.0', '3.2.0'],
+      options: ['3.2.0'],
     }),
-    db: flags.string({ char: 'd', description: 'path to a custom db' }),
+    snapshot: flags.string({ char: 's', description: 'path to a custom snapshot' }),
     timeout: flags.string({
       char: 't',
       default: '60',
@@ -35,12 +35,12 @@ export default class Start extends Command {
     const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
 
-    const { version, timeout, db } = commandFlags;
+    const { version, timeout, snapshot } = commandFlags;
 
-    const dbPath = db || path.resolve(snapshotsPath, `${version}.tgz`);
+    const snapshotPath = snapshot || path.resolve(snapshotsPath, `${version}.tgz`);
     const chainsPath = `${snapshotsPath}/chains`;
 
-    if (!fs.existsSync(dbPath) && !fs.existsSync(chainsPath)) {
+    if (!fs.existsSync(snapshotPath) && !fs.existsSync(chainsPath)) {
       return this.error('"db" does not exist', { exit: 2 });
     }
 
