@@ -150,7 +150,7 @@ async function main() {
     process.exit(1);
   }
 
-  const forkedSpecPath = path.join(__dirname, '../src/public/snapshots', `${tag}.json`);
+  const forkedSpecPath = path.join(__dirname, '../src/public/snapshots', `${tag}.tgz`);
 
   if (!SKIP_BUILD) {
     if (fs.existsSync(polymeshPath)) {
@@ -208,46 +208,14 @@ async function main() {
         }
       }
     });
-
-    // Generate chain spec for original and forked chains
-    execSync(binaryPath + ' build-spec --chain testnet-dev --raw > ' + originalSpecPath);
-    execSync(binaryPath + ' build-spec --chain testnet-dev --raw > ' + forkedSpecPath);
-
-    const originalSpec = JSON.parse(fs.readFileSync(originalSpecPath, 'utf8'));
-    const forkedSpec = JSON.parse(fs.readFileSync(forkedSpecPath, 'utf8'));
-
-    // Modify chain name and id
-    forkedSpec.name = originalSpec.name + '-fork';
-    forkedSpec.id = originalSpec.id + '-fork';
-    forkedSpec.protocolId = originalSpec.protocolId;
-
-    // Grab the items to be moved, then iterate through and insert into storage
-    storage
-      .filter(i => prefixes.some(prefix => i[0].startsWith(prefix)))
-      .forEach(([key, value]) => (forkedSpec.genesis.raw.top[key] = value));
-
-    // Delete System.LastRuntimeUpgrade to ensure that the on_runtime_upgrade event is triggered
-    delete forkedSpec.genesis.raw.top[
-      '0x26aa394eea5630e07c48ae0c9558cef7f9cce9c888469bb1a0dceaa129672ef8'
-    ];
-
-    // Set the code to the current runtime code
-    forkedSpec.genesis.raw.top['0x3a636f6465'] = '0x' + fs.readFileSync(hexPath, 'utf8').trim();
-
-    // To prevent the validator set from changing mid-test, set Staking.ForceEra to ForceNone ('0x02')
-    forkedSpec.genesis.raw.top[
-      '0x5f3e4907f716ac89b6347d15ececedcaf7dad0317324aecae8744b87fc95f2f3'
-    ] = '0x02';
-
-    fs.writeFileSync(forkedSpecPath, JSON.stringify(forkedSpec, null, 4));
-
-    console.log(`Forked genesis generated successfully. Find it at ${forkedSpecPath}`);
   } catch (e) {
     console.error(e);
   } finally {
     for (const child of chainChildren) {
       child.kill();
     }
+    const chainDataPath = `${polymeshPath}/chain_data/node_0`;
+    execSync(`tar -czvf ${forkedSpecPath} .`, { cwd: chainDataPath });
     process.exit();
   }
 }

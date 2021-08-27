@@ -1,4 +1,5 @@
 import { Command, flags } from '@oclif/command';
+import { execSync } from 'child_process';
 import cli from 'cli-ux';
 import compose from 'docker-compose';
 import fs from 'fs-extra';
@@ -22,6 +23,7 @@ export default class Start extends Command {
       options: ['3.0.0', '3.1.0', '3.2.0'],
     }),
     snapshot: flags.string({ char: 's', description: 'path to a custom snapshot file' }),
+    db: flags.string({ char: 'd', description: 'path to a custom db' }),
     timeout: flags.string({
       char: 't',
       default: '60',
@@ -34,12 +36,27 @@ export default class Start extends Command {
     const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
 
-    const { version, snapshot, timeout } = commandFlags;
+    const { version, snapshot, timeout, db } = commandFlags;
 
     const snapshotPath = snapshot || path.resolve(snapshotsPath, `${version}.json`);
 
+    const dbPath = db || path.resolve(snapshotsPath, `v${version}.tgz`);
+    const chainsPath = `${snapshotsPath}/chains`;
+
     if (!fs.existsSync(snapshotPath)) {
       return this.error('"snapshot" file does not exist', { exit: 2 });
+    }
+
+    if (!fs.existsSync(dbPath) && !fs.existsSync(chainsPath)) {
+      return this.error('"db" does not exist', { exit: 2 });
+    }
+
+    // unzip the tar file if there is no chains directory
+    if (!fs.existsSync(chainsPath)) {
+      execSync(`tar -xf v${version}.tgz`, { cwd: snapshotsPath });
+      execSync('chmod -R 667 chains', { cwd: snapshotsPath });
+      execSync('mv ./chains/dev_testnet ./chains/local_testnet', { cwd: snapshotsPath });
+      this.log('unzipped db');
     }
 
     const seconds = Number(timeout);
@@ -53,8 +70,13 @@ export default class Start extends Command {
     cli.action.start('starting the polymesh container');
     await compose.upAll({
       cwd: publicPath,
-      log: false,
-      env: { ...process.env, POLYMESH_VERSION: version, SNAPSHOT_PATH: snapshotPath },
+      log: true,
+      env: {
+        ...process.env,
+        POLYMESH_VERSION: version,
+        SNAPSHOT_PATH: snapshotPath,
+        DB_PATH: chainsPath,
+      },
     });
     cli.action.stop();
 

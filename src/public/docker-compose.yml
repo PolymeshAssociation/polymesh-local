@@ -8,12 +8,12 @@ services:
       - '9944:9944'
       - '30333:30333'
     volumes:
-      - '${SNAPSHOT_PATH}:/var/lib/fork.json'
+      - '${DB_PATH}:/var/lib/polymesh/chains'
     command:
       [
         '-d',
         '/var/lib/polymesh',
-        '--chain=/var/lib/fork.json',
+        '--chain=testnet-local',
         '--alice',
         '--validator',
         '--unsafe-rpc-external',
