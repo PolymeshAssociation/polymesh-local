@@ -149,8 +149,8 @@ async function main() {
     console.log('Please provide a Polymesh tag or branch as an argument');
     process.exit(1);
   }
-
-  const forkedSpecPath = path.join(__dirname, '../src/public/snapshots', `${tag}.tgz`);
+  const version = tag.replace('v', '');
+  const snapshotPath = path.join(__dirname, '../src/public/snapshots', `${version}.tgz`);
 
   if (!SKIP_BUILD) {
     if (fs.existsSync(polymeshPath)) {
@@ -172,8 +172,6 @@ async function main() {
     if (!SKIP_TESTS) {
       runTests();
     }
-
-    execSync('cat ' + wasmPath + ' | hexdump -ve \'/1 "%02x"\' > ' + hexPath);
 
     console.log(
       chalk.green(
@@ -215,7 +213,7 @@ async function main() {
       child.kill();
     }
     const chainDataPath = `${polymeshPath}/chain_data/node_0`;
-    execSync(`tar -czvf ${forkedSpecPath} .`, { cwd: chainDataPath });
+    execSync(`tar -czvf ${snapshotPath} .`, { cwd: chainDataPath });
     process.exit();
   }
 }

@@ -22,7 +22,6 @@ export default class Start extends Command {
       description: 'version of the containers to run',
       options: ['3.0.0', '3.1.0', '3.2.0'],
     }),
-    snapshot: flags.string({ char: 's', description: 'path to a custom snapshot file' }),
     db: flags.string({ char: 'd', description: 'path to a custom db' }),
     timeout: flags.string({
       char: 't',
@@ -36,16 +35,10 @@ export default class Start extends Command {
     const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
 
-    const { version, snapshot, timeout, db } = commandFlags;
+    const { version, timeout, db } = commandFlags;
 
-    const snapshotPath = snapshot || path.resolve(snapshotsPath, `${version}.json`);
-
-    const dbPath = db || path.resolve(snapshotsPath, `v${version}.tgz`);
+    const dbPath = db || path.resolve(snapshotsPath, `${version}.tgz`);
     const chainsPath = `${snapshotsPath}/chains`;
-
-    if (!fs.existsSync(snapshotPath)) {
-      return this.error('"snapshot" file does not exist', { exit: 2 });
-    }
 
     if (!fs.existsSync(dbPath) && !fs.existsSync(chainsPath)) {
       return this.error('"db" does not exist', { exit: 2 });
@@ -53,9 +46,8 @@ export default class Start extends Command {
 
     // unzip the tar file if there is no chains directory
     if (!fs.existsSync(chainsPath)) {
-      execSync(`tar -xf v${version}.tgz`, { cwd: snapshotsPath });
+      execSync(`tar -xf ${version}.tgz`, { cwd: snapshotsPath });
       execSync('chmod -R 667 chains', { cwd: snapshotsPath });
-      execSync('mv ./chains/dev_testnet ./chains/local_testnet', { cwd: snapshotsPath });
       this.log('unzipped db');
     }
 
@@ -74,7 +66,6 @@ export default class Start extends Command {
       env: {
         ...process.env,
         POLYMESH_VERSION: version,
-        SNAPSHOT_PATH: snapshotPath,
         DB_PATH: chainsPath,
       },
     });

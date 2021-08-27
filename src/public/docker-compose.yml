@@ -13,7 +13,7 @@ services:
       [
         '-d',
         '/var/lib/polymesh',
-        '--chain=testnet-local',
+        '--chain=testnet-dev',
         '--alice',
         '--validator',
         '--unsafe-rpc-external',

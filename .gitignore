@@ -8,3 +8,5 @@
 node_modules
 .DS_Store
 scripts/tmp
+/src/public/snapshots/*
+!/src/public/snapshots/*.tgz
