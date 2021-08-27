@@ -1,13 +1,8 @@
-import { ApiPromise } from '@polkadot/api';
-import { HttpProvider } from '@polkadot/rpc-provider';
-import { xxhashAsHex } from '@polkadot/util-crypto';
-import chalk from 'chalk';
 import { execFileSync, execSync, spawn } from 'child_process';
-import fetch from 'node-fetch';
-import { Presets, SingleBar } from 'cli-progress';
 import * as fs from 'fs';
 import * as path from 'path';
 import { argv } from 'process';
+import fetch from 'node-fetch';
 
 const tmpDir = path.join(__dirname, 'tmp');
 if (!fs.existsSync(tmpDir)) {
@@ -17,25 +12,13 @@ if (!fs.existsSync(tmpDir)) {
 const SKIP_BUILD = false;
 const SKIP_TESTS = false;
 
-const hexPath = path.join(tmpDir, 'runtime.hex');
-const originalSpecPath = path.join(tmpDir, 'genesis.json');
 const polymeshPath = path.join(tmpDir, 'polymesh');
-const schemaPath = path.join(polymeshPath, 'polymesh_schema.json');
 const binaryPath = path.join(polymeshPath, 'target/release/polymesh');
 const testsPath = path.join(polymeshPath, 'scripts/cli');
 const wasmPath = path.join(
   polymeshPath,
   'target/release/wbuild/polymesh-runtime-testnet/polymesh_runtime_testnet.compact.wasm'
 );
-
-// Using http endpoint since substrate's Ws endpoint has a size limit.
-const provider = new HttpProvider('http://localhost:9933');
-// The storage download will be split into 256^chunksLevel chunks.
-const chunksLevel = 1;
-const totalChunks = Math.pow(256, chunksLevel);
-
-let chunksFetched = 0;
-const progressBar = new SingleBar({}, Presets.shades_classic);
 
 /**
  * All module prefixes except those mentioned in the skippedModulesPrefix will be added to this by the script.
@@ -50,18 +33,6 @@ const progressBar = new SingleBar({}, Presets.shades_classic);
  * For module hashing, do it via xxhashAsHex,
  * e.g. console.log(xxhashAsHex('System', 128)).
  */
-const prefixes = [
-  '0x26aa394eea5630e07c48ae0c9558cef7b99d880ec681799c0cf30e8886371da9' /* System.Account */,
-];
-const skippedModulesPrefix = [
-  'System',
-  'Session',
-  'Babe',
-  'Grandpa',
-  'GrandpaFinality',
-  'FinalityTracker',
-  'Authorship',
-];
 
 function pullPolymesh(tag: string) {
   const POLYMESH_GIT = 'https://github.com/PolymathNetwork/Polymesh.git';
@@ -172,40 +143,6 @@ async function main() {
     if (!SKIP_TESTS) {
       runTests();
     }
-
-    console.log(
-      chalk.green(
-        'We are intentionally using the HTTP endpoint. If you see any warnings about that, please ignore them.'
-      )
-    );
-    const { types, rpc } = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
-    const api = await ApiPromise.create({
-      provider,
-      types,
-      rpc,
-    });
-
-    // Download state of original chain
-    console.log(
-      chalk.green(
-        'Fetching current state of the live chain. Please wait, it can take a while depending on the size of your chain.'
-      )
-    );
-    progressBar.start(totalChunks, 0);
-    const storage: [string, string][] = [];
-    await fetchChunks('0x', chunksLevel, storage);
-    progressBar.stop();
-
-    const metadata = await api.rpc.state.getMetadata();
-    // Populate the prefixes array
-    const modules = JSON.parse(metadata.asLatest.modules.toString());
-    modules.forEach((module: { storage?: { prefix: string } }) => {
-      if (module.storage) {
-        if (!skippedModulesPrefix.includes(module.storage.prefix)) {
-          prefixes.push(xxhashAsHex(module.storage.prefix, 128));
-        }
-      }
-    });
   } catch (e) {
     console.error(e);
   } finally {
@@ -219,20 +156,3 @@ async function main() {
 }
 
 main();
-
-async function fetchChunks(prefix: string, levelsRemaining: number, storage: [string, string][]) {
-  if (levelsRemaining <= 0) {
-    const pairs = await provider.send('state_getPairs', [prefix]);
-    storage.push(...pairs);
-    progressBar.update(++chunksFetched);
-    return;
-  }
-
-  const promises = [];
-  for (let i = 0; i < 256; i++) {
-    promises.push(
-      fetchChunks(prefix + i.toString(16).padStart(2, '0'), levelsRemaining - 1, storage)
-    );
-  }
-  await Promise.all(promises);
-}
