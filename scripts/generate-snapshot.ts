@@ -149,7 +149,9 @@ async function main() {
     for (const child of chainChildren) {
       child.kill();
     }
-    const chainDataPath = `${polymeshPath}/chain_data/node_0`;
+    const chainDataPath = path.join(polymeshPath, '/chain_data/node_0');
+
+    execSync(`chmod -R 777 ${chainDataPath} `);
     execSync(`tar -czvf ${snapshotPath} .`, { cwd: chainDataPath });
     process.exit();
   }

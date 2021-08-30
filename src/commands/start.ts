@@ -47,7 +47,7 @@ export default class Start extends Command {
     // unzip the tar file if there is no chains directory
     if (!fs.existsSync(chainsPath)) {
       execSync(`tar -xf ${version}.tgz`, { cwd: snapshotsPath });
-      execSync('chmod -R 667 chains', { cwd: snapshotsPath });
+      execSync('chmod -R 777 chains', { cwd: snapshotsPath });
       this.log('unzipped db');
     }
 
