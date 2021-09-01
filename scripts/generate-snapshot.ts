@@ -1,3 +1,13 @@
+/*
+  This script creates a chain, runs tests and saves the state so it can be used for later testing.
+  At a high level the steps are:
+
+  1. Try to fetch a prebuilt Polymesh binary from Github releases
+  2. Fallback on compiling if not found
+  3. Bring up 3 nodes, the minimum amount needed to commit blocks
+  4. Run the test scripts found in the Polymesh/scripts/cli/tests directory to populate data
+  5. Create a .tgz file of the `rocksdb` of the primary node that is used in the start command
+*/
 import { execFileSync, execSync, spawn } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
