@@ -80,7 +80,7 @@ export default class Start extends Command {
       env: {
         ...process.env,
         POLYMESH_VERSION: version,
-        DB_PATH: chainsPath,
+        SNAPSHOT_PATH: chainsPath,
       },
     });
     cli.action.stop();

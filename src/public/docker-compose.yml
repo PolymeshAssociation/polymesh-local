@@ -8,7 +8,7 @@ services:
       - '9944:9944'
       - '30333:30333'
     volumes:
-      - '${DB_PATH}:/var/lib/polymesh/chains'
+      - '${SNAPSHOT_PATH}:/var/lib/polymesh/chains'
     command:
       [
         '-d',
