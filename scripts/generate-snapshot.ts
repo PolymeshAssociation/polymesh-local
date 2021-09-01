@@ -20,20 +20,6 @@ const wasmPath = path.join(
   'target/release/wbuild/polymesh-runtime-testnet/polymesh_runtime_testnet.compact.wasm'
 );
 
-/**
- * All module prefixes except those mentioned in the skippedModulesPrefix will be added to this by the script.
- * If you want to add any past module or part of a skipped module, add the prefix here manually.
- *
- * Any storage value’s hex can be logged via console.log(api.query.<module>.<call>.key([...opt params])),
- * e.g. console.log(api.query.timestamp.now.key()).
- *
- * If you want a map/doublemap key prefix, you can do it via .keyPrefix(),
- * e.g. console.log(api.query.system.account.keyPrefix()).
- *
- * For module hashing, do it via xxhashAsHex,
- * e.g. console.log(xxhashAsHex('System', 128)).
- */
-
 function pullPolymesh(tag: string) {
   const POLYMESH_GIT = 'https://github.com/PolymathNetwork/Polymesh.git';
   execSync(`git clone --depth 1 --branch ${tag} ${POLYMESH_GIT} ${polymeshPath}`, {
@@ -43,26 +29,24 @@ function pullPolymesh(tag: string) {
 
 async function fetchRelease(tag: string) {
   const version = tag.replace('v', '');
-  const binary = fetch(
+  const binaryPromise = fetch(
     `https://github.com/PolymathNetwork/Polymesh/releases/download/${tag}/polymesh-${version}-linux-amd64.tgz`
-  );
-
-  const runtime = fetch(
+  ).then(res => res.buffer());
+  const runtimePromise = fetch(
     `https://github.com/PolymathNetwork/Polymesh/releases/download/${tag}/polymesh_runtime-${version}.tgz`
-  );
-
+  ).then(res => res.buffer());
   const binaryDir = path.dirname(binaryPath);
   if (!fs.existsSync(binaryDir)) {
     fs.mkdirSync(binaryDir, { recursive: true });
   }
-
   const runtimeDir = path.dirname(wasmPath);
   if (!fs.existsSync(runtimeDir)) {
     fs.mkdirSync(runtimeDir, { recursive: true });
   }
 
-  fs.writeFileSync(path.join(binaryDir, 'binary.tgz'), await (await binary).buffer());
-  fs.writeFileSync(path.join(runtimeDir, 'runtime.tgz'), await (await runtime).buffer());
+  const [binary, runtime] = await Promise.all([binaryPromise, runtimePromise]);
+  fs.writeFileSync(path.join(binaryDir, 'binary.tgz'), binary);
+  fs.writeFileSync(path.join(runtimeDir, 'runtime.tgz'), runtime);
 
   execSync('tar -xf binary.tgz', { cwd: binaryDir });
   execSync('tar -xf runtime.tgz', { cwd: runtimeDir });
@@ -81,7 +65,6 @@ function runChain() {
     spawn(
       binaryPath,
       [
-        // '--tmp',
         '-d',
         `chain_data/node_${i}`,
         '--rpc-methods=unsafe',
@@ -106,7 +89,6 @@ function runChain() {
 
 function runTests() {
   const cwd = testsPath;
-  // next version yarn should work, execSync('yarn', { stdio: 'inherit', cwd });
   execSync('npm ci', { stdio: 'inherit', cwd });
   execSync('npm run build', { stdio: 'inherit', cwd });
   execSync('npm test', { stdio: 'inherit', cwd });
@@ -130,8 +112,8 @@ async function main() {
     pullPolymesh(tag);
     try {
       await fetchRelease(tag);
-    } catch {
-      console.log('Could not fetch release from github, building binary instead');
+    } catch (err) {
+      console.log(`Could not fetch release from github, building binary instead. Error: ${err}`);
       buildPolymesh();
     }
     execFileSync('chmod', ['+x', binaryPath]);
@@ -157,4 +139,7 @@ async function main() {
   }
 }
 
-main();
+main().catch(e => {
+  console.error(e);
+  process.exit(1);
+});

@@ -1,9 +1,11 @@
 import { Command } from '@oclif/command';
+import { execSync } from 'child_process';
 import cli from 'cli-ux';
 import compose from 'docker-compose';
+import fs from 'fs-extra';
 
 import { stopContainers } from '../common/containers';
-import { publicPath } from '../consts';
+import { chainsPath, publicPath } from '../consts';
 
 export default class Stop extends Command {
   static description = 'stop all containers started with the "start" command';
@@ -23,6 +25,10 @@ export default class Stop extends Command {
     cli.action.start('stopping all services');
     await stopContainers();
     cli.action.stop();
+
+    if (fs.existsSync(chainsPath)) {
+      execSync(`rm -rf ${chainsPath}`);
+    }
 
     this.log('bye!');
   }

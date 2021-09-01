@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 import path from 'path';
 
 import { stopContainers } from '../common/containers';
-import { chainNetworkData, publicPath, snapshotsPath } from '../consts';
+import { chainNetworkData, chainsPath, publicPath, snapshotsDir } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -32,24 +32,38 @@ export default class Start extends Command {
   };
 
   async run(): Promise<void> {
+    // If the node is running it should return a 400 since fetch won't upgrade to WS
+    let status = 0;
+    const { host, port } = chainNetworkData;
+    const url = `http://${host}:${port}`;
+    ({ status } = await fetch(url).catch(() => {
+      return { status: 0 };
+    }));
+
+    if (status === 400) {
+      this.log(`chain is already running at wss://${host}:${port}`);
+      return;
+    }
+
     const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
 
     const { version, timeout, snapshot } = commandFlags;
 
-    const snapshotPath = snapshot || path.resolve(snapshotsPath, `${version}.tgz`);
-    const chainsPath = `${snapshotsPath}/chains`;
+    const snapshotPath = snapshot || path.resolve(snapshotsDir, `${version}.tgz`);
 
     if (!fs.existsSync(snapshotPath) && !fs.existsSync(chainsPath)) {
-      return this.error('"db" does not exist', { exit: 2 });
+      return this.error('"snapshot" does not exist', { exit: 2 });
     }
 
     // unzip the tar file if there is no chains directory
-    if (!fs.existsSync(chainsPath)) {
-      execSync(`tar -xf ${version}.tgz`, { cwd: snapshotsPath });
-      execSync('chmod -R 777 chains', { cwd: snapshotsPath });
-      this.log('unzipped db');
+    if (fs.existsSync(chainsPath)) {
+      console.log('removing old chain data');
+      execSync(`rm -rf ${chainsPath}`);
     }
+    execSync(`tar -xf ${version}.tgz`, { cwd: snapshotsDir });
+    execSync('chmod -R 777 chains', { cwd: snapshotsDir });
+    this.log('snapshot unzipped');
 
     const seconds = Number(timeout);
 
@@ -72,11 +86,7 @@ export default class Start extends Command {
     cli.action.stop();
 
     cli.action.start('connecting to the local node');
-    let status = 0;
     const startTime = new Date().getTime();
-
-    const { host, port } = chainNetworkData;
-    const url = `http://${host}:${port}`;
 
     // wait for the node to accept incoming connections
     for (let i = 0; i < iterations && status !== 400; i += 1) {
