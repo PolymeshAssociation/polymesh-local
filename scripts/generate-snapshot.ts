@@ -6,7 +6,7 @@
   2. Fallback on compiling if not found
   3. Bring up 3 nodes, the minimum amount needed to commit blocks
   4. Run the test scripts found in the Polymesh/scripts/cli/tests directory to populate data
-  5. Create a .tgz file of the `rocksdb` of the primary node that is used in the start command
+  5. Create a .tgz file out of the `rocksdb` directory of a node that was made in the start command
 */
 import { execFileSync, execSync, spawn } from 'child_process';
 import * as fs from 'fs';
@@ -18,9 +18,6 @@ const tmpDir = path.join(__dirname, 'tmp');
 if (!fs.existsSync(tmpDir)) {
   fs.mkdirSync(tmpDir);
 }
-
-const SKIP_BUILD = false;
-const SKIP_TESTS = false;
 
 const polymeshPath = path.join(tmpDir, 'polymesh');
 const binaryPath = path.join(polymeshPath, 'target/release/polymesh');
@@ -99,6 +96,7 @@ function runChain() {
 
 function runTests() {
   const cwd = testsPath;
+  // yarn should work with chains versions ^3.3, execSync('yarn', { stdio: 'inherit', cwd });
   execSync('npm ci', { stdio: 'inherit', cwd });
   execSync('npm run build', { stdio: 'inherit', cwd });
   execSync('npm test', { stdio: 'inherit', cwd });
@@ -115,26 +113,22 @@ async function main() {
   const version = tag.replace('v', '');
   const snapshotPath = path.join(__dirname, '../src/public/snapshots', `${version}.tgz`);
 
-  if (!SKIP_BUILD) {
-    if (fs.existsSync(polymeshPath)) {
-      fs.rmSync(polymeshPath, { recursive: true });
-    }
-    pullPolymesh(tag);
-    try {
-      await fetchRelease(tag);
-    } catch (err) {
-      console.log(`Could not fetch release from github, building binary instead. Error: ${err}`);
-      buildPolymesh();
-    }
-    execFileSync('chmod', ['+x', binaryPath]);
+  if (fs.existsSync(polymeshPath)) {
+    fs.rmSync(polymeshPath, { recursive: true });
   }
+  pullPolymesh(tag);
+  try {
+    await fetchRelease(tag);
+  } catch (err) {
+    console.log(`Could not fetch release from github, building binary instead. Error: ${err}`);
+    buildPolymesh();
+  }
+  execFileSync('chmod', ['+x', binaryPath]);
 
   const chainChildren = runChain();
   try {
     await sleep(10000);
-    if (!SKIP_TESTS) {
-      runTests();
-    }
+    runTests();
   } catch (e) {
     console.error(e);
   } finally {
