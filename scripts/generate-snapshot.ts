@@ -96,7 +96,7 @@ function runChain() {
 
 function runTests() {
   const cwd = testsPath;
-  // yarn should work with chains versions ^3.3, execSync('yarn', { stdio: 'inherit', cwd });
+  // change to yarn when we move to Polymesh 3.3 and remove 3.2 support
   execSync('npm ci', { stdio: 'inherit', cwd });
   execSync('npm run build', { stdio: 'inherit', cwd });
   execSync('npm test', { stdio: 'inherit', cwd });
