@@ -1,4 +1,5 @@
 import { Command, flags } from '@oclif/command';
+import { execSync } from 'child_process';
 import cli from 'cli-ux';
 import compose from 'docker-compose';
 import fs from 'fs-extra';
@@ -6,7 +7,7 @@ import fetch from 'node-fetch';
 import path from 'path';
 
 import { stopContainers } from '../common/containers';
-import { chainNetworkData, publicPath, snapshotsPath } from '../consts';
+import { chainNetworkData, chainsPath, publicPath, snapshotsDir } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -17,11 +18,11 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '3.1.0',
+      default: '3.2.0',
       description: 'version of the containers to run',
-      options: ['3.0.0', '3.1.0'],
+      options: ['3.2.0'],
     }),
-    snapshot: flags.string({ char: 's', description: 'path to a custom snapshot file' }),
+    snapshot: flags.string({ char: 's', description: 'path to a custom snapshot' }),
     timeout: flags.string({
       char: 't',
       default: '60',
@@ -31,16 +32,38 @@ export default class Start extends Command {
   };
 
   async run(): Promise<void> {
-    const iterations = 5;
+    // If the node is running it should return a 400 since fetch won't upgrade to WS
+    let status = 0;
+    const { host, port } = chainNetworkData;
+    const url = `http://${host}:${port}`;
+    ({ status } = await fetch(url).catch(() => {
+      return { status: 0 };
+    }));
+
+    if (status === 400) {
+      this.log(`chain is already running at wss://${host}:${port}`);
+      return;
+    }
+
+    const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
 
-    const { version, snapshot, timeout } = commandFlags;
+    const { version, timeout, snapshot } = commandFlags;
 
-    const snapshotPath = snapshot || path.resolve(snapshotsPath, `${version}.json`);
+    const snapshotPath = snapshot || path.resolve(snapshotsDir, `${version}.tgz`);
 
-    if (!fs.existsSync(snapshotPath)) {
-      return this.error('"snapshot" file does not exist', { exit: 2 });
+    if (!fs.existsSync(snapshotPath) && !fs.existsSync(chainsPath)) {
+      return this.error('"snapshot" does not exist', { exit: 2 });
     }
+
+    // unzip the tar file if there is no chains directory
+    if (fs.existsSync(chainsPath)) {
+      console.log('removing old chain data');
+      execSync(`rm -rf ${chainsPath}`);
+    }
+    execSync(`tar -xf ${version}.tgz`, { cwd: snapshotsDir });
+    execSync('chmod -R 777 chains', { cwd: snapshotsDir });
+    this.log('snapshot unzipped');
 
     const seconds = Number(timeout);
 
@@ -53,17 +76,17 @@ export default class Start extends Command {
     cli.action.start('starting the polymesh container');
     await compose.upAll({
       cwd: publicPath,
-      log: false,
-      env: { ...process.env, POLYMESH_VERSION: version, SNAPSHOT_PATH: snapshotPath },
+      log: true,
+      env: {
+        ...process.env,
+        POLYMESH_VERSION: version,
+        SNAPSHOT_PATH: chainsPath,
+      },
     });
     cli.action.stop();
 
     cli.action.start('connecting to the local node');
-    let status = 0;
     const startTime = new Date().getTime();
-
-    const { host, port } = chainNetworkData;
-    const url = `http://${host}:${port}`;
 
     // wait for the node to accept incoming connections
     for (let i = 0; i < iterations && status !== 400; i += 1) {

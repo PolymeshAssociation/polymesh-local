@@ -86,3 +86,7 @@ USAGE
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/stop.ts)_
 <!-- commandsstop -->
+
+# Credits
+
+- Mudit Gupta's [fork off substrate](https://github.com/maxsam4/fork-off-substrate)

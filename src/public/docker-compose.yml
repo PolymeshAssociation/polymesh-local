@@ -8,15 +8,16 @@ services:
       - '9944:9944'
       - '30333:30333'
     volumes:
-      - '${SNAPSHOT_PATH}:/var/lib/fork.json'
+      - '${SNAPSHOT_PATH}:/var/lib/polymesh/chains'
     command:
       [
         '-d',
         '/var/lib/polymesh',
-        '--chain=/var/lib/fork.json',
+        '--chain=testnet-dev',
         '--alice',
-        '--rpc-external',
-        '--ws-external',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
         '--rpc-cors=all',
         '--force-authoring',
       ]
