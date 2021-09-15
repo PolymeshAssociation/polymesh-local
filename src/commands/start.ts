@@ -1,13 +1,12 @@
 import { Command, flags } from '@oclif/command';
-import { execSync } from 'child_process';
 import cli from 'cli-ux';
 import compose from 'docker-compose';
-import fs from 'fs-extra';
-import fetch from 'node-fetch';
-import path from 'path';
 
+import { isChainUp, loadSnapshot } from '../common/chain';
 import { stopContainers } from '../common/containers';
-import { chainNetworkData, chainsPath, publicPath, snapshotsDir } from '../consts';
+import { isSubqueryUp } from '../common/subquery';
+import { isToolingUp } from '../common/tooling';
+import { chain, postgres, publicPath, tooling } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -22,98 +21,63 @@ export default class Start extends Command {
       description: 'version of the containers to run',
       options: ['3.2.0'],
     }),
-    snapshot: flags.string({ char: 's', description: 'path to a custom snapshot' }),
-    timeout: flags.string({
-      char: 't',
-      default: '60',
+    snapshot: flags.string({
+      char: 's',
       description:
-        'maximum amount of seconds to wait for the local node to be able to receive connections',
+        'name of .tgz snapshot to use that is in the snapshots directory. defaults to version',
     }),
   };
 
   async run(): Promise<void> {
-    // If the node is running it should return a 400 since fetch won't upgrade to WS
-    let status = 0;
-    const { host, port } = chainNetworkData;
-    const url = `http://${host}:${port}`;
-    ({ status } = await fetch(url).catch(() => {
-      return { status: 0 };
-    }));
-
-    if (status === 400) {
-      this.log(`chain is already running at wss://${host}:${port}`);
-      return;
-    }
-
-    const iterations = 20;
     const { flags: commandFlags } = this.parse(Start);
+    const { version, snapshot } = commandFlags;
 
-    const { version, timeout, snapshot } = commandFlags;
+    cli.action.start(`Unzipping chain snapshot: ${snapshot || version}`);
+    await loadSnapshot(snapshot || version);
+    cli.action.stop();
 
-    const snapshotPath = snapshot || path.resolve(snapshotsDir, `${version}.tgz`);
-
-    if (!fs.existsSync(snapshotPath) && !fs.existsSync(chainsPath)) {
-      return this.error('"snapshot" does not exist', { exit: 2 });
-    }
-
-    // unzip the tar file if there is no chains directory
-    if (fs.existsSync(chainsPath)) {
-      console.log('removing old chain data');
-      execSync(`rm -rf ${chainsPath}`);
-    }
-    execSync(`tar -xf ${version}.tgz`, { cwd: snapshotsDir });
-    execSync('chmod -R 777 chains', { cwd: snapshotsDir });
-    this.log('snapshot unzipped');
-
-    const seconds = Number(timeout);
-
-    if (isNaN(seconds) || seconds < iterations) {
-      return this.error(`"timeout" must be a number greater or equal than ${iterations}`, {
-        exit: 2,
-      });
-    }
-
-    cli.action.start('starting the polymesh container');
+    cli.action.start('Starting the containers');
     await compose.upAll({
       cwd: publicPath,
       log: true,
       env: {
-        ...process.env,
         POLYMESH_VERSION: version,
-        SNAPSHOT_PATH: chainsPath,
+        SNAPSHOT_PATH: chain.chainsDir,
+        PG_USER: postgres.user,
+        PG_HOST: postgres.host,
+        PG_PASSWORD: postgres.password,
+        PG_PORT: postgres.port,
+        PG_DB: postgres.db,
+        ...process.env,
       },
     });
     cli.action.stop();
 
-    cli.action.start('connecting to the local node');
-    const startTime = new Date().getTime();
+    cli.action.start('Checking service liveness');
+    const [chainUp, toolingUp, subqueryUp] = await Promise.all([
+      isChainUp(),
+      isToolingUp(),
+      isSubqueryUp(),
+    ]);
 
-    // wait for the node to accept incoming connections
-    for (let i = 0; i < iterations && status !== 400; i += 1) {
-      ({ status } = await fetch(url).catch(err => {
-        if (err.code === 'ECONNRESET') {
-          return { status: 0 };
-        }
-
-        throw err;
-      }));
-
-      // if the chain is ready, or if we have timed out, we break out of the loop
-      if (status === 400 || new Date().getTime() - startTime > seconds * 1000) {
-        break;
-      }
-
-      await cli.wait(2000);
-    }
-
-    if (status !== 400) {
+    if (![chainUp, toolingUp, subqueryUp].every(Boolean)) {
       await stopContainers();
-      return this.error('timed out while connecting to the node', { exit: 2 });
+      this.error(
+        `A service did not come up. Check results: ${JSON.stringify({
+          chainUp,
+          toolingUp,
+          subqueryUp,
+        })}. Inspect the logs to diagnose the problem`,
+        { exit: 2 }
+      );
     }
+    // wait for the node to accept incoming connections
     cli.action.stop();
 
     this.log('\n');
-    this.log(`local polymesh node listening at wss://${host}:${port}`);
+    this.log(`polymesh node listening at wss://${chain.url}`);
+    this.log(`postgreSQL listening at :${postgres.port}`);
+    this.log(`tooling-gql listening at http://${tooling.url}`);
     this.log('happy testing!');
   }
 }

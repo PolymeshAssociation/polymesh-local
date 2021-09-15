@@ -6,5 +6,6 @@ export async function stopContainers(): Promise<void> {
   await compose.down({
     cwd: publicPath,
     log: false,
+    commandOptions: ['--volumes'], // removes volumes
   });
 }

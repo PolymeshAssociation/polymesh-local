@@ -5,7 +5,7 @@ import compose from 'docker-compose';
 import fs from 'fs-extra';
 
 import { stopContainers } from '../common/containers';
-import { chainsPath, publicPath } from '../consts';
+import { chain, publicPath } from '../consts';
 
 export default class Stop extends Command {
   static description = 'stop all containers started with the "start" command';
@@ -26,9 +26,12 @@ export default class Stop extends Command {
     await stopContainers();
     cli.action.stop();
 
-    if (fs.existsSync(chainsPath)) {
-      execSync(`rm -rf ${chainsPath}`);
+    const { chainsDir } = chain;
+    cli.action.start(`removing chain data at ${chainsDir}`);
+    if (fs.existsSync(chainsDir)) {
+      execSync(`rm -rf ${chainsDir}`);
     }
+    cli.action.stop();
 
     this.log('bye!');
   }

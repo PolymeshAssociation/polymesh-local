@@ -1,11 +1,18 @@
 version: '2'
 services:
-  polymesh-node:
-    image: 'polymathnet/polymesh:${POLYMESH_VERSION}-debian'
-    network_mode: bridge
+  postgres:
+    image: postgres:12-alpine
+    restart: always
     ports:
-      - '9933:9933'
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+
+  polymesh:
+    image: 'polymathnet/polymesh:${POLYMESH_VERSION}-debian'
+    ports:
       - '9944:9944'
+      - '9933:9933'
       - '30333:30333'
     volumes:
       - '${SNAPSHOT_PATH}:/var/lib/polymesh/chains'
@@ -21,3 +28,59 @@ services:
         '--rpc-cors=all',
         '--force-authoring',
       ]
+
+  subquery:
+    image: 'polymathnet/polymesh-subquery:latest'
+    restart: always
+    depends_on:
+      - 'postgres'
+    ports:
+      - 3002:3000
+    environment:
+      NETWORK_ENDPOINT: ws://polymesh:9944
+      DB_USER: '${PG_USER}'
+      DB_PASS: '${PG_PASSWORD}'
+      DB_DATABASE: '${PG_DB}'
+      DB_PORT: '${PG_PORT}'
+      DB_HOST: '${PG_HOST}'
+      NODE_ENV: local
+    command:
+      - --batch-size=500
+      - -f=/app
+      - --local
+
+  graphql-engine:
+    image: onfinality/subql-query:latest
+    restart: always
+    ports:
+      - 3001:3000
+    depends_on:
+      - 'postgres'
+      - 'subquery'
+    restart: always
+    environment:
+      DB_USER: '${PG_USER}'
+      DB_PASS: '${PG_PASSWORD}'
+      DB_DATABASE: '${PG_DB}'
+      DB_PORT: '${PG_PORT}'
+      DB_HOST: '${PG_HOST}'
+    command:
+      - --name=app
+      - --playground
+      - --local
+
+  tooling:
+    image: polymathnet/tooling-gql:latest
+    depends_on:
+      - 'postgres'
+    ports:
+      - 3000:3000
+    environment:
+      PG_HOST: '${PG_HOST}'
+      PG_USERNAME: '${PG_USER}'
+      PG_PASSWORD: '${PG_PASSWORD}'
+      STAGE: dev
+
+networks: 
+  default:
+    name: 'mesh'
