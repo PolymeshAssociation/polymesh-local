@@ -13,7 +13,7 @@
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "version": "oclif-dev readme && git add README.md",
-    "build:ts": "tsc -b && copyfiles -u 1 \"src/public/**/*\" lib",
+    "build:ts": "tsc -b && copyfiles -u 1 \"src/local/**/*\" lib",
     "commit": "npx git-cz",
     "semantic-release": "semantic-release",
     "lint": "eslint src --ext .js,.jsx,.ts,.tsx",
