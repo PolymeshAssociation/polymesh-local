@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: postgres
 
   alice:
-    build: 
+    build:
       context: .
       dockerfile: mesh.Dockerfile
     ports:
@@ -18,9 +18,10 @@ services:
       - '40333:30333'
     volumes:
       - '${DATA_DIR}/alice/chains:/var/lib/polymesh/chains'
-    environment: 
+    environment:
       - FAKETIME=${FAKETIME}
-    command: [
+    command:
+      [
         '-d',
         '/var/lib/polymesh',
         '--chain=testnet-dev',
@@ -33,7 +34,7 @@ services:
       ]
 
   bob:
-    build: 
+    build:
       context: .
       dockerfile: mesh.Dockerfile
     restart: always
@@ -43,22 +44,23 @@ services:
       - '30333:30333'
     volumes:
       - '${DATA_DIR}/bob/chains:/var/lib/polymesh/chains'
-    environment: 
+    environment:
       - FAKETIME=${FAKETIME}
-    command: [
-      '-d',
-      '/var/lib/polymesh',
-      '--chain=testnet-dev',
-      '--bob',
-      '--validator',
-      '--unsafe-rpc-external',
-      '--unsafe-ws-external',
-      '--rpc-cors=all',
-      '--force-authoring',
-    ]
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=testnet-dev',
+        '--bob',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
+        '--rpc-cors=all',
+        '--force-authoring',
+      ]
 
   charlie:
-    build: 
+    build:
       context: .
       dockerfile: mesh.Dockerfile
     restart: always
@@ -68,19 +70,20 @@ services:
       - '50333:30333'
     volumes:
       - '${DATA_DIR}/charlie/chains:/var/lib/polymesh/chains'
-    environment: 
+    environment:
       - FAKETIME=${FAKETIME}
-    command: [
-      '-d',
-      '/var/lib/polymesh',
-      '--chain=testnet-dev',
-      '--charlie',
-      '--validator',
-      '--unsafe-rpc-external',
-      '--unsafe-ws-external',
-      '--rpc-cors=all',
-      '--force-authoring',
-    ]
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=testnet-dev',
+        '--charlie',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
+        '--rpc-cors=all',
+        '--force-authoring',
+      ]
 
   subquery:
     image: 'polymathnet/polymesh-subquery:latest'
@@ -102,28 +105,9 @@ services:
       - -f=/app
       - --local
 
-  graphql-engine:
-    image: onfinality/subql-query:latest
-    restart: always
-    ports:
-      - 3001:3000
-    depends_on:
-      - 'postgres'
-      - 'subquery'
-    restart: always
-    environment:
-      DB_USER: '${PG_USER}'
-      DB_PASS: '${PG_PASSWORD}'
-      DB_DATABASE: '${PG_DB}'
-      DB_PORT: '${PG_PORT}'
-      DB_HOST: '${PG_HOST}'
-    command:
-      - --name=app
-      - --playground
-      - --local
-
   tooling:
     image: polymathnet/tooling-gql:latest
+    restart: always
     depends_on:
       - 'postgres'
     ports:
@@ -136,4 +120,4 @@ services:
 
 networks:
   default:
-    name: 'mesh'
+    name: 'polymesh-local'

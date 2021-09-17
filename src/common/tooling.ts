@@ -1,4 +1,4 @@
-import { retryCheck } from '../common/util';
+import { returnsExpectedStatus } from '../common/util';
 import { tooling } from '../consts';
 
 export async function isToolingUp(): Promise<boolean> {
@@ -7,5 +7,5 @@ export async function isToolingUp(): Promise<boolean> {
    }`;
   const headers = { 'Content-Type': 'application/json', 'x-api-key': tooling.apiKey };
   const body = JSON.stringify({ query });
-  return retryCheck(`http://${tooling.url}`, 200, body, headers);
+  return returnsExpectedStatus(`http://${tooling.url}`, 200, body, headers);
 }

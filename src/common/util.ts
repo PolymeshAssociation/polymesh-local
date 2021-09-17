@@ -6,16 +6,12 @@ async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-export async function retryCheck(
-  url: string,
-  expectedStatus: number,
-  body: string | undefined = undefined,
-  headers: Record<string, string> | undefined = undefined
-): Promise<boolean> {
+/** Will repeatly call a function until it returns true. Returns false after some time. */
+export async function retry(check: () => Promise<boolean>): Promise<boolean> {
   const { timeout, iterations } = checkSettings;
   const startTime = new Date().getTime();
   for (let i = 0; i < iterations; i += 1) {
-    if (await check(url, expectedStatus, body, headers)) {
+    if (await check()) {
       return true;
     } else if (new Date().getTime() - timeout > startTime) {
       return false;
@@ -25,7 +21,7 @@ export async function retryCheck(
   return false;
 }
 
-export async function check(
+export async function returnsExpectedStatus(
   url: string,
   expectedStatus: number,
   body: string | undefined = undefined,

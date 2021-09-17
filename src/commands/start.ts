@@ -3,10 +3,11 @@ import cli from 'cli-ux';
 import compose from 'docker-compose';
 import fs from 'fs';
 
-import { checkChain, isChainUp, loadSnapshot } from '../common/chain';
+import { isChainUp, loadSnapshot } from '../common/chain';
 import { prepareDockerfile, stopContainers } from '../common/containers';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
+import { retry } from '../common/util';
 import { chain, dockerPath, postgres, tooling } from '../consts';
 
 export default class Start extends Command {
@@ -42,7 +43,7 @@ export default class Start extends Command {
     const { flags: commandFlags } = this.parse(Start);
     const { snapshot, noChecks, verbose, version } = commandFlags;
 
-    if (!(await checkChain())) {
+    if (!(await isChainUp())) {
       cli.action.start(`Unzipping chain snapshot: ${snapshot || version}`);
       await loadSnapshot(snapshot || version);
       cli.action.stop();
@@ -76,20 +77,15 @@ export default class Start extends Command {
 
     if (noChecks) {
       cli.action.start('Checking service liveness');
-      const [chainUp, toolingUp, subqueryUp] = await Promise.all([
-        isChainUp(),
-        isToolingUp(),
-        isSubqueryUp(),
-      ]);
-
-      if (![chainUp, toolingUp, subqueryUp].every(Boolean)) {
+      const checks = [isChainUp, isToolingUp, isSubqueryUp];
+      const results = await Promise.all(checks.map(c => retry(c)));
+      if (!results.every(Boolean)) {
+        const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);
         await stopContainers();
         this.error(
-          `A service did not come up. Check results: ${JSON.stringify({
-            chainUp,
-            toolingUp,
-            subqueryUp,
-          })}. Inspect the logs to diagnose the problem`,
+          `A service did not come up. Results: \n${resultMsgs.join(
+            '\n'
+          )}.\nInspect the logs to diagnose the problem`,
           { exit: 2 }
         );
       }

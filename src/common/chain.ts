@@ -3,19 +3,14 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import { chain } from '../../src/consts';
-import { check, retryCheck } from '../common/util';
+import { returnsExpectedStatus } from '../common/util';
 
 export async function isChainUp(): Promise<boolean> {
-  // A 400 is expected since fetch won't upgrade to websocket
-  return retryCheck(`http://${chain.url}`, 400);
-}
-
-export async function checkChain(): Promise<boolean> {
-  return await check(`http://${chain.url}`, 400);
+  return await returnsExpectedStatus(`http://${chain.url}`, 400);
 }
 
 export async function loadSnapshot(snapshot: string): Promise<void> {
-  if (!(await checkChain())) {
+  if (!(await isChainUp())) {
     unzipSnapshot(snapshot);
   } else {
     console.log('chain node was running, skipping loading snapshot');
