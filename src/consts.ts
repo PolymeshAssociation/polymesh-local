@@ -1,6 +1,6 @@
 import path from 'path';
 
-export const publicPath = path.resolve(__dirname, 'public');
+export const dockerPath = path.resolve(__dirname, 'local');
 
 export const checkSettings = {
   timeout: 60 * 1000,
@@ -9,8 +9,8 @@ export const checkSettings = {
 
 export const chain = {
   url: 'localhost:9944',
-  snapshotsDir: path.resolve(publicPath, 'snapshots'),
-  chainsDir: path.resolve(publicPath, 'snapshots', 'chains'),
+  snapshotsDir: path.resolve(dockerPath, 'snapshots'),
+  dataDir: path.resolve(dockerPath, 'snapshots', 'data'),
 };
 
 export const subquery = {

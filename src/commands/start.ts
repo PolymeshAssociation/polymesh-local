@@ -1,12 +1,13 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
 import compose from 'docker-compose';
+import fs from 'fs';
 
-import { isChainUp, loadSnapshot } from '../common/chain';
-import { stopContainers } from '../common/containers';
+import { checkChain, isChainUp, loadSnapshot } from '../common/chain';
+import { prepareDockerfile, stopContainers } from '../common/containers';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
-import { chain, postgres, publicPath, tooling } from '../consts';
+import { chain, dockerPath, postgres, tooling } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -26,58 +27,79 @@ export default class Start extends Command {
       description:
         'name of .tgz snapshot to use that is in the snapshots directory. defaults to version',
     }),
+    noChecks: flags.boolean({
+      char: 'n',
+      description: 'skips service liveness checks',
+      default: true,
+    }),
+    verbose: flags.boolean({
+      description: 'enables verbose output',
+      default: false,
+    }),
   };
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { version, snapshot } = commandFlags;
+    const { snapshot, noChecks, verbose, version } = commandFlags;
 
-    cli.action.start(`Unzipping chain snapshot: ${snapshot || version}`);
-    await loadSnapshot(snapshot || version);
-    cli.action.stop();
+    if (!(await checkChain())) {
+      cli.action.start(`Unzipping chain snapshot: ${snapshot || version}`);
+      await loadSnapshot(snapshot || version);
+      cli.action.stop();
 
+      cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
+      prepareDockerfile(version);
+      cli.action.stop();
+    } else {
+      this.log('Detected chain already up. Skipping snapshot loading + Dockerfile preperation');
+    }
+
+    const faketime = fs.readFileSync(`${chain.snapshotsDir}/data/timestamp.txt`).toString();
     cli.action.start('Starting the containers');
     await compose.upAll({
-      cwd: publicPath,
-      log: true,
+      cwd: dockerPath,
+      log: verbose,
+      commandOptions: ['--build'],
       env: {
         POLYMESH_VERSION: version,
-        SNAPSHOT_PATH: chain.chainsDir,
+        DATA_DIR: chain.dataDir,
         PG_USER: postgres.user,
         PG_HOST: postgres.host,
         PG_PASSWORD: postgres.password,
         PG_PORT: postgres.port,
         PG_DB: postgres.db,
+        FAKETIME: `@${faketime}`,
         ...process.env,
       },
     });
     cli.action.stop();
 
-    cli.action.start('Checking service liveness');
-    const [chainUp, toolingUp, subqueryUp] = await Promise.all([
-      isChainUp(),
-      isToolingUp(),
-      isSubqueryUp(),
-    ]);
+    if (noChecks) {
+      cli.action.start('Checking service liveness');
+      const [chainUp, toolingUp, subqueryUp] = await Promise.all([
+        isChainUp(),
+        isToolingUp(),
+        isSubqueryUp(),
+      ]);
 
-    if (![chainUp, toolingUp, subqueryUp].every(Boolean)) {
-      await stopContainers();
-      this.error(
-        `A service did not come up. Check results: ${JSON.stringify({
-          chainUp,
-          toolingUp,
-          subqueryUp,
-        })}. Inspect the logs to diagnose the problem`,
-        { exit: 2 }
-      );
+      if (![chainUp, toolingUp, subqueryUp].every(Boolean)) {
+        await stopContainers();
+        this.error(
+          `A service did not come up. Check results: ${JSON.stringify({
+            chainUp,
+            toolingUp,
+            subqueryUp,
+          })}. Inspect the logs to diagnose the problem`,
+          { exit: 2 }
+        );
+      }
+      cli.action.stop();
     }
-    // wait for the node to accept incoming connections
-    cli.action.stop();
-
     this.log('\n');
     this.log(`polymesh node listening at wss://${chain.url}`);
     this.log(`postgreSQL listening at :${postgres.port}`);
     this.log(`tooling-gql listening at http://${tooling.url}`);
-    this.log('happy testing!');
+    this.log('\n');
+    this.log('Happy testing!');
   }
 }
