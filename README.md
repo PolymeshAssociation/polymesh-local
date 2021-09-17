@@ -7,17 +7,22 @@ Polymesh local environment for development and e2e testing
 [![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
 [![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymathNetwork/polymesh-local/blob/master/package.json)
 
+Tool for managing a Polymesh development or CI Polymesh environment. This environment includes 3 Polymesh nodes, a Polymesh specific [SubQuery](https://subquery.network/) instance, its corresponding PostgreSQL instance and tooling-gql, a GraphQL interface to querying chain data.
+
+This tool is using `docker-compose` internally. This means each service is a container that can be managed like a normal docker container.
+
 _NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
 
 <!-- toc -->
-* [polymesh-local](#polymesh-local)
-* [Usage](#usage)
-* [Commands](#commands)
+- [polymesh-local](#polymesh-local)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g polymesh-local
 $ polymesh-local COMMAND
@@ -29,14 +34,16 @@ USAGE
   $ polymesh-local COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
-* [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
-* [`polymesh-local stop`](#polymesh-local-stop)
+
+- [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
+- [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
+- [`polymesh-local stop`](#polymesh-local-stop)
 
 ## `polymesh-local help [COMMAND]`
 
@@ -64,13 +71,11 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -h, --help                 show CLI help
-  -s, --snapshot=snapshot    path to a custom snapshot file
-
-  -t, --timeout=timeout      [default: 60] maximum amount of seconds to wait for the local node to be able to receive
-                             connections
-
-  -v, --version=3.0.0|3.1.0  [default: 3.1.0] version of the containers to run
+  -h, --help               show CLI help
+  -n, --noChecks           skips service liveness checks
+  -s, --snapshot=snapshot  name of .tgz snapshot to use that is in the snapshots directory. defaults to version
+  -v, --version=3.2.0      [default: 3.2.0] version of the containers to run
+  --verbose                enables verbose output
 ```
 
 _See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/start.ts)_
@@ -85,4 +90,5 @@ USAGE
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/stop.ts)_
+
 <!-- commandsstop -->

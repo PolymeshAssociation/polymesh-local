@@ -85,7 +85,7 @@ export default class Start extends Command {
         this.error(
           `A service did not come up. Results: \n${resultMsgs.join(
             '\n'
-          )}.\nInspect the logs to diagnose the problem`,
+          )}.\nInspect the docker logs to diagnose the problem`,
           { exit: 2 }
         );
       }
