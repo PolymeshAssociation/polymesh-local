@@ -48,7 +48,7 @@ export async function returnsExpectedStatus(
 
 export function printInfo(cmd: Command): void {
   cmd.log(`polymesh node listening at wss://${chain.url}`);
-  cmd.log(`postgreSQL listening at localhost:${postgres.port}`);
+  cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);
   cmd.log(`tooling-gql listening at http://${tooling.url}.`);
   cmd.log(`  note: tooling-gql requests need a header of: \`x-api-key: ${tooling.apiKey}\` set`);
 }

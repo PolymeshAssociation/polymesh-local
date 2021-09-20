@@ -38,6 +38,12 @@ export default class Start extends Command {
     const { flags: commandFlags } = this.parse(Start);
     const { snapshot, verbose, version } = commandFlags;
 
+    if (await isChainUp()) {
+      this.error(
+        `A running chain at ${chain.url} was detected. If you wish to start a new instance first use the "stop" command`
+      );
+    }
+
     const snapshotPath = snapshot || `${chain.snapshotsDir}/${version}.tgz`;
     cli.action.start(`Loading chain snapshot: ${snapshot || version}`);
     await loadSnapshot(this, snapshotPath);
