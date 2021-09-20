@@ -38,20 +38,14 @@ export default class Start extends Command {
     const { flags: commandFlags } = this.parse(Start);
     const { snapshot, verbose, version } = commandFlags;
 
-    if (!(await isChainUp())) {
-      const snapshotPath = snapshot || `${chain.snapshotsDir}/${version}.tgz`;
-      cli.action.start(`Loading chain snapshot: ${snapshot || version}`);
-      await loadSnapshot(snapshotPath);
-      cli.action.stop();
+    const snapshotPath = snapshot || `${chain.snapshotsDir}/${version}.tgz`;
+    cli.action.start(`Loading chain snapshot: ${snapshot || version}`);
+    await loadSnapshot(this, snapshotPath);
+    cli.action.stop();
 
-      cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
-      prepareDockerfile(version);
-      cli.action.stop();
-    } else {
-      this.log(
-        'There is a chain instance already running. Skipping snapshot loading + Dockerfile preparation'
-      );
-    }
+    cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
+    prepareDockerfile(version);
+    cli.action.stop();
 
     const faketime = fs.readFileSync(`${chain.snapshotsDir}/data/timestamp.txt`).toString();
     cli.action.start('Starting the containers');
