@@ -1,32 +1,27 @@
 import { execSync } from 'child_process';
 import fs from 'fs-extra';
-import path from 'path';
 
 import { chain } from '../../src/consts';
 import { returnsExpectedStatus } from '../common/util';
 
 export async function isChainUp(): Promise<boolean> {
-  return await returnsExpectedStatus(`http://${chain.url}`, 400);
+  return returnsExpectedStatus(`http://${chain.url}`, 400);
 }
 
 export async function loadSnapshot(snapshot: string): Promise<void> {
-  if (!(await isChainUp())) {
-    unzipSnapshot(snapshot);
+  const { dataDir, snapshotsDir } = chain;
+  if (await isChainUp()) {
+    console.log('Chain node was running, skipping loading snapshot');
   } else {
-    console.log('chain node was running, skipping loading snapshot');
-  }
-}
+    if (!fs.existsSync(snapshot)) {
+      throw new Error(`Snapshot at ${snapshot} does not exist`);
+    }
 
-function unzipSnapshot(snapshot: string): void {
-  const snapshotPath = path.resolve(chain.snapshotsDir, `${snapshot}.tgz`);
-  if (!fs.existsSync(snapshotPath) && !fs.existsSync(chain.dataDir)) {
-    throw new Error(`snapshot at ${snapshotPath} does not exist`);
+    if (fs.existsSync(dataDir)) {
+      console.log(`Removing old chain data at ${dataDir}`);
+      execSync(`rm -rf ${dataDir}`);
+    }
+    execSync('mkdir data', { cwd: snapshotsDir });
+    execSync(`tar -xf ${snapshot} -C ./data`, { cwd: snapshotsDir });
   }
-
-  if (fs.existsSync(chain.dataDir)) {
-    console.log(`removing old chain data at ${chain.dataDir}`);
-    execSync(`rm -rf ${chain.dataDir}`);
-  }
-  execSync('mkdir data', { cwd: chain.snapshotsDir });
-  execSync(`tar -xf ${snapshot}.tgz -C ./data`, { cwd: chain.snapshotsDir });
 }

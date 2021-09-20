@@ -7,8 +7,8 @@ import { isChainUp, loadSnapshot } from '../common/chain';
 import { prepareDockerfile, stopContainers } from '../common/containers';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
-import { retry } from '../common/util';
-import { chain, dockerPath, postgres, tooling } from '../consts';
+import { printInfo, retry } from '../common/util';
+import { chain, dockerPath, postgres } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -26,12 +26,7 @@ export default class Start extends Command {
     snapshot: flags.string({
       char: 's',
       description:
-        'name of .tgz snapshot to use that is in the snapshots directory. defaults to version',
-    }),
-    noChecks: flags.boolean({
-      char: 'n',
-      description: 'skips service liveness checks',
-      default: true,
+        'path to the snapshot to use. If no file is passed, the default snapshot for the selected version is used',
     }),
     verbose: flags.boolean({
       description: 'enables verbose output',
@@ -41,18 +36,21 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { snapshot, noChecks, verbose, version } = commandFlags;
+    const { snapshot, verbose, version } = commandFlags;
 
     if (!(await isChainUp())) {
-      cli.action.start(`Unzipping chain snapshot: ${snapshot || version}`);
-      await loadSnapshot(snapshot || version);
+      const snapshotPath = snapshot || `${chain.snapshotsDir}/${version}.tgz`;
+      cli.action.start(`Loading chain snapshot: ${snapshot || version}`);
+      await loadSnapshot(snapshotPath);
       cli.action.stop();
 
       cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
       prepareDockerfile(version);
       cli.action.stop();
     } else {
-      this.log('Detected chain already up. Skipping snapshot loading + Dockerfile preperation');
+      this.log(
+        'There is a chain instance already running. Skipping snapshot loading + Dockerfile preparation'
+      );
     }
 
     const faketime = fs.readFileSync(`${chain.snapshotsDir}/data/timestamp.txt`).toString();
@@ -62,6 +60,7 @@ export default class Start extends Command {
       log: verbose,
       commandOptions: ['--build'],
       env: {
+        ...process.env,
         POLYMESH_VERSION: version,
         DATA_DIR: chain.dataDir,
         PG_USER: postgres.user,
@@ -70,32 +69,26 @@ export default class Start extends Command {
         PG_PORT: postgres.port,
         PG_DB: postgres.db,
         FAKETIME: `@${faketime}`,
-        ...process.env,
       },
     });
     cli.action.stop();
 
-    if (noChecks) {
-      cli.action.start('Checking service liveness');
-      const checks = [isChainUp, isToolingUp, isSubqueryUp];
-      const results = await Promise.all(checks.map(c => retry(c)));
-      if (!results.every(Boolean)) {
-        const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);
-        await stopContainers();
-        this.error(
-          `A service did not come up. Results: \n${resultMsgs.join(
-            '\n'
-          )}.\nInspect the docker logs to diagnose the problem`,
-          { exit: 2 }
-        );
-      }
-      cli.action.stop();
+    cli.action.start('Checking service liveness');
+    const checks = [isChainUp, isToolingUp, isSubqueryUp];
+    const results = await Promise.all(checks.map(c => retry(c)));
+    if (!results.every(Boolean)) {
+      const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);
+      await stopContainers();
+      this.error(
+        `At least one of the required services did not launch correctly. Results: \n${resultMsgs.join(
+          '\n'
+        )}.\nInspect the docker logs to diagnose the problem`,
+        { exit: 2 }
+      );
     }
-    this.log('\n');
-    this.log(`polymesh node listening at wss://${chain.url}`);
-    this.log(`postgreSQL listening at :${postgres.port}`);
-    this.log(`tooling-gql listening at http://${tooling.url}`);
-    this.log('\n');
-    this.log('Happy testing!');
+    cli.action.stop();
+    this.log(); // implicit newline
+    printInfo(this);
+    this.log('\nHappy testing!');
   }
 }

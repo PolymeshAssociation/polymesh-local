@@ -1,19 +1,24 @@
+import Command from '@oclif/command';
 import fetch from 'node-fetch';
 
-import { checkSettings } from '../consts';
+import { chain, checkSettings, postgres, tooling } from '../consts';
 
 async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-/** Will repeatly call a function until it returns true. Returns false after some time. */
+/**
+ * Repeatedly call an async check function until it returns true. Returns true when the check function
+ *   returns true. Returns false if the check hasn't returned true after a certain number of retries, or after
+ *   a specific time has passed
+ */
 export async function retry(check: () => Promise<boolean>): Promise<boolean> {
   const { timeout, iterations } = checkSettings;
   const startTime = new Date().getTime();
   for (let i = 0; i < iterations; i += 1) {
     if (await check()) {
       return true;
-    } else if (new Date().getTime() - timeout > startTime) {
+    } else if (new Date().getTime() - startTime > timeout) {
       return false;
     }
     await sleep(2000);
@@ -39,4 +44,11 @@ export async function returnsExpectedStatus(
     throw err;
   });
   return status === expectedStatus;
+}
+
+export function printInfo(cmd: Command): void {
+  cmd.log(`polymesh node listening at wss://${chain.url}`);
+  cmd.log(`postgreSQL listening at localhost:${postgres.port}`);
+  cmd.log(`tooling-gql listening at http://${tooling.url}.`);
+  cmd.log(`  note: tooling-gql requests need a header of: \`x-api-key: ${tooling.apiKey}\` set`);
 }

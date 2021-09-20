@@ -31,7 +31,7 @@ export default class Stop extends Command {
       return this.error('No containers to stop. Did you forget to run the "start" command?');
     }
 
-    cli.action.start('stopping all services');
+    cli.action.start('Stopping all services');
     await stopContainers();
     cli.action.stop();
 
@@ -42,6 +42,6 @@ export default class Stop extends Command {
     }
     cli.action.stop();
 
-    this.log('bye!');
+    this.log('Bye!');
   }
 }

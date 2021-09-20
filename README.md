@@ -7,13 +7,14 @@ Polymesh local environment for development and e2e testing
 [![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
 [![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymathNetwork/polymesh-local/blob/master/package.json)
 
-Tool for managing a Polymesh development or CI Polymesh environment. This environment includes 3 Polymesh nodes, a Polymesh specific [SubQuery](https://subquery.network/) instance, its corresponding PostgreSQL instance and tooling-gql, a GraphQL interface to querying chain data.
+Tool for managing a Polymesh development or CI environment. This environment includes 3 Polymesh nodes, a Polymesh specific [SubQuery](https://subquery.network/) instance, its corresponding PostgreSQL instance and tooling-gql, a GraphQL interface to query historic chain data.
 
 This tool is using `docker-compose` internally. This means each service is a container that can be managed like a normal docker container.
 
 _NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
 
 <!-- toc -->
+
 - [polymesh-local](#polymesh-local)
 - [Usage](#usage)
 - [Commands](#commands)
@@ -90,5 +91,14 @@ USAGE
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/stop.ts)_
+
+## `polymesh-local info`
+
+prints service connection information
+
+```
+USAGE
+  $ polymesh-local info
+```
 
 <!-- commandsstop -->
