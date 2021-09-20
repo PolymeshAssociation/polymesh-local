@@ -28,7 +28,7 @@ export default class Stop extends Command {
     });
 
     if (ps.data.services.length === 0) {
-      return this.error('No containers to stop. Did you forget to run the "start" command?');
+      this.error('No containers to stop. Did you forget to run the "start" command?');
     }
 
     cli.action.start('Stopping all services');
