@@ -1,0 +1,123 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:12-alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+
+  alice:
+    build:
+      context: .
+      dockerfile: mesh.Dockerfile
+    ports:
+      - '9944:9944'
+      - '9933:9933'
+      - '40333:30333'
+    volumes:
+      - '${DATA_DIR}/alice/chains:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=testnet-dev',
+        '--alice',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
+        '--rpc-cors=all',
+        '--force-authoring',
+      ]
+
+  bob:
+    build:
+      context: .
+      dockerfile: mesh.Dockerfile
+    restart: always
+    ports:
+      - '8833:9933'
+      - '8844:9944'
+      - '30333:30333'
+    volumes:
+      - '${DATA_DIR}/bob/chains:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=testnet-dev',
+        '--bob',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
+        '--rpc-cors=all',
+        '--force-authoring',
+      ]
+
+  charlie:
+    build:
+      context: .
+      dockerfile: mesh.Dockerfile
+    restart: always
+    ports:
+      - '7733:9933'
+      - '7744:9944'
+      - '50333:30333'
+    volumes:
+      - '${DATA_DIR}/charlie/chains:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=testnet-dev',
+        '--charlie',
+        '--validator',
+        '--unsafe-rpc-external',
+        '--unsafe-ws-external',
+        '--rpc-cors=all',
+        '--force-authoring',
+      ]
+
+  subquery:
+    image: 'polymathnet/polymesh-subquery:latest'
+    restart: always
+    depends_on:
+      - 'postgres'
+    ports:
+      - 3002:3000
+    environment:
+      NETWORK_ENDPOINT: ws://alice:9944
+      DB_USER: '${PG_USER}'
+      DB_PASS: '${PG_PASSWORD}'
+      DB_DATABASE: '${PG_DB}'
+      DB_PORT: '${PG_PORT}'
+      DB_HOST: '${PG_HOST}'
+      NODE_ENV: local
+    command:
+      - --batch-size=500
+      - -f=/app
+      - --local
+
+  tooling:
+    image: polymathnet/tooling-gql:latest
+    restart: always
+    depends_on:
+      - 'postgres'
+    ports:
+      - 3000:3000
+    environment:
+      PG_HOST: '${PG_HOST}'
+      PG_USERNAME: '${PG_USER}'
+      PG_PASSWORD: '${PG_PASSWORD}'
+      STAGE: dev
+
+networks:
+  default:
+    name: 'polymesh-local'

@@ -73,7 +73,7 @@ function runChain() {
       binaryPath,
       [
         '-d',
-        `chain_data/node_${i}`,
+        `chain_data/${name}`,
         '--rpc-methods=unsafe',
         '--ws-port',
         `${9944 + i}`,
@@ -111,7 +111,7 @@ async function main() {
     process.exit(1);
   }
   const version = tag.replace('v', '');
-  const snapshotPath = path.join(__dirname, '../src/public/snapshots', `${version}.tgz`);
+  const snapshotPath = path.join(__dirname, '../src/local/snapshots', `${version}.tgz`);
 
   if (fs.existsSync(polymeshPath)) {
     fs.rmSync(polymeshPath, { recursive: true });
@@ -135,8 +135,9 @@ async function main() {
     for (const child of chainChildren) {
       child.kill();
     }
-    const chainDataPath = path.join(polymeshPath, '/chain_data/node_0');
-
+    const chainDataPath = path.join(polymeshPath, '/chain_data');
+    // save the time with the snapshot so the nodes can use it to set their clocks
+    execSync("echo $(date '+%Y-%m-%d %H:%M:%S') > timestamp.txt", { cwd: chainDataPath });
     execSync(`chmod -R 777 ${chainDataPath} `);
     execSync(`tar -czvf ${snapshotPath} .`, { cwd: chainDataPath });
     process.exit();
