@@ -14,37 +14,34 @@ This tool is using `docker-compose` internally. This means each service is a con
 _NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
 
 <!-- toc -->
-
-- [polymesh-local](#polymesh-local)
-- [Usage](#usage)
-- [Commands](#commands)
+* [polymesh-local](#polymesh-local)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/1.1.0 linux-x64 node-v14.17.4
+polymesh-local/1.1.0 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-
-- [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
-- [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
-- [`polymesh-local stop`](#polymesh-local-stop)
+* [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
+* [`polymesh-local info`](#polymesh-local-info)
+* [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
+* [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
 
 ## `polymesh-local help [COMMAND]`
 
@@ -63,6 +60,17 @@ OPTIONS
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
 
+## `polymesh-local info`
+
+prints service connection information
+
+```
+USAGE
+  $ polymesh-local info
+```
+
+_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/info.ts)_
+
 ## `polymesh-local start [OPTIONS]`
 
 start all containers
@@ -73,32 +81,28 @@ USAGE
 
 OPTIONS
   -h, --help               show CLI help
-  -n, --noChecks           skips service liveness checks
-  -s, --snapshot=snapshot  name of .tgz snapshot to use that is in the snapshots directory. defaults to version
+
+  -s, --snapshot=snapshot  path to the snapshot to use. If no file is passed, the default snapshot for the selected
+                           version is used
+
   -v, --version=3.2.0      [default: 3.2.0] version of the containers to run
+
   --verbose                enables verbose output
 ```
 
 _See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/start.ts)_
 
-## `polymesh-local stop`
+## `polymesh-local stop [OPTIONS]`
 
 stop all containers started with the "start" command
 
 ```
 USAGE
-  $ polymesh-local stop
+  $ polymesh-local stop [OPTIONS]
+
+OPTIONS
+  --verbose  enables verbose output
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/stop.ts)_
-
-## `polymesh-local info`
-
-prints service connection information
-
-```
-USAGE
-  $ polymesh-local info
-```
-
 <!-- commandsstop -->
