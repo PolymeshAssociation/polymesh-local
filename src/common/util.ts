@@ -1,7 +1,8 @@
 import Command from '@oclif/command';
+import { execSync } from 'child_process';
 import fetch from 'node-fetch';
 
-import { chain, checkSettings, postgres, tooling } from '../consts';
+import { chain, checkSettings, dateFmt, postgres, tooling } from '../consts';
 
 async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -51,4 +52,8 @@ export function printInfo(cmd: Command): void {
   cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);
   cmd.log(`tooling-gql listening at http://${tooling.url}.`);
   cmd.log(`  note: tooling-gql requests need a header of: \`x-api-key: ${tooling.apiKey}\` set`);
+}
+
+export function hostTime(): string {
+  return `${execSync(`date "${dateFmt}"`).toString()}`;
 }

@@ -1,11 +1,9 @@
 import { Command, flags } from '@oclif/command';
-import { execSync } from 'child_process';
 import cli from 'cli-ux';
 import compose from 'docker-compose';
-import fs from 'fs-extra';
 
-import { stopContainers } from '../common/containers';
-import { chain, dockerPath } from '../consts';
+import { cleanUp, stopContainers } from '../common/containers';
+import { localDir } from '../consts';
 
 export default class Stop extends Command {
   static description = 'stop all containers started with the "start" command';
@@ -23,7 +21,7 @@ export default class Stop extends Command {
     const { flags: commandFlags } = this.parse(Stop);
     const { verbose } = commandFlags;
     const ps = await compose.ps({
-      cwd: dockerPath,
+      cwd: localDir,
       log: verbose,
     });
 
@@ -35,11 +33,8 @@ export default class Stop extends Command {
     await stopContainers();
     cli.action.stop();
 
-    const { dataDir } = chain;
-    cli.action.start(`Removing chain data at ${dataDir}`);
-    if (fs.existsSync(dataDir)) {
-      execSync(`rm -r ${dataDir}`);
-    }
+    cli.action.start('Cleaning up chain data');
+    cleanUp();
     cli.action.stop();
 
     this.log('Bye!');

@@ -8,6 +8,5 @@
 node_modules
 .DS_Store
 scripts/tmp
-/src/local/snapshots/*
-!/src/local/snapshots/*.tgz
+/src/local/data/
 mesh.Dockerfile

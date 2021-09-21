@@ -40,6 +40,7 @@ USAGE
 <!-- commands -->
 * [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
 * [`polymesh-local info`](#polymesh-local-info)
+* [`polymesh-local save `](#polymesh-local-save)
 * [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
 * [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
 
@@ -71,6 +72,20 @@ USAGE
 
 _See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/info.ts)_
 
+## `polymesh-local save `
+
+saves current chain state into a tarball
+
+```
+USAGE
+  $ polymesh-local save
+
+OPTIONS
+  -o, --output=output  path for saving the snapshot too
+```
+
+_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/save.ts)_
+
 ## `polymesh-local start [OPTIONS]`
 
 start all containers
@@ -80,6 +95,7 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
+  -c, --cleanStart         Brings up a fresh environment with no data. Skips the snapshot importing step
   -h, --help               show CLI help
 
   -s, --snapshot=snapshot  path to the snapshot to use. If no file is passed, the default snapshot for the selected

@@ -1,14 +1,13 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
-import compose from 'docker-compose';
-import fs from 'fs';
 
 import { isChainUp, loadSnapshot } from '../common/chain';
-import { prepareDockerfile, stopContainers } from '../common/containers';
+import { prepareDockerfile, startContainers, stopContainers } from '../common/containers';
+import { getMetadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
-import { printInfo, retry } from '../common/util';
-import { chain, dockerPath, postgres } from '../consts';
+import { hostTime, printInfo, retry } from '../common/util';
+import { chain, snapshotsDir } from '../consts';
 
 export default class Start extends Command {
   static description = 'start all containers';
@@ -28,6 +27,11 @@ export default class Start extends Command {
       description:
         'path to the snapshot to use. If no file is passed, the default snapshot for the selected version is used',
     }),
+    cleanStart: flags.boolean({
+      char: 'c',
+      description: 'Brings up a fresh environment with no data. Skips the snapshot importing step',
+      default: false,
+    }),
     verbose: flags.boolean({
       description: 'enables verbose output',
       default: false,
@@ -36,7 +40,7 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { snapshot, verbose, version } = commandFlags;
+    const { snapshot, verbose, version, cleanStart } = commandFlags;
 
     if (await isChainUp()) {
       this.error(
@@ -44,33 +48,27 @@ export default class Start extends Command {
       );
     }
 
-    const snapshotPath = snapshot || `${chain.snapshotsDir}/${version}.tgz`;
-    cli.action.start(`Loading chain snapshot: ${snapshot || version}`);
-    await loadSnapshot(this, snapshotPath);
-    cli.action.stop();
+    let metadata;
+    if (!cleanStart) {
+      const snapshotPath = snapshot || `${snapshotsDir}/${version}.tgz`;
+      cli.action.start(`Loading chain snapshot: ${snapshotPath}`);
+      await loadSnapshot(this, snapshotPath);
+      cli.action.stop();
+      metadata = getMetadata();
+    } else {
+      metadata = {
+        version,
+        time: hostTime(),
+      };
+      writeMetadata(metadata);
+    }
 
     cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
     prepareDockerfile(version);
     cli.action.stop();
 
-    const faketime = fs.readFileSync(`${chain.snapshotsDir}/data/timestamp.txt`).toString();
     cli.action.start('Starting the containers');
-    await compose.upAll({
-      cwd: dockerPath,
-      log: verbose,
-      commandOptions: ['--build'],
-      env: {
-        ...process.env,
-        POLYMESH_VERSION: version,
-        DATA_DIR: chain.dataDir,
-        PG_USER: postgres.user,
-        PG_HOST: postgres.host,
-        PG_PASSWORD: postgres.password,
-        PG_PORT: postgres.port,
-        PG_DB: postgres.db,
-        FAKETIME: `@${faketime}`,
-      },
-    });
+    startContainers(version, metadata.time, verbose);
     cli.action.stop();
 
     cli.action.start('Checking service liveness');
