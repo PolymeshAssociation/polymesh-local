@@ -55,5 +55,5 @@ export function printInfo(cmd: Command): void {
 }
 
 export function hostTime(): string {
-  return `${execSync(`date "${dateFmt}"`).toString()}`;
+  return execSync(`date "${dateFmt}"`).toString().trim();
 }

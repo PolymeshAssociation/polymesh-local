@@ -1,13 +1,14 @@
 import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
+import { Metadata } from 'src/common/snapshots';
 
-import { dataDir, dateFmt, localDir, postgres } from '../consts';
+import { dataDir, dateFmt, docker, localDir, postgres } from '../consts';
 
 export function prepareDockerfile(version: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
-  const docker = template.replace(/{{VERSION}}/, version);
-  fs.writeFileSync(`${localDir}/mesh.Dockerfile`, docker);
+  const dockerfile = template.replace(/{{VERSION}}/, version);
+  fs.writeFileSync(`${localDir}/mesh.Dockerfile`, dockerfile);
 }
 
 export async function startContainers(
@@ -37,6 +38,7 @@ export async function stopContainers(): Promise<void> {
   await compose.down({
     cwd: localDir,
     log: false,
+    commandOptions: ['--volumes'], // removes volumes
   });
 }
 
@@ -46,6 +48,17 @@ export async function cleanUp(): Promise<void> {
   }
 }
 
-export function containerTime(container: string): string {
-  return execSync(`docker exec ${container} sh -c 'date "${dateFmt}"'`).toString().trim();
+//
+/**
+ * Calculates the current time from the perspective of the container
+ *   libfaketime produces a time relative to the start of a process
+ *   offset is needed to recalculate this time without having to fork the Polymesh node process
+ */
+export function containerTime(metadata: Metadata): string {
+  const offset = (new Date().getTime() - new Date(metadata.startedAt).getTime()) / 1000;
+  return execSync(
+    `docker exec ${docker.execContainer} sh -c 'date "${dateFmt}" -d "${offset} seconds"'`
+  )
+    .toString()
+    .trim();
 }

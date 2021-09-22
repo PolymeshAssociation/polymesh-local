@@ -1,16 +1,18 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
+import { existsSync } from 'fs';
 
-import { isChainUp, loadSnapshot } from '../common/chain';
-import { prepareDockerfile, startContainers, stopContainers } from '../common/containers';
-import { getMetadata, writeMetadata } from '../common/snapshots';
+import { isChainUp } from '../common/chain';
+import { cleanUp, prepareDockerfile, startContainers, stopContainers } from '../common/containers';
+import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { hostTime, printInfo, retry } from '../common/util';
-import { chain, snapshotsDir } from '../consts';
+import { dataDir } from '../consts';
+import { chainRunningError } from '../errors';
 
 export default class Start extends Command {
-  static description = 'start all containers';
+  static description = 'Start all the services';
 
   static usage = 'start [OPTIONS]';
 
@@ -24,13 +26,12 @@ export default class Start extends Command {
     }),
     snapshot: flags.string({
       char: 's',
-      description:
-        'path to the snapshot to use. If no file is passed, the default snapshot for the selected version is used',
+      description: 'Loads snapshot before starting. Current state used if not passed',
     }),
-    cleanStart: flags.boolean({
+    clean: flags.boolean({
       char: 'c',
-      description: 'Brings up a fresh environment with no data. Skips the snapshot importing step',
       default: false,
+      description: 'Cleans state before starting.',
     }),
     verbose: flags.boolean({
       description: 'enables verbose output',
@@ -40,28 +41,41 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { snapshot, verbose, version, cleanStart } = commandFlags;
+    const { clean, snapshot, verbose, version } = commandFlags;
 
     if (await isChainUp()) {
-      this.error(
-        `A running chain at ${chain.url} was detected. If you wish to start a new instance first use the "stop" command`
-      );
+      this.error(chainRunningError);
     }
 
-    let metadata;
-    if (!cleanStart) {
-      const snapshotPath = snapshot || `${snapshotsDir}/${version}.tgz`;
-      cli.action.start(`Loading chain snapshot: ${snapshotPath}`);
-      await loadSnapshot(this, snapshotPath);
+    if (clean) {
+      cli.action.start('Removing old state');
+      cleanUp();
       cli.action.stop();
-      metadata = getMetadata();
-    } else {
-      metadata = {
-        version,
-        time: hostTime(),
-      };
-      writeMetadata(metadata);
     }
+
+    let metadata: Metadata;
+    if (snapshot) {
+      cli.action.start('Loading chain snapshot');
+      await loadSnapshot(this, snapshot);
+      cli.action.stop();
+    }
+
+    if (!existsSync(dataDir)) {
+      cli.action.start('No previous data found. Initializing data directory');
+      metadata = { version, time: hostTime(), startedAt: '' };
+      cli.action.stop();
+    } else {
+      cli.log('Found existing data');
+      metadata = getMetadata();
+    }
+
+    if (version !== metadata.version) {
+      this.error(
+        `Polymesh version ${version} was specified, but data was for ${metadata.version}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the version`
+      );
+    }
+    metadata.startedAt = new Date().toISOString();
+    writeMetadata(metadata);
 
     cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
     prepareDockerfile(version);

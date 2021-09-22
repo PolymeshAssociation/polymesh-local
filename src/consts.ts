@@ -8,7 +8,7 @@ export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 90 * 1000, // start is slow if empty data dir is mounted
+  timeout: 90 * 1000,
   iterations: 45,
 };
 

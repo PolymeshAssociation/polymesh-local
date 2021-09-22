@@ -3,7 +3,7 @@ import { Command } from '@oclif/command';
 import { printInfo } from '../common/util';
 
 export default class Info extends Command {
-  static description = 'prints service connection information';
+  static description = 'Prints service connection information';
 
   static usage = 'info';
 

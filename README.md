@@ -27,7 +27,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/1.2.0 linux-x64 node-v14.17.6
+polymesh-local/1.2.0 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -38,11 +38,26 @@ USAGE
 # Commands
 
 <!-- commands -->
+* [`polymesh-local clean`](#polymesh-local-clean)
 * [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
 * [`polymesh-local info`](#polymesh-local-info)
-* [`polymesh-local save `](#polymesh-local-save)
+* [`polymesh-local load FILE`](#polymesh-local-load-file)
+* [`polymesh-local ls`](#polymesh-local-ls)
+* [`polymesh-local rm FILE`](#polymesh-local-rm-file)
+* [`polymesh-local save [name]`](#polymesh-local-save-name)
 * [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
 * [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
+
+## `polymesh-local clean`
+
+Clean removes the chain data so the next start is starts at a genisis block. Services must be stopped for this command to work
+
+```
+USAGE
+  $ polymesh-local clean
+```
+
+_See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/clean.ts)_
 
 ## `polymesh-local help [COMMAND]`
 
@@ -63,7 +78,7 @@ _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2
 
 ## `polymesh-local info`
 
-prints service connection information
+Prints service connection information
 
 ```
 USAGE
@@ -72,37 +87,66 @@ USAGE
 
 _See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/info.ts)_
 
-## `polymesh-local save `
+## `polymesh-local load FILE`
 
-saves current chain state into a tarball
+Loads a snapshot into the data directory. Services must be stopped for this command to work
 
 ```
 USAGE
-  $ polymesh-local save
-
-OPTIONS
-  -o, --output=output  path for saving the snapshot too
+  $ polymesh-local load FILE
 ```
 
-_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/save.ts)_
+_See code: [src/commands/load.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/load.ts)_
+
+## `polymesh-local ls`
+
+Lists current snapshots
+
+```
+USAGE
+  $ polymesh-local ls
+```
+
+_See code: [src/commands/ls.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/ls.ts)_
+
+## `polymesh-local rm FILE`
+
+Removes a snapshot
+
+```
+USAGE
+  $ polymesh-local rm FILE
+```
+
+_See code: [src/commands/rm.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/rm.ts)_
+
+## `polymesh-local save [name]`
+
+Saves current chain state into an archive file
+
+```
+USAGE
+  $ polymesh-local save [name]
+
+ARGUMENTS
+  NAME  A name or path for the snapshot
+```
+
+_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/save.ts)_
 
 ## `polymesh-local start [OPTIONS]`
 
-start all containers
+Start all the services
 
 ```
 USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -c, --cleanStart         Brings up a fresh environment with no data. Skips the snapshot importing step
+  -c, --clean              Cleans state before starting.
   -h, --help               show CLI help
-
-  -s, --snapshot=snapshot  path to the snapshot to use. If no file is passed, the default snapshot for the selected
-                           version is used
-
+  -s, --snapshot=snapshot  Loads snapshot before starting. Current state used if not passed
   -v, --version=3.2.0      [default: 3.2.0] version of the containers to run
-
   --verbose                enables verbose output
 ```
 
@@ -110,14 +154,15 @@ _See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-l
 
 ## `polymesh-local stop [OPTIONS]`
 
-stop all containers started with the "start" command
+Stops all services started with the "start" command
 
 ```
 USAGE
   $ polymesh-local stop [OPTIONS]
 
 OPTIONS
-  --verbose  enables verbose output
+  -c, --clean  Cleans state after stopping
+  --verbose    enables verbose output
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/stop.ts)_

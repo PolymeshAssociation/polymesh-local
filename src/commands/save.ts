@@ -1,54 +1,60 @@
-import { Command, flags } from '@oclif/command';
+import { Command } from '@oclif/command';
 import cli from 'cli-ux';
+import { existsSync } from 'fs';
 
+import { isChainUp } from '../common/chain';
 import { containerTime, startContainers, stopContainers } from '../common/containers';
-import { createSnapshot, getMetadata, writeMetadata } from '../common/snapshots';
-import { docker, snapshotsDir } from '../consts';
+import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
+import { dataDir, snapshotsDir } from '../consts';
+import { noData } from '../errors';
 
 export default class Save extends Command {
-  static description = 'saves current chain state into a tarball';
+  static description = 'Saves current chain state into an archive file';
 
-  static usage = 'save ';
+  static usage = 'save [name]';
 
-  static flags = {
-    output: flags.string({
-      char: 'o',
-      description: 'File path for the created snapshot',
-    }),
-  };
+  static args = [
+    {
+      name: 'name',
+      description: 'A name or path for the snapshot',
+    },
+  ];
 
   async run(): Promise<void> {
-    const { flags: commandFlags } = this.parse(Save);
-    const { output } = commandFlags;
+    const { args } = this.parse(Save);
+    const output = args.name;
+
+    if (!existsSync(dataDir)) {
+      this.error(noData);
+    }
 
     const metadata = getMetadata();
-    metadata.time = containerTime(docker.execContainer);
-    cli.action.start('Preparing to create snapshot');
-    writeMetadata(metadata);
-    cli.action.stop();
+    const chainRunning = await isChainUp();
+    if (chainRunning) {
+      metadata.time = containerTime(metadata);
+      cli.action.start('Pausing all services');
+      writeMetadata(metadata);
+      await stopContainers();
+      cli.action.stop();
+    }
 
-    cli.action.start('Pausing all services');
-    await stopContainers();
-    cli.action.stop();
-
-    const fileName = output ? outputPath(output) : defaultFilename(metadata.version);
+    const fileName = output ? snapshotPath(output) : defaultFilename(metadata.version);
     cli.action.start(`Creating snapshot at: ${fileName}`);
     createSnapshot(fileName);
     cli.action.stop();
 
-    cli.action.start('Restarting containers');
-    startContainers(metadata.version, metadata.time, false);
-    cli.action.stop();
+    if (chainRunning) {
+      cli.action.start('Restarting containers');
+      startContainers(metadata.version, metadata.time, false);
+      metadata.startedAt = new Date().toISOString();
+      writeMetadata(metadata);
+      cli.action.stop();
+    }
   }
 }
 
 function defaultFilename(version: string): string {
-  return `${snapshotsDir}/v${version}_${new Date().toISOString().replace('T', '_').split('.')[0]}`;
-}
-
-function outputPath(output: string): string {
-  if (output && !output.endsWith('.tgz')) {
-    return `${output}.tgz`;
-  }
-  return output;
+  return `${snapshotsDir}/${version}_${
+    new Date().toISOString().replace('T', '_').split('.')[0]
+  }.tgz`;
 }

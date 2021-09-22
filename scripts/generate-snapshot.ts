@@ -48,10 +48,10 @@ async function main() {
   const version = tag.replace('v', '');
   pullPolymesh(tag);
 
-  execSync(`${cliDir}/run start --cleanStart --version=${version} `);
+  execSync(`${cliDir}/run start --clean --version=${version} `);
   runTests();
-  execSync(`${cliDir}/bin/run save`);
-  execSync(`${cliDir}/bin/run stop`);
+  execSync(`${cliDir}/bin/run save ${version}.tgz`);
+  execSync(`${cliDir}/bin/run stop --clean`);
 }
 
 main().catch(e => {
