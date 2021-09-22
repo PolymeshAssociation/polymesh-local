@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v1.1.0...v1.2.0) (2021-09-22)
+
+
+### Features
+
+* 🎸 Add tooling and subquery services ([#3](https://github.com/PolymathNetwork/polymesh-local/issues/3)) ([0f52f3c](https://github.com/PolymathNetwork/polymesh-local/commit/0f52f3c8057537588f063bc8679ecb597f25044a))
+* 🎸 Dont lint semantic release bot commit messages ([#4](https://github.com/PolymathNetwork/polymesh-local/issues/4)) ([3e6fbe9](https://github.com/PolymathNetwork/polymesh-local/commit/3e6fbe947527511b22727cbb672bda5206fc3e0a))
+
 # [1.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v1.0.2...v1.1.0) (2021-08-10)
 
 

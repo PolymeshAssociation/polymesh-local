@@ -27,7 +27,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/1.1.0 darwin-arm64 node-v14.17.1
+polymesh-local/1.2.0 linux-x64 node-v14.17.6
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -69,7 +69,7 @@ USAGE
   $ polymesh-local info
 ```
 
-_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/info.ts)_
+_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/info.ts)_
 
 ## `polymesh-local start [OPTIONS]`
 
@@ -90,7 +90,7 @@ OPTIONS
   --verbose                enables verbose output
 ```
 
-_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/start.ts)_
 
 ## `polymesh-local stop [OPTIONS]`
 
@@ -104,5 +104,5 @@ OPTIONS
   --verbose  enables verbose output
 ```
 
-_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.1.0/src/commands/stop.ts)_
+_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/stop.ts)_
 <!-- commandsstop -->
