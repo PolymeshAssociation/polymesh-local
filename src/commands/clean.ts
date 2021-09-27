@@ -1,8 +1,7 @@
 import { Command } from '@oclif/command';
 import { cli } from 'cli-ux';
 
-import { isChainUp } from '../common/chain';
-import { cleanUp } from '../common/containers';
+import { anyContainersUp, cleanUp } from '../common/containers';
 import { chainRunningError } from '../errors';
 
 export default class Clean extends Command {
@@ -10,7 +9,7 @@ export default class Clean extends Command {
     'Clean removes the chain data so the next start is starts at a genisis block. Services must be stopped for this command to work';
 
   async run(): Promise<void> {
-    if (await isChainUp()) {
+    if (await anyContainersUp()) {
       this.error(chainRunningError);
     }
     cli.action.start('Removing data directory');

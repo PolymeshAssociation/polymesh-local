@@ -3,7 +3,13 @@ import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
 import { isChainUp } from '../common/chain';
-import { cleanUp, prepareDockerfile, startContainers, stopContainers } from '../common/containers';
+import {
+  anyContainersUp,
+  cleanUp,
+  prepareDockerfile,
+  startContainers,
+  stopContainers,
+} from '../common/containers';
 import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
@@ -43,7 +49,7 @@ export default class Start extends Command {
     const { flags: commandFlags } = this.parse(Start);
     const { clean, snapshot, verbose, version } = commandFlags;
 
-    if (await isChainUp()) {
+    if (await anyContainersUp()) {
       this.error(chainRunningError);
     }
 

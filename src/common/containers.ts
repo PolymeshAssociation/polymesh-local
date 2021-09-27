@@ -1,8 +1,8 @@
 import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
-import { Metadata } from 'src/common/snapshots';
 
+import { Metadata } from '../common/snapshots';
 import { dataDir, dateFmt, docker, localDir, postgres } from '../consts';
 
 export function prepareDockerfile(version: string): void {
@@ -40,6 +40,14 @@ export async function stopContainers(): Promise<void> {
     log: false,
     commandOptions: ['--volumes'], // removes volumes
   });
+}
+
+export async function anyContainersUp(): Promise<boolean> {
+  const ps = await compose.ps({
+    cwd: localDir,
+  });
+
+  return ps.data.services.length > 0;
 }
 
 export async function cleanUp(): Promise<void> {

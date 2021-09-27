@@ -1,7 +1,7 @@
 import { Command } from '@oclif/command';
 import { cli } from 'cli-ux';
 
-import { isChainUp } from '../common/chain';
+import { anyContainersUp } from '../common/containers';
 import { loadSnapshot } from '../common/snapshots';
 import { chainRunningError } from '../errors';
 
@@ -13,7 +13,7 @@ export default class Load extends Command {
 
   async run(): Promise<void> {
     const { args } = this.parse(Load);
-    if (await isChainUp()) {
+    if (await anyContainersUp()) {
       this.error(chainRunningError);
     }
 

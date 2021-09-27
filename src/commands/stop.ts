@@ -1,10 +1,8 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
-import compose from 'docker-compose';
 
-import { cleanUp, containerTime, stopContainers } from '../common/containers';
+import { anyContainersUp, cleanUp, containerTime, stopContainers } from '../common/containers';
 import { getMetadata, writeMetadata } from '../common/snapshots';
-import { localDir } from '../consts';
 
 export default class Stop extends Command {
   static description = 'Stops all services started with the "start" command';
@@ -12,10 +10,6 @@ export default class Stop extends Command {
   static usage = 'stop [OPTIONS]';
 
   static flags = {
-    verbose: flags.boolean({
-      description: 'enables verbose output',
-      default: false,
-    }),
     clean: flags.boolean({
       char: 'c',
       description: 'Cleans state after stopping',
@@ -25,13 +19,9 @@ export default class Stop extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Stop);
-    const { verbose, clean } = commandFlags;
-    const ps = await compose.ps({
-      cwd: localDir,
-      log: verbose,
-    });
+    const { clean } = commandFlags;
 
-    if (ps.data.services.length === 0) {
+    if (!(await anyContainersUp())) {
       this.error('No containers to stop. Did you forget to run the "start" command?');
     }
 
