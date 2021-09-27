@@ -2,6 +2,7 @@ import Command from '@oclif/command';
 import { execSync } from 'child_process';
 import fetch from 'node-fetch';
 
+import { getMetadata } from '../common/snapshots';
 import { chain, checkSettings, dateFmt, postgres, tooling } from '../consts';
 
 async function sleep(time: number): Promise<void> {
@@ -48,6 +49,8 @@ export async function returnsExpectedStatus(
 }
 
 export function printInfo(cmd: Command): void {
+  const metadata = getMetadata();
+  cmd.log(`chain version ${metadata.version} running`);
   cmd.log(`polymesh node listening at wss://${chain.url}`);
   cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);
   cmd.log(`tooling-gql listening at http://${tooling.url}.`);
