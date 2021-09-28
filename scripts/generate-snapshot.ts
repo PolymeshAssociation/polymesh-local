@@ -46,9 +46,17 @@ async function main() {
     process.exit(1);
   }
   const version = tag.replace('v', '');
+  const image = argv[3];
+  if (image && execSync(`docker images -q ${image}`).toString() === '') {
+    console.error(`Image ${image} was not found`);
+    process.exit(1);
+  }
+  const imageFlag = image ? `--image=${image}` : '';
+  const versionFlag = `--version=${version}`;
+
   pullPolymesh(tag);
 
-  execSync(`${cliDir}/run start --clean --version=${version} `);
+  execSync(`${cliDir}/run start --clean ${image ? imageFlag : versionFlag}`);
   runTests();
   execSync(`${cliDir}/bin/run save ${version}.tgz`);
   execSync(`${cliDir}/bin/run stop --clean`);
