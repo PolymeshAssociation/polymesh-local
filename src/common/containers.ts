@@ -5,9 +5,14 @@ import fs from 'fs';
 import { Metadata } from '../common/snapshots';
 import { dataDir, dateFmt, docker, localDir, postgres } from '../consts';
 
-export function prepareDockerfile(version: string): void {
+export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
-  const dockerfile = template.replace(/{{VERSION}}/, version);
+  let dockerfile;
+  if (image) {
+    dockerfile = template.replace(/FROM.*/, `FROM ${image}`);
+  } else {
+    dockerfile = template.replace(/{{VERSION}}/, version);
+  }
   fs.writeFileSync(`${localDir}/mesh.Dockerfile`, dockerfile);
 }
 

@@ -13,6 +13,14 @@ This tool is using `docker-compose` internally. This means each service is a con
 
 _NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
 
+### Custom Image
+
+You can specify an official release with the `--version` flag on start. To use this tool with a version that is not an official release it is possible to specify one with `--image` flag for start. The image should have as its ENTRYPOINT the polymesh binary. If using `docker import` you should use the `--change` to add it in.
+
+````sh
+docker import --change 'ENTRYPOINT ["/usr/local/bin/polymesh"]' mesh.tar mypoly:latest
+``
+
 <!-- toc -->
 * [polymesh-local](#polymesh-local)
 * [Usage](#usage)
@@ -143,11 +151,17 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -c, --clean              Cleans state before starting.
-  -h, --help               show CLI help
-  -s, --snapshot=snapshot  Loads snapshot before starting. Current state used if not passed
-  -v, --version=3.2.0      [default: 3.2.0] version of the containers to run
-  --verbose                enables verbose output
+  -c, --clean                Cleans state before starting.
+  -h, --help                 show CLI help
+
+  -i, --image=image          (Advanced) Specify a local docker image to use for Polymesh containers. Such an image
+                             should be debian based and have the polymesh node binary set as its entrypoint
+
+  -s, --snapshot=snapshot    Loads snapshot before starting. Current state used if not passed
+
+  -v, --version=3.2.0|3.3.0  [default: 3.2.0] version of the containers to run
+
+  --verbose                  enables verbose output
 ```
 
 _See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/start.ts)_
@@ -162,7 +176,6 @@ USAGE
 
 OPTIONS
   -c, --clean  Cleans state after stopping
-  --verbose    enables verbose output
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v1.2.0/src/commands/stop.ts)_

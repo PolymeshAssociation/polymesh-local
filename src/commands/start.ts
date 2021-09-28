@@ -28,7 +28,12 @@ export default class Start extends Command {
       char: 'v',
       default: '3.2.0',
       description: 'version of the containers to run',
-      options: ['3.2.0'],
+      options: ['3.2.0', '3.3.0'],
+    }),
+    image: flags.string({
+      char: 'i',
+      description:
+        '(Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and have the polymesh node binary set as its entrypoint',
     }),
     snapshot: flags.string({
       char: 's',
@@ -47,7 +52,7 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version } = commandFlags;
+    const { clean, snapshot, verbose, version, image } = commandFlags;
 
     if (await anyContainersUp()) {
       this.error(chainRunningError);
@@ -69,13 +74,16 @@ export default class Start extends Command {
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
       metadata = { version, time: hostTime(), startedAt: '' };
+      if (image) {
+        metadata.version = image;
+      }
       cli.action.stop();
     } else {
       cli.log('Found existing data');
       metadata = getMetadata();
     }
 
-    if (version !== metadata.version) {
+    if (!image && version !== metadata.version) {
       this.error(
         `Polymesh version ${version} was specified, but data was for ${metadata.version}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the version`
       );
@@ -83,8 +91,8 @@ export default class Start extends Command {
     metadata.startedAt = new Date().toISOString();
     writeMetadata(metadata);
 
-    cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
-    prepareDockerfile(version);
+    cli.action.start(`Preparing dockerfile for Polymesh version: ${image || version}`);
+    prepareDockerfile(version, image);
     cli.action.stop();
 
     cli.action.start('Starting the containers');
