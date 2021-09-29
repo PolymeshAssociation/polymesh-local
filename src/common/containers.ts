@@ -57,7 +57,7 @@ export async function anyContainersUp(): Promise<boolean> {
 
 export async function cleanUp(): Promise<void> {
   if (fs.existsSync(dataDir)) {
-    execSync(`rm -r ${dataDir}`);
+    execSync(`sudo rm -r ${dataDir}`);
   }
 }
 

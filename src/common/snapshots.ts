@@ -11,6 +11,7 @@ export interface Metadata {
 }
 
 export function createSnapshot(fileName: string): void {
+  execSync(`sudo chmod -R 777 ${dataDir}`, { stdio: 'ignore' });
   execSync(`tar -czvf ${fileName} -C ${dataDir} .`, { stdio: 'ignore' });
 }
 

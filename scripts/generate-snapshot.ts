@@ -56,10 +56,13 @@ async function main() {
 
   pullPolymesh(tag);
 
-  execSync(`${cliDir}/run start --clean ${image ? imageFlag : versionFlag}`);
-  runTests();
-  execSync(`${cliDir}/bin/run save ${version}.tgz`);
-  execSync(`${cliDir}/bin/run stop --clean`);
+  try {
+    execSync(`${cliDir}/run start --clean ${image ? imageFlag : versionFlag} --verbose`);
+    runTests();
+    execSync(`${cliDir}/run save ${version}`);
+  } finally {
+    execSync(`${cliDir}/run stop --clean`);
+  }
 }
 
 main().catch(e => {
