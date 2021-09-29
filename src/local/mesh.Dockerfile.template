@@ -3,5 +3,4 @@
 FROM polymathnet/polymesh:{{VERSION}}-debian
 USER root
 RUN apt-get update && apt-get install -y libfaketime
-USER 4001:4001
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
