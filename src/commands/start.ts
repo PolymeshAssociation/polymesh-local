@@ -96,7 +96,7 @@ export default class Start extends Command {
     cli.action.stop();
 
     cli.action.start('Starting the containers');
-    startContainers(version, metadata.time, verbose);
+    await startContainers(version, metadata.time, verbose);
     cli.action.stop();
 
     cli.action.start('Checking service liveness');

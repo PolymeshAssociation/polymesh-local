@@ -45,7 +45,7 @@ export default class Save extends Command {
 
     if (chainRunning) {
       cli.action.start('Restarting containers');
-      startContainers(metadata.version, metadata.time, false);
+      await startContainers(metadata.version, metadata.time, false);
       metadata.startedAt = new Date().toISOString();
       writeMetadata(metadata);
       cli.action.stop();
