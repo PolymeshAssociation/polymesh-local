@@ -1,16 +1,19 @@
 import path from 'path';
 
-export const dockerPath = path.resolve(__dirname, 'local');
+export const localDir = path.resolve(__dirname, 'local');
+export const dataDir = path.resolve(localDir, 'data');
+export const snapshotsDir = path.resolve(localDir, 'snapshots');
+
+// This format is compatible with libfaketime is using
+export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 60 * 1000,
-  iterations: 30,
+  timeout: 90 * 1000,
+  iterations: 45,
 };
 
 export const chain = {
   url: 'localhost:9944',
-  snapshotsDir: path.resolve(dockerPath, 'snapshots'),
-  dataDir: path.resolve(dockerPath, 'snapshots', 'data'),
 };
 
 export const subquery = {
@@ -28,4 +31,8 @@ export const postgres = {
   host: 'postgres',
   port: '5432',
   db: 'postgres',
+};
+
+export const docker = {
+  execContainer: 'local_alice_1',
 };

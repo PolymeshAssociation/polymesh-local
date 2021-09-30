@@ -2,96 +2,33 @@
   This script creates a chain, runs tests and saves the state so it can be used for later testing.
   At a high level the steps are:
 
-  1. Try to fetch a prebuilt Polymesh binary from Github releases
-  2. Fallback on compiling if not found
-  3. Bring up 3 nodes, the minimum amount needed to commit blocks
-  4. Run the test scripts found in the Polymesh/scripts/cli/tests directory to populate data
-  5. Create a .tgz file out of the `rocksdb` directory of a node that was made in the start command
+  1. Fetch the Polymesh repository for its test scripts
+  2. Use the start command to bring up an environment
+  3. Run the test scripts found in the Polymesh/scripts/cli/tests directory to populate data
+  4. Use the save command to create a snapshot
 */
-import { execFileSync, execSync, spawn } from 'child_process';
+import { execSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 import { argv } from 'process';
-import fetch from 'node-fetch';
 
 const tmpDir = path.join(__dirname, 'tmp');
 if (!fs.existsSync(tmpDir)) {
   fs.mkdirSync(tmpDir);
 }
 
+const cliDir = path.join(__dirname, '..', 'bin');
 const polymeshPath = path.join(tmpDir, 'polymesh');
-const binaryPath = path.join(polymeshPath, 'target/release/polymesh');
 const testsPath = path.join(polymeshPath, 'scripts/cli');
-const wasmPath = path.join(
-  polymeshPath,
-  'target/release/wbuild/polymesh-runtime-testnet/polymesh_runtime_testnet.compact.wasm'
-);
 
 function pullPolymesh(tag: string) {
+  if (fs.existsSync(polymeshPath)) {
+    fs.rmSync(polymeshPath, { recursive: true });
+  }
   const POLYMESH_GIT = 'https://github.com/PolymathNetwork/Polymesh.git';
   execSync(`git clone --depth 1 --branch ${tag} ${POLYMESH_GIT} ${polymeshPath}`, {
     stdio: 'inherit',
   });
-}
-
-async function fetchRelease(tag: string) {
-  const version = tag.replace('v', '');
-  const binaryPromise = fetch(
-    `https://github.com/PolymathNetwork/Polymesh/releases/download/${tag}/polymesh-${version}-linux-amd64.tgz`
-  ).then(res => res.buffer());
-  const runtimePromise = fetch(
-    `https://github.com/PolymathNetwork/Polymesh/releases/download/${tag}/polymesh_runtime-${version}.tgz`
-  ).then(res => res.buffer());
-  const binaryDir = path.dirname(binaryPath);
-  if (!fs.existsSync(binaryDir)) {
-    fs.mkdirSync(binaryDir, { recursive: true });
-  }
-  const runtimeDir = path.dirname(wasmPath);
-  if (!fs.existsSync(runtimeDir)) {
-    fs.mkdirSync(runtimeDir, { recursive: true });
-  }
-
-  const [binary, runtime] = await Promise.all([binaryPromise, runtimePromise]);
-  fs.writeFileSync(path.join(binaryDir, 'binary.tgz'), binary);
-  fs.writeFileSync(path.join(runtimeDir, 'runtime.tgz'), runtime);
-
-  execSync('tar -xf binary.tgz', { cwd: binaryDir });
-  execSync('tar -xf runtime.tgz', { cwd: runtimeDir });
-
-  execSync(`mv polymesh-${version}-linux-amd64 ${binaryPath}`, { cwd: binaryDir });
-  execSync(`mv polymesh_runtime_testnet-${version}.wasm ${wasmPath}`, { cwd: runtimeDir });
-}
-
-function buildPolymesh() {
-  execSync('scripts/init.sh', { cwd: polymeshPath, stdio: 'inherit' });
-  execSync('cargo build --release', { cwd: polymeshPath, stdio: 'inherit' });
-}
-
-function runChain() {
-  const spawnOne = (name: string, i: number) =>
-    spawn(
-      binaryPath,
-      [
-        '-d',
-        `chain_data/${name}`,
-        '--rpc-methods=unsafe',
-        '--ws-port',
-        `${9944 + i}`,
-        '--rpc-port',
-        `${9933 + i}`,
-        '--rpc-cors',
-        'all',
-        '--rpc-external',
-        '--ws-external',
-        `--${name}`,
-        '--validator',
-        '--chain',
-        'testnet-dev',
-        '--force-authoring',
-      ],
-      { cwd: polymeshPath, stdio: 'inherit' }
-    );
-  return [spawnOne('alice', 0), spawnOne('bob', 1), spawnOne('charlie', 2)];
 }
 
 function runTests() {
@@ -102,8 +39,6 @@ function runTests() {
   execSync('npm test', { stdio: 'inherit', cwd });
 }
 
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 async function main() {
   const tag = argv[2];
   if (!tag) {
@@ -111,36 +46,22 @@ async function main() {
     process.exit(1);
   }
   const version = tag.replace('v', '');
-  const snapshotPath = path.join(__dirname, '../src/local/snapshots', `${version}.tgz`);
-
-  if (fs.existsSync(polymeshPath)) {
-    fs.rmSync(polymeshPath, { recursive: true });
+  const image = argv[3];
+  if (image && execSync(`docker images -q ${image}`).toString() === '') {
+    console.error(`Image ${image} was not found`);
+    process.exit(1);
   }
+  const imageFlag = image ? `--image=${image}` : '';
+  const versionFlag = `--version=${version}`;
+
   pullPolymesh(tag);
-  try {
-    await fetchRelease(tag);
-  } catch (err) {
-    console.log(`Could not fetch release from github, building binary instead. Error: ${err}`);
-    buildPolymesh();
-  }
-  execFileSync('chmod', ['+x', binaryPath]);
 
-  const chainChildren = runChain();
   try {
-    await sleep(10000);
+    execSync(`${cliDir}/run start --clean ${image ? imageFlag : versionFlag} --verbose`);
     runTests();
-  } catch (e) {
-    console.error(e);
+    execSync(`${cliDir}/run save ${version}`);
   } finally {
-    for (const child of chainChildren) {
-      child.kill();
-    }
-    const chainDataPath = path.join(polymeshPath, '/chain_data');
-    // save the time with the snapshot so the nodes can use it to set their clocks
-    execSync("echo $(date '+%Y-%m-%d %H:%M:%S') > timestamp.txt", { cwd: chainDataPath });
-    execSync(`chmod -R 777 ${chainDataPath} `);
-    execSync(`tar -czvf ${snapshotPath} .`, { cwd: chainDataPath });
-    process.exit();
+    execSync(`${cliDir}/run stop --clean`);
   }
 }
 

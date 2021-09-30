@@ -1,17 +1,24 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
-import compose from 'docker-compose';
-import fs from 'fs';
+import { existsSync } from 'fs';
 
-import { isChainUp, loadSnapshot } from '../common/chain';
-import { prepareDockerfile, stopContainers } from '../common/containers';
+import { isChainUp } from '../common/chain';
+import {
+  anyContainersUp,
+  cleanUp,
+  prepareDockerfile,
+  startContainers,
+  stopContainers,
+} from '../common/containers';
+import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
-import { printInfo, retry } from '../common/util';
-import { chain, dockerPath, postgres } from '../consts';
+import { hostTime, printInfo, retry } from '../common/util';
+import { dataDir } from '../consts';
+import { chainRunningError } from '../errors';
 
 export default class Start extends Command {
-  static description = 'start all containers';
+  static description = 'Start all the services';
 
   static usage = 'start [OPTIONS]';
 
@@ -21,12 +28,21 @@ export default class Start extends Command {
       char: 'v',
       default: '3.2.0',
       description: 'version of the containers to run',
-      options: ['3.2.0'],
+      options: ['3.2.0', '3.3.0'],
+    }),
+    image: flags.string({
+      char: 'i',
+      description:
+        '(Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and have the polymesh node binary set as its entrypoint',
     }),
     snapshot: flags.string({
       char: 's',
-      description:
-        'path to the snapshot to use. If no file is passed, the default snapshot for the selected version is used',
+      description: 'Loads snapshot before starting. Current state used if not passed',
+    }),
+    clean: flags.boolean({
+      char: 'c',
+      default: false,
+      description: 'Cleans state before starting.',
     }),
     verbose: flags.boolean({
       description: 'enables verbose output',
@@ -36,41 +52,51 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { snapshot, verbose, version } = commandFlags;
+    const { clean, snapshot, verbose, version, image } = commandFlags;
 
-    if (await isChainUp()) {
-      this.error(
-        `A running chain at ${chain.url} was detected. If you wish to start a new instance first use the "stop" command`
-      );
+    if (await anyContainersUp()) {
+      this.error(chainRunningError);
     }
 
-    const snapshotPath = snapshot || `${chain.snapshotsDir}/${version}.tgz`;
-    cli.action.start(`Loading chain snapshot: ${snapshot || version}`);
-    await loadSnapshot(this, snapshotPath);
+    if (clean) {
+      cli.action.start('Removing old state');
+      cleanUp();
+      cli.action.stop();
+    }
+
+    let metadata: Metadata;
+    if (snapshot) {
+      cli.action.start('Loading chain snapshot');
+      await loadSnapshot(this, snapshot);
+      cli.action.stop();
+    }
+
+    if (!existsSync(dataDir)) {
+      cli.action.start('No previous data found. Initializing data directory');
+      metadata = { version, time: hostTime(), startedAt: '' };
+      if (image) {
+        metadata.version = image;
+      }
+      cli.action.stop();
+    } else {
+      cli.log('Found existing data');
+      metadata = getMetadata();
+    }
+
+    if (!image && version !== metadata.version) {
+      this.error(
+        `Polymesh version ${version} was specified, but data was for ${metadata.version}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the version`
+      );
+    }
+    metadata.startedAt = new Date().toISOString();
+    writeMetadata(metadata);
+
+    cli.action.start(`Preparing dockerfile for Polymesh version: ${image || version}`);
+    prepareDockerfile(version, image);
     cli.action.stop();
 
-    cli.action.start(`Preparing dockerfile for Polymesh version: ${version}`);
-    prepareDockerfile(version);
-    cli.action.stop();
-
-    const faketime = fs.readFileSync(`${chain.snapshotsDir}/data/timestamp.txt`).toString();
     cli.action.start('Starting the containers');
-    await compose.upAll({
-      cwd: dockerPath,
-      log: verbose,
-      commandOptions: ['--build'],
-      env: {
-        ...process.env,
-        POLYMESH_VERSION: version,
-        DATA_DIR: chain.dataDir,
-        PG_USER: postgres.user,
-        PG_HOST: postgres.host,
-        PG_PASSWORD: postgres.password,
-        PG_PORT: postgres.port,
-        PG_DB: postgres.db,
-        FAKETIME: `@${faketime}`,
-      },
-    });
+    await startContainers(version, metadata.time, verbose);
     cli.action.stop();
 
     cli.action.start('Checking service liveness');
