@@ -1,3 +1,41 @@
+# [2.0.0](https://github.com/PolymathNetwork/polymesh-local/compare/v1.2.0...v2.0.0) (2021-09-30)
+
+
+* Ncbd 442 add save command (#5) ([4c908ab](https://github.com/PolymathNetwork/polymesh-local/commit/4c908ab75de21041bfcff6fdf28530779db33c3f)), closes [#5](https://github.com/PolymathNetwork/polymesh-local/issues/5)
+
+
+### BREAKING CHANGES
+
+* 🧨 Removes autoloading of snapshot
+
+✅ Closes: NCBD-442
+
+* refactor: 💡 Use containers function to check running
+
+Instead of calling out to the Polymesh node check if any containers are
+up like "stop" was
+
+* feat: 🎸 Display running version to user
+
+✅ Closes: NCBD-443
+
+* feat: 🎸 Add flag for specifying node image
+
+Allow user to specify Polymesh node image to use so they can test things
+that haven't been bundled as part of a release
+
+* feat: 🎸 Update generate snapshot to support passing an image
+
+* fix: 🐛 Wait for containers to be up
+
+* fix: 🐛 Update snapshot time so it advances right away
+
+* remove user in dockerfile
+
+* linux support
+
+Co-authored-by: Raycar5 <raycar5@users.noreply.github.com>
+
 # [1.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v1.1.0...v1.2.0) (2021-09-22)
 
 
