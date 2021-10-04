@@ -17,6 +17,7 @@ export interface Metadata {
 }
 
 export function createSnapshot(fileName: string): void {
+  execSync(`mkdir -p ${snapshotsDir}`);
   backupVolumes();
   execSync(`tar -czvf ${fileName} -C ${dataDir} .`, { stdio: 'ignore' });
 }
@@ -47,6 +48,7 @@ export function getMetadata(): Metadata {
 }
 
 export function listSnapshots(cmd: Command): void {
+  execSync(`mkdir -p ${snapshotsDir}`);
   const snapshots = execSync(`ls ${snapshotsDir}`).toString().replace(/\.tgz/g, '');
   cmd.log('Local snapshots: \n');
   cmd.log(snapshots);
