@@ -55,13 +55,6 @@ export async function anyContainersUp(): Promise<boolean> {
   return ps.data.services.length > 0;
 }
 
-export async function cleanUp(): Promise<void> {
-  if (fs.existsSync(dataDir)) {
-    execSync(`sudo rm -r ${dataDir}`);
-  }
-}
-
-//
 /**
  * Calculates the current time from the perspective of the container
  *   libfaketime produces a time relative to the start of a process
@@ -74,4 +67,56 @@ export function containerTime(metadata: Metadata): string {
   )
     .toString()
     .trim();
+}
+
+// A simple bind mount to the data directory creates permission errors on linux. Instead named volumes are needed.
+// To export volumes we spin up a container to tar the contents, vice versa for importing.
+// Technique from: https://docs.docker.com/storage/volumes/#backup-restore-or-migrate-data-volumes
+const namedVolumes = ['polymesh_alice', 'polymesh_bob', 'polymesh_charlie', 'polymesh_postgres'];
+
+export function createEmptyVolumes(): void {
+  namedVolumes.forEach(volume => {
+    execSync(`docker volume create --name=${volume}`);
+  });
+}
+
+export async function removeVolumes(): Promise<void> {
+  if (fs.existsSync(dataDir)) {
+    fs.rmSync(dataDir, { recursive: true });
+  }
+  if (anyVolumes()) {
+    namedVolumes.forEach(volume => {
+      execSync(`docker volume rm ${volume}`);
+    });
+  }
+}
+
+export function anyVolumes(): boolean {
+  return (
+    execSync('docker volume ls -q')
+      .toString()
+      .split('\n')
+      .filter(v => namedVolumes.indexOf(v) !== -1).length > 0
+  );
+}
+
+export function backupVolumes(): void {
+  execSync('docker pull ubuntu');
+  namedVolumes.forEach(volume => {
+    execSync(
+      `docker run --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu tar cvf /data/${volume}.tar /source`,
+      { stdio: 'ignore' }
+    );
+  });
+}
+
+export function restoreVolumes(): void {
+  createEmptyVolumes();
+  execSync('docker pull ubuntu');
+  namedVolumes.forEach(volume => {
+    execSync(
+      `docker run --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu bash -c "cd /source && tar xvf /data/${volume}.tar --strip 1"`,
+      { stdio: 'ignore' }
+    );
+  });
 }

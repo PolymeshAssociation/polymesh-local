@@ -6,7 +6,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - '${DATA_DIR}/postgres:/var/lib/postgresql/data'
+      - 'polymesh_postgres:/var/lib/postgresql/data'
     environment:
       POSTGRES_PASSWORD: postgres
 
@@ -19,7 +19,7 @@ services:
       - '9933:9933'
       - '40333:30333'
     volumes:
-      - '${DATA_DIR}/alice/chains:/var/lib/polymesh/chains'
+      - 'polymesh_alice:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
     command:
@@ -45,7 +45,7 @@ services:
       - '8844:9944'
       - '30333:30333'
     volumes:
-      - '${DATA_DIR}/bob/chains:/var/lib/polymesh/chains'
+      - 'polymesh_bob:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
     command:
@@ -71,7 +71,7 @@ services:
       - '7744:9944'
       - '50333:30333'
     volumes:
-      - '${DATA_DIR}/charlie/chains:/var/lib/polymesh/chains'
+      - 'polymesh_charlie:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
     command:
@@ -119,6 +119,16 @@ services:
       PG_USERNAME: '${PG_USER}'
       PG_PASSWORD: '${PG_PASSWORD}'
       STAGE: dev
+
+volumes:
+  polymesh_alice:
+    external: true
+  polymesh_bob:
+    external: true
+  polymesh_charlie:
+    external: true
+  polymesh_postgres:
+    external: true
 
 networks:
   default:

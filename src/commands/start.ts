@@ -1,12 +1,14 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
-import { existsSync } from 'fs';
+import { existsSync, mkdirSync } from 'fs';
 
 import { isChainUp } from '../common/chain';
 import {
   anyContainersUp,
-  cleanUp,
+  anyVolumes,
+  createEmptyVolumes,
   prepareDockerfile,
+  removeVolumes,
   startContainers,
   stopContainers,
 } from '../common/containers';
@@ -60,7 +62,13 @@ export default class Start extends Command {
 
     if (clean) {
       cli.action.start('Removing old state');
-      cleanUp();
+      removeVolumes();
+      cli.action.stop();
+    }
+
+    if (!anyVolumes()) {
+      cli.action.start('No volumes detected. Initializing volumes');
+      createEmptyVolumes();
       cli.action.stop();
     }
 

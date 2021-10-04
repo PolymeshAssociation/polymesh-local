@@ -1,7 +1,7 @@
 import { Command } from '@oclif/command';
 import { cli } from 'cli-ux';
 
-import { anyContainersUp, cleanUp } from '../common/containers';
+import { anyContainersUp, removeVolumes } from '../common/containers';
 import { chainRunningError } from '../errors';
 
 export default class Clean extends Command {
@@ -13,7 +13,7 @@ export default class Clean extends Command {
       this.error(chainRunningError);
     }
     cli.action.start('Removing data directory');
-    cleanUp();
+    removeVolumes();
     cli.action.stop();
   }
 }
