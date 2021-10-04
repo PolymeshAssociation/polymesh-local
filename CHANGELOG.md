@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.0...v2.0.1) (2021-10-04)
+
+
+### Bug Fixes
+
+* 🐛 Remove sudo calls ([#6](https://github.com/PolymathNetwork/polymesh-local/issues/6)) ([f7d2fcf](https://github.com/PolymathNetwork/polymesh-local/commit/f7d2fcf54023f8119bb4d676fa05b6ed3cf73c19))
+
 # [2.0.0](https://github.com/PolymathNetwork/polymesh-local/compare/v1.2.0...v2.0.0) (2021-09-30)
 
 
