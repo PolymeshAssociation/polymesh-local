@@ -2,8 +2,12 @@ import { Command } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
-import { isChainUp } from '../common/chain';
-import { containerTime, startContainers, stopContainers } from '../common/containers';
+import {
+  anyContainersUp,
+  containerTime,
+  startContainers,
+  stopContainers,
+} from '../common/containers';
 import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
 import { dataDir, snapshotsDir } from '../consts';
 import { noData } from '../errors';
@@ -29,7 +33,7 @@ export default class Save extends Command {
     }
 
     const metadata = getMetadata();
-    const chainRunning = await isChainUp();
+    const chainRunning = await anyContainersUp();
     if (chainRunning) {
       metadata.time = containerTime(metadata);
       cli.action.start('Pausing all services');
@@ -44,7 +48,7 @@ export default class Save extends Command {
     cli.action.stop();
 
     if (chainRunning) {
-      cli.action.start('Restarting containers');
+      cli.action.start('Restarting services');
       await startContainers(metadata.version, metadata.time, false);
       metadata.startedAt = new Date().toISOString();
       writeMetadata(metadata);

@@ -5,8 +5,10 @@ import { existsSync } from 'fs';
 import { isChainUp } from '../common/chain';
 import {
   anyContainersUp,
-  cleanUp,
+  anyVolumes,
+  createEmptyVolumes,
   prepareDockerfile,
+  removeVolumes,
   startContainers,
   stopContainers,
 } from '../common/containers';
@@ -26,9 +28,9 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '3.2.0',
+      default: '4.0.0',
       description: 'version of the containers to run',
-      options: ['3.2.0', '3.3.0'],
+      options: ['4.0.0'],
     }),
     image: flags.string({
       char: 'i',
@@ -60,7 +62,13 @@ export default class Start extends Command {
 
     if (clean) {
       cli.action.start('Removing old state');
-      cleanUp();
+      removeVolumes();
+      cli.action.stop();
+    }
+
+    if (!anyVolumes()) {
+      cli.action.start('No volumes detected. Initializing volumes');
+      createEmptyVolumes();
       cli.action.stop();
     }
 

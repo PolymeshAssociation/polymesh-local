@@ -2,16 +2,23 @@ import Command from '@oclif/command';
 import { execSync } from 'child_process';
 import { existsSync, lstatSync, readFileSync, writeFileSync } from 'fs';
 
+import { backupVolumes, restoreVolumes } from '../common/containers';
 import { dataDir, snapshotsDir } from '../consts';
+
+// A snapshot is a collection of docker volumes for containers along with additional meta data.
 
 export interface Metadata {
   version: string;
+  // time represents the time to set inside the container so the node considers it live
   time: string;
+  // startedAt is a timestamp recorded when starting. Used to calculate time when shutting down.
+  // libfaketime advances on a per process basis making it difficult to query directly form the container.
   startedAt: string;
 }
 
 export function createSnapshot(fileName: string): void {
-  execSync(`sudo chmod -R 777 ${dataDir}`, { stdio: 'ignore' });
+  execSync(`mkdir -p ${snapshotsDir}`);
+  backupVolumes();
   execSync(`tar -czvf ${fileName} -C ${dataDir} .`, { stdio: 'ignore' });
 }
 
@@ -32,6 +39,7 @@ export async function loadSnapshot(cmd: Command, snapshot: string): Promise<void
   }
   execSync(`mkdir -p ${dataDir}`);
   execSync(`tar -xf ${path} -C ${dataDir}`);
+  restoreVolumes();
 }
 
 export function getMetadata(): Metadata {
@@ -40,6 +48,7 @@ export function getMetadata(): Metadata {
 }
 
 export function listSnapshots(cmd: Command): void {
+  execSync(`mkdir -p ${snapshotsDir}`);
   const snapshots = execSync(`ls ${snapshotsDir}`).toString().replace(/\.tgz/g, '');
   cmd.log('Local snapshots: \n');
   cmd.log(snapshots);

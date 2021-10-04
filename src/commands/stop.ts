@@ -1,7 +1,12 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
 
-import { anyContainersUp, cleanUp, containerTime, stopContainers } from '../common/containers';
+import {
+  anyContainersUp,
+  containerTime,
+  removeVolumes,
+  stopContainers,
+} from '../common/containers';
 import { getMetadata, writeMetadata } from '../common/snapshots';
 
 export default class Stop extends Command {
@@ -37,7 +42,7 @@ export default class Stop extends Command {
 
     if (clean) {
       cli.action.start('Removing old container state');
-      cleanUp();
+      removeVolumes();
       cli.action.stop();
     }
 
