@@ -104,7 +104,7 @@ export function backupVolumes(): void {
   execSync('docker pull ubuntu');
   namedVolumes.forEach(volume => {
     execSync(
-      `docker run --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu tar cvf /data/${volume}.tar /source`,
+      `docker run --name polymesh_archiver --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu tar cvf /data/${volume}.tar /source`,
       { stdio: 'ignore' }
     );
   });
@@ -115,7 +115,7 @@ export function restoreVolumes(): void {
   execSync('docker pull ubuntu');
   namedVolumes.forEach(volume => {
     execSync(
-      `docker run --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu bash -c "cd /source && tar xvf /data/${volume}.tar --strip 1"`,
+      `docker run --name polymesh_archiver --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu bash -c "cd /source && tar xvf /data/${volume}.tar --strip 1"`,
       { stdio: 'ignore' }
     );
   });

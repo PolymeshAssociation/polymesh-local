@@ -1,6 +1,6 @@
 import Command from '@oclif/command';
 import { execSync } from 'child_process';
-import { existsSync, lstatSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { existsSync, lstatSync, readFileSync, writeFileSync } from 'fs';
 
 import { backupVolumes, restoreVolumes } from '../common/containers';
 import { dataDir, snapshotsDir } from '../consts';

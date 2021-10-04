@@ -1,6 +1,6 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
-import { existsSync, mkdirSync } from 'fs';
+import { existsSync } from 'fs';
 
 import { isChainUp } from '../common/chain';
 import {
@@ -28,9 +28,9 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '3.2.0',
+      default: '4.0.0',
       description: 'version of the containers to run',
-      options: ['3.2.0', '3.3.0'],
+      options: ['4.0.0'],
     }),
     image: flags.string({
       char: 'i',
