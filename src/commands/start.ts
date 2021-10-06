@@ -49,7 +49,7 @@ export default class Start extends Command {
     clean: flags.boolean({
       char: 'c',
       default: false,
-      description: 'Cleans state before starting.',
+      description: 'Cleans state before starting',
     }),
     verbose: flags.boolean({
       description: 'enables verbose output',
