@@ -14,6 +14,7 @@ export interface Metadata {
   // startedAt is a timestamp recorded when starting. Used to calculate time when shutting down.
   // libfaketime advances on a per process basis making it difficult to query directly form the container.
   startedAt: string;
+  chain: string;
 }
 
 export function createSnapshot(fileName: string): void {

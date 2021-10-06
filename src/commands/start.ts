@@ -37,6 +37,9 @@ export default class Start extends Command {
       description:
         '(Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and have the polymesh node binary set as its entrypoint',
     }),
+    chain: flags.string({
+      description: '(Advanced) Specify a Polymesh runtime',
+    }),
     snapshot: flags.string({
       char: 's',
       description: 'Loads snapshot before starting. Current state used if not passed',
@@ -54,7 +57,7 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version, image } = commandFlags;
+    const { clean, snapshot, verbose, version, image, chain } = commandFlags;
 
     if (await anyContainersUp()) {
       this.error(chainRunningError);
@@ -81,7 +84,7 @@ export default class Start extends Command {
 
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
-      metadata = { version, time: hostTime(), startedAt: '' };
+      metadata = { version, time: hostTime(), startedAt: '', chain: chain || 'testnet-dev' };
       if (image) {
         metadata.version = image;
       }
@@ -96,6 +99,11 @@ export default class Start extends Command {
         `Polymesh version ${version} was specified, but data was for ${metadata.version}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the version`
       );
     }
+    if (chain && chain !== metadata.chain) {
+      this.error(
+        `Polymesh chain ${chain} was specified, but data was for ${metadata.chain}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the chain`
+      );
+    }
     metadata.startedAt = new Date().toISOString();
     writeMetadata(metadata);
 
@@ -104,7 +112,7 @@ export default class Start extends Command {
     cli.action.stop();
 
     cli.action.start('Starting the containers');
-    await startContainers(version, metadata.time, verbose);
+    await startContainers(version, metadata.time, verbose, metadata.chain);
     cli.action.stop();
 
     cli.action.start('Checking service liveness');

@@ -57,7 +57,9 @@ async function main() {
   pullPolymesh(tag);
 
   try {
-    execSync(`${cliDir}/run start --clean ${image ? imageFlag : versionFlag} --verbose`);
+    execSync(
+      `${cliDir}/run start --chain ci-dev --clean ${image ? imageFlag : versionFlag} --verbose`
+    );
     runTests();
     execSync(`${cliDir}/run save ${version}`);
   } finally {

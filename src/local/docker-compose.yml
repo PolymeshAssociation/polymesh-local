@@ -26,7 +26,7 @@ services:
       [
         '-d',
         '/var/lib/polymesh',
-        '--chain=testnet-dev',
+        '--chain=${CHAIN}',
         '--alice',
         '--validator',
         '--unsafe-rpc-external',
@@ -52,7 +52,7 @@ services:
       [
         '-d',
         '/var/lib/polymesh',
-        '--chain=testnet-dev',
+        '--chain=${CHAIN}',
         '--bob',
         '--validator',
         '--unsafe-rpc-external',
@@ -78,7 +78,7 @@ services:
       [
         '-d',
         '/var/lib/polymesh',
-        '--chain=testnet-dev',
+        '--chain=${CHAIN}',
         '--charlie',
         '--validator',
         '--unsafe-rpc-external',
