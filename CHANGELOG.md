@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.1...v2.0.2) (2021-10-06)
+
+
+### Bug Fixes
+
+* 🐛 inconsistent permissions ([de6b30d](https://github.com/PolymathNetwork/polymesh-local/commit/de6b30d896dc77d99e98b722b3adb7998d76b654))
+
 ## [2.0.1](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.0...v2.0.1) (2021-10-04)
 
 
