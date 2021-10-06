@@ -38,7 +38,8 @@ export default class Start extends Command {
         '(Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and have the polymesh node binary set as its entrypoint',
     }),
     chain: flags.string({
-      description: '(Advanced) Specify a Polymesh runtime',
+      description: '(Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than testnet-dev,
+      options: ['testnet-dev', 'ci-dev']
     }),
     snapshot: flags.string({
       char: 's',
