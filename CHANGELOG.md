@@ -1,3 +1,10 @@
+## [2.0.3](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.2...v2.0.3) (2021-10-06)
+
+
+### Bug Fixes
+
+* 🐛 Fix bad import path for consts ([#9](https://github.com/PolymathNetwork/polymesh-local/issues/9)) ([2e3df97](https://github.com/PolymathNetwork/polymesh-local/commit/2e3df977083b2a5c0d80400f4ed70ce65476446b))
+
 ## [2.0.2](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.1...v2.0.2) (2021-10-06)
 
 
