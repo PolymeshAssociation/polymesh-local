@@ -19,7 +19,8 @@ export function prepareDockerfile(version: string, image?: string): void {
 export async function startContainers(
   version: string,
   timestamp: string,
-  log: boolean
+  log: boolean,
+  chain: string
 ): Promise<void> {
   await compose.upAll({
     cwd: localDir,
@@ -35,6 +36,7 @@ export async function startContainers(
       PG_PORT: postgres.port,
       PG_DB: postgres.db,
       FAKETIME: `@${timestamp}`,
+      CHAIN: chain,
     },
   });
 }
