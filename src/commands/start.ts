@@ -51,6 +51,13 @@ export default class Start extends Command {
       default: false,
       description: 'Cleans state before starting',
     }),
+    only: flags.string({
+      multiple: true,
+      default: ['chain', 'subquery', 'gql'],
+      char: 'o',
+      description: 'Run only some services',
+      options: ['chain', 'subquery', 'gql'],
+    }),
     verbose: flags.boolean({
       description: 'enables verbose output',
       default: false,
@@ -59,7 +66,8 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version, image, chain } = commandFlags;
+    const { clean, snapshot, verbose, version, image, chain, only } = commandFlags;
+    const typedOnly = only as ('chain' | 'subquery' | 'gql')[];
 
     if (await anyContainersUp()) {
       this.error(chainRunningError);
@@ -113,12 +121,26 @@ export default class Start extends Command {
     prepareDockerfile(version, image);
     cli.action.stop();
 
+    const services = typedOnly.flatMap(o => {
+      switch (o) {
+        case 'chain':
+          return ['alice', 'bob', 'charlie'];
+        case 'subquery':
+          return ['subquery'];
+        case 'gql':
+          return ['tooling'];
+      }
+      return [];
+    });
+
     cli.action.start('Starting the containers');
-    await startContainers(version, metadata.time, verbose, metadata.chain);
+    await startContainers(version, metadata.time, verbose, metadata.chain, services);
     cli.action.stop();
 
+    const allChecks = { chain: isChainUp, subquery: isSubqueryUp, gql: isToolingUp };
+    const checks = typedOnly.map(o => allChecks[o]);
+
     cli.action.start('Checking service liveness');
-    const checks = [isChainUp, isToolingUp, isSubqueryUp];
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);

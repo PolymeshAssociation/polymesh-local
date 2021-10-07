@@ -20,9 +20,10 @@ export async function startContainers(
   version: string,
   timestamp: string,
   log: boolean,
-  chain: string
+  chain: string,
+  services: string[]
 ): Promise<void> {
-  await compose.upAll({
+  await compose.upMany(services, {
     cwd: localDir,
     log,
     commandOptions: ['--build'],
@@ -49,12 +50,24 @@ export async function stopContainers(): Promise<void> {
   });
 }
 
-export async function anyContainersUp(): Promise<boolean> {
+const serviceRegex = /local_(.+)_1/;
+export async function containersUp(): Promise<string[]> {
   const ps = await compose.ps({
     cwd: localDir,
   });
 
-  return ps.data.services.length > 0;
+  return ps.data.services.map(s => {
+    const matches = serviceRegex.exec(s.name);
+    if (!matches || !matches[1]) {
+      throw new Error('Invalid docker-compose state');
+    }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    return matches![1];
+  });
+}
+
+export async function anyContainersUp(): Promise<boolean> {
+  return (await containersUp()).length > 0;
 }
 
 /**
