@@ -61,6 +61,7 @@ export async function containersUp(): Promise<string[]> {
     if (!matches || !matches[1]) {
       throw new Error('Invalid docker-compose state');
     }
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return matches![1];
   });
 }
