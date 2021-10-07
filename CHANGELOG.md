@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.3...v2.1.0) (2021-10-07)
+
+
+### Features
+
+* 🎸 Added --only flags to run only some services ([9e9fcb4](https://github.com/PolymathNetwork/polymesh-local/commit/9e9fcb426dc226d49f8ce7515093334285a03a99))
+
 ## [2.0.3](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.2...v2.0.3) (2021-10-06)
 
 
