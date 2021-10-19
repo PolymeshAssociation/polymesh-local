@@ -120,6 +120,18 @@ services:
       PG_PASSWORD: '${PG_PASSWORD}'
       STAGE: dev
 
+  rest_api:
+    image: polymathnet/polymesh-rest-api:latest
+    restart: always
+    ports:
+      - 3004:3000
+    environment:
+      POLYMESH_NODE_URL: 'ws://alice:9944'
+      POLYMESH_MIDDLEWARE_URL: 'http://tooling:3000'
+      POLYMESH_MIDDLEWARE_API_KEY: '${TOOLING_API_KEY}'
+      RELAYER_DIDS: '${RELAYER_DIDS}'
+      RELAYER_MNEMONICS: '${RELAYER_MNEMONICS}'
+
 volumes:
   polymesh_alice:
     external: true
