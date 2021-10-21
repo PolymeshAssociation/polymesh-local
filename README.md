@@ -35,7 +35,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/2.1.0 linux-x64 node-v14.18.0
+polymesh-local/2.1.0 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -151,22 +151,30 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -c, --clean                    Cleans state before starting
-  -h, --help                     show CLI help
+  -c, --clean                         Cleans state before starting
+  -h, --help                          show CLI help
 
-  -i, --image=image              (Advanced) Specify a local docker image to use for Polymesh containers. Such an image
-                                 should be debian based and have the polymesh node binary set as its entrypoint
+  -i, --image=image                   (Advanced) Specify a local docker image to use for Polymesh containers. Such an
+                                      image should be debian based and have the polymesh node binary set as its
+                                      entrypoint
 
-  -o, --only=chain|subquery|gql  [default: chain,subquery,gql] Run only some services
+  -o, --only=chain|subquery|gql|rest  [default: chain,subquery,gql,rest] Run only some services
 
-  -s, --snapshot=snapshot        Loads snapshot before starting. Current state used if not passed
+  -s, --snapshot=snapshot             Loads snapshot before starting. Current state used if not passed
 
-  -v, --version=4.0.0            [default: 4.0.0] version of the containers to run
+  -v, --version=4.0.0                 [default: 4.0.0] version of the containers to run
 
-  --chain=testnet-dev|ci-dev     (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it
-                                 process transactions faster than testnet-dev
+  --chain=testnet-dev|ci-dev          (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it
+                                      process transactions faster than testnet-dev
 
-  --verbose                      enables verbose output
+  --dids=dids                         [default: 0x0600000000000000000000000000000000000000000000000000000000000000]
+                                      Comma seperated list of dids available in the rest api. Defaults to
+                                      `0x0600000000000000000000000000000000000000000000000000000000000000`
+
+  --mnemonics=mnemonics               [default: //Alice] Comma seperated list of mnemonics for dids. Defaults to
+                                      `//Alice`
+
+  --verbose                           enables verbose output
 ```
 
 _See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v2.1.0/src/commands/start.ts)_

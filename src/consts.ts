@@ -20,6 +20,11 @@ export const subquery = {
   url: 'localhost:3002',
 };
 
+export const rest = {
+  url: 'localhost:3004',
+  container: 'local_rest_api_1',
+};
+
 export const tooling = {
   apiKey: 'd41d8cd98f00b204e9800998ecf8427e',
   url: 'localhost:3000/dev/graphql',

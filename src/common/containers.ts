@@ -3,7 +3,7 @@ import compose from 'docker-compose';
 import fs from 'fs';
 
 import { Metadata } from '../common/snapshots';
-import { dataDir, dateFmt, docker, localDir, postgres } from '../consts';
+import { dataDir, dateFmt, docker, localDir, postgres, tooling } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
@@ -21,7 +21,9 @@ export async function startContainers(
   timestamp: string,
   log: boolean,
   chain: string,
-  services: string[]
+  services: string[],
+  dids: string,
+  mnemonics: string
 ): Promise<void> {
   await compose.upMany(services, {
     cwd: localDir,
@@ -38,6 +40,9 @@ export async function startContainers(
       PG_DB: postgres.db,
       FAKETIME: `@${timestamp}`,
       CHAIN: chain,
+      TOOLING_API_KEY: tooling.apiKey,
+      RELAYER_DIDS: dids,
+      RELAYER_MNEMONICS: mnemonics,
     },
   });
 }
@@ -64,6 +69,10 @@ export async function containersUp(): Promise<string[]> {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     return matches![1];
   });
+}
+
+export function getContainerEnv(container: string, env: string): string {
+  return execSync(`docker exec ${container} bash -c 'echo "$${env}"'`).toString().trim();
 }
 
 export async function anyContainersUp(): Promise<boolean> {

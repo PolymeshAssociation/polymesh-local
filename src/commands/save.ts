@@ -3,6 +3,7 @@ import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
 import { containersUp, containerTime, startContainers, stopContainers } from '../common/containers';
+import { getRelayerEnvs } from '../common/rest';
 import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
 import { dataDir, snapshotsDir } from '../consts';
 import { noData } from '../errors';
@@ -27,6 +28,7 @@ export default class Save extends Command {
       this.error(noData);
     }
 
+    const restEnvs = await getRelayerEnvs();
     const metadata = getMetadata();
     const services = await containersUp();
     if (services.length > 0) {
@@ -44,7 +46,15 @@ export default class Save extends Command {
 
     if (services.length > 0) {
       cli.action.start('Restarting services');
-      await startContainers(metadata.version, metadata.time, false, metadata.chain, services);
+      await startContainers(
+        metadata.version,
+        metadata.time,
+        false,
+        metadata.chain,
+        services,
+        restEnvs[0],
+        restEnvs[1]
+      );
       metadata.startedAt = new Date().toISOString();
       writeMetadata(metadata);
       cli.action.stop();

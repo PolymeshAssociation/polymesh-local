@@ -12,12 +12,13 @@ import {
   startContainers,
   stopContainers,
 } from '../common/containers';
+import { isRestUp, validateDidArgs } from '../common/rest';
 import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { hostTime, printInfo, retry } from '../common/util';
 import { dataDir } from '../consts';
-import { chainRunningError } from '../errors';
+import { chainRunningError, restArgsError } from '../errors';
 
 export default class Start extends Command {
   static description = 'Start all the services';
@@ -53,21 +54,30 @@ export default class Start extends Command {
     }),
     only: flags.string({
       multiple: true,
-      default: ['chain', 'subquery', 'gql'],
+      default: ['chain', 'subquery', 'gql', 'rest'],
       char: 'o',
       description: 'Run only some services',
-      options: ['chain', 'subquery', 'gql'],
+      options: ['chain', 'subquery', 'gql', 'rest'],
     }),
     verbose: flags.boolean({
       description: 'enables verbose output',
       default: false,
     }),
+    dids: flags.string({
+      description:
+        'Comma seperated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
+      default: '0x0600000000000000000000000000000000000000000000000000000000000000',
+    }),
+    mnemonics: flags.string({
+      description: 'Comma seperated list of mnemonics for dids. Defaults to `//Alice`',
+      default: '//Alice',
+    }),
   };
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version, image, chain, only } = commandFlags;
-    const typedOnly = only as ('chain' | 'subquery' | 'gql')[];
+    const { clean, snapshot, verbose, version, image, chain, only, dids, mnemonics } = commandFlags;
+    const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest')[];
 
     if (await anyContainersUp()) {
       this.error(chainRunningError);
@@ -77,6 +87,10 @@ export default class Start extends Command {
       cli.action.start('Removing old state');
       removeVolumes();
       cli.action.stop();
+    }
+
+    if (!validateDidArgs(dids, mnemonics)) {
+      this.error(restArgsError);
     }
 
     if (!anyVolumes()) {
@@ -129,15 +143,30 @@ export default class Start extends Command {
           return ['subquery'];
         case 'gql':
           return ['tooling'];
+        case 'rest':
+          return ['rest_api'];
       }
       return [];
     });
 
     cli.action.start('Starting the containers');
-    await startContainers(version, metadata.time, verbose, metadata.chain, services);
+    await startContainers(
+      version,
+      metadata.time,
+      verbose,
+      metadata.chain,
+      services,
+      dids,
+      mnemonics
+    );
     cli.action.stop();
 
-    const allChecks = { chain: isChainUp, subquery: isSubqueryUp, gql: isToolingUp };
+    const allChecks = {
+      chain: isChainUp,
+      subquery: isSubqueryUp,
+      gql: isToolingUp,
+      rest: isRestUp,
+    };
     const checks = typedOnly.map(o => allChecks[o]);
 
     cli.action.start('Checking service liveness');

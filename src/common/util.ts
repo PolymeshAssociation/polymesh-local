@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import fetch from 'node-fetch';
 
 import { getMetadata } from '../common/snapshots';
-import { chain, checkSettings, dateFmt, postgres, tooling } from '../consts';
+import { chain, checkSettings, dateFmt, postgres, rest, tooling } from '../consts';
 
 async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -53,6 +53,7 @@ export function printInfo(cmd: Command): void {
   cmd.log(`chain version ${metadata.version} running`);
   cmd.log(`polymesh node listening at wss://${chain.url}`);
   cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);
+  cmd.log(`rest API listening at http://${rest.url}`);
   cmd.log(`tooling-gql listening at http://${tooling.url}.`);
   cmd.log(`  note: tooling-gql requests need a header of: \`x-api-key: ${tooling.apiKey}\` set`);
 }
