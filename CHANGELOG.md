@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v2.1.0...v2.2.0) (2021-10-21)
+
+
+### Features
+
+* 🎸 Add rest api ([#11](https://github.com/PolymathNetwork/polymesh-local/issues/11)) ([aa37e61](https://github.com/PolymathNetwork/polymesh-local/commit/aa37e6186b30a1a1527f01ff2ad88ec9dcdcba97))
+
 # [2.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v2.0.3...v2.1.0) (2021-10-07)
 
 
