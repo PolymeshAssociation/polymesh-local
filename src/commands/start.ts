@@ -41,7 +41,20 @@ export default class Start extends Command {
     chain: flags.string({
       description:
         '(Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than testnet-dev',
-      options: ['testnet-dev', 'ci-dev'],
+      options: [
+        'dev',
+        'local',
+        'testnet-dev',
+        'ci-dev',
+        'ci-local',
+        'testnet-local',
+        'testnet-bootstrap',
+        'mainnet-dev',
+        'mainnet-local',
+        'mainnet-bootstrap',
+        'mainnet',
+        'testnet',
+      ],
     }),
     snapshot: flags.string({
       char: 's',
@@ -108,7 +121,7 @@ export default class Start extends Command {
 
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
-      metadata = { version, time: hostTime(), startedAt: '', chain: chain || 'testnet-dev' };
+      metadata = { version, time: hostTime(), startedAt: '', chain: chain || 'dev' };
       if (image) {
         metadata.version = image;
       }
