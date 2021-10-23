@@ -1,3 +1,15 @@
+# [3.0.0](https://github.com/PolymathNetwork/polymesh-local/compare/v2.2.1...v3.0.0) (2021-10-23)
+
+
+### Features
+
+* 🎸 add all chain runtimes as options for --chain ([049caf4](https://github.com/PolymathNetwork/polymesh-local/commit/049caf4e1d0e5f82f982310b26e502b04317256d))
+
+
+### BREAKING CHANGES
+
+* 🧨 change the default runtime from `testnet-dev` to `dev`
+
 ## [2.2.1](https://github.com/PolymathNetwork/polymesh-local/compare/v2.2.0...v2.2.1) (2021-10-22)
 
 
