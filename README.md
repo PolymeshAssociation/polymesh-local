@@ -13,7 +13,28 @@ This tool is using `docker-compose` internally. This means each service is a con
 
 _NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
 
-### Custom Image
+### Getting Started
+
+The easiest way to run polymesh-local is to grab the latest release from npm.
+
+```sh
+npm i -g polymesh-local
+polymesh-local start
+```
+
+The first time can take a while as the various docker images are pulled in. After the initial start it should be much quicker. The full set of commands can be seen with `help` command.
+
+### Building From Source
+
+When developing polymesh-local, commands can be executed with `./bin/run COMMAND`, which will execute the repo's code. It can be packaged and installed locally with:
+
+```sh
+yarn build:ts
+yarn pack # produces a .tgz file that can be installed
+npm i -g polymesh-local-v3.0.0.tgz # specify the file created from previous step
+```
+
+### Custom Image (Advanced)
 
 You can specify an official release with the `--version` flag on start. To use this tool with a version that is not an official release it is possible to specify one with `--image` flag for start. The image should have as its ENTRYPOINT the polymesh binary. If using `docker import` you should use the `--change` to add it in.
 
@@ -35,7 +56,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/3.0.0 linux-x64 node-v14.18.1
+polymesh-local/3.0.0 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
