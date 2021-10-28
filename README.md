@@ -34,19 +34,17 @@ yarn pack # produces a .tgz file that can be installed
 npm i -g polymesh-local-v3.0.0.tgz # specify the file created from previous step
 ```
 
-```sh
-docker import --change 'ENTRYPOINT ["/usr/local/bin/polymesh"]' mesh.tar mypoly:latest
-```
-
 <!-- toc -->
-* [polymesh-local](#polymesh-local)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [polymesh-local](#polymesh-local)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g polymesh-local
 $ polymesh-local COMMAND
@@ -58,20 +56,22 @@ USAGE
   $ polymesh-local COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`polymesh-local clean`](#polymesh-local-clean)
-* [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
-* [`polymesh-local info`](#polymesh-local-info)
-* [`polymesh-local load FILE`](#polymesh-local-load-file)
-* [`polymesh-local ls`](#polymesh-local-ls)
-* [`polymesh-local rm FILE`](#polymesh-local-rm-file)
-* [`polymesh-local save [name]`](#polymesh-local-save-name)
-* [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
-* [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
+
+- [`polymesh-local clean`](#polymesh-local-clean)
+- [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
+- [`polymesh-local info`](#polymesh-local-info)
+- [`polymesh-local load FILE`](#polymesh-local-load-file)
+- [`polymesh-local ls`](#polymesh-local-ls)
+- [`polymesh-local rm FILE`](#polymesh-local-rm-file)
+- [`polymesh-local save [name]`](#polymesh-local-save-name)
+- [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
+- [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
 
 ## `polymesh-local clean`
 
@@ -175,7 +175,7 @@ OPTIONS
       show CLI help
 
   -i, --image=image
-      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and 
+      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and
       have the polymesh node binary set as its entrypoint
 
   -o, --only=chain|subquery|gql|rest
@@ -189,11 +189,11 @@ OPTIONS
 
   --chain=dev|local|testnet-dev|ci-dev|ci-local|testnet-local|testnet-bootstrap|mainnet-dev|mainnet-local|mainnet-bootst
   rap|mainnet|testnet
-      (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than 
+      (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than
       testnet-dev
 
   --dids=dids
-      [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma seperated list of dids available 
+      [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma seperated list of dids available
       in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`
 
   --mnemonics=mnemonics
@@ -218,4 +218,5 @@ OPTIONS
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.0.0/src/commands/stop.ts)_
+
 <!-- commandsstop -->
