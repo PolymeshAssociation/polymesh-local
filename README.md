@@ -34,13 +34,9 @@ yarn pack # produces a .tgz file that can be installed
 npm i -g polymesh-local-v3.0.0.tgz # specify the file created from previous step
 ```
 
-### Custom Image (Advanced)
-
-You can specify an official release with the `--version` flag on start. To use this tool with a version that is not an official release it is possible to specify one with `--image` flag for start. The image should have as its ENTRYPOINT the polymesh binary. If using `docker import` you should use the `--change` to add it in.
-
-````sh
+```sh
 docker import --change 'ENTRYPOINT ["/usr/local/bin/polymesh"]' mesh.tar mypoly:latest
-``
+```
 
 <!-- toc -->
 * [polymesh-local](#polymesh-local)
