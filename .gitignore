@@ -9,4 +9,5 @@ node_modules
 .DS_Store
 scripts/tmp
 /src/local/data/
+/src/local/uis/
 mesh.Dockerfile

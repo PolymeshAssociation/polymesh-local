@@ -7,11 +7,18 @@ Polymesh local environment for development and e2e testing
 [![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
 [![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymathNetwork/polymesh-local/blob/master/package.json)
 
-Tool for managing a Polymesh development or CI environment. This environment includes 3 Polymesh nodes, a Polymesh specific [SubQuery](https://subquery.network/) instance, its corresponding PostgreSQL instance and tooling-gql, a GraphQL interface to query historic chain data.
+Tool for managing a Polymesh development or CI environment. This environment includes:
 
-This tool is using `docker-compose` internally. This means each service is a container that can be managed like a normal docker container.
+- 3 Polymesh nodes (ws on :9944)
+- A Polymesh [SubQuery](https://subquery.network/) instance
+- A PostgreSQL instance (Served on :5432)
+- Rest API for interacting with the chain (Served on :3004)
+- Polymesh UIs (Dashboard on :3000, Bridge on :3001, Token Studio on :3002, Governance on :3003)
+- Tooling-gql, a GraphQL interface to query historic chain data. (Served on :3007)
 
-_NOTE: This package requires docker to run. It must be installed on the user's system beforehand_
+Individual pieces can be brought up by using the `--only` flag on start
+
+_NOTE: This package requires docker and docker-compose to run. They must be installed on the user's system beforehand_
 
 ### Getting Started
 
@@ -23,6 +30,14 @@ polymesh-local start
 ```
 
 The first time can take a while as the various docker images are pulled in. After the initial start it should be much quicker. The full set of commands can be seen with `help` command.
+
+### Creating a CDD + uID
+
+In order to interact with the UIs you will need the [Polymesh wallet](https://chrome.google.com/webstore/detail/polymesh-wallet/jojhfeoedkpkglbfimdfabpdfjaoolaf?hl=en) browser extension installed, as well as a CDD + uID claim for your account.
+
+To create a CDD claim you can use [https://app.polymesh.live/](https://app.polymesh.live/?rpc=ws%3A%2F%2F127.0.0.1%3A9944), add in your wallet address in Addresses > Address Book. Then navigate to Developer > Extrinsics. There select `testUtils` > `mockCddRegisterDid` and select your account. After a CDD has been generated you can use the [mock uID provider](https://polymathnetwork.github.io/mock-uid-provider/) to add a uID claim to your wallet.
+
+After creating the CDD claim you will likely want to transfer POLYX from Alice to your account as well. This can be done in app.polymesh.live under Accounts > Transfer.
 
 ### Building From Source
 
@@ -178,8 +193,8 @@ OPTIONS
       (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and
       have the polymesh node binary set as its entrypoint
 
-  -o, --only=chain|subquery|gql|rest
-      [default: chain,subquery,gql,rest] Run only some services
+  -o, --only=chain|subquery|gql|rest|uis
+      [default: chain,subquery,gql,rest,uis] Run only some services
 
   -s, --snapshot=snapshot
       Loads snapshot before starting. Current state used if not passed

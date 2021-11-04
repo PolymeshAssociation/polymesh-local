@@ -3,7 +3,7 @@ import compose from 'docker-compose';
 import fs from 'fs';
 
 import { Metadata } from '../common/snapshots';
-import { dataDir, dateFmt, docker, localDir, postgres, tooling } from '../consts';
+import { dataDir, dateFmt, docker, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
@@ -43,6 +43,8 @@ export async function startContainers(
       TOOLING_API_KEY: tooling.apiKey,
       RELAYER_DIDS: dids,
       RELAYER_MNEMONICS: mnemonics,
+      UI_DIR: uis.dir,
+      LOCAL_DIR: localDir,
     },
   });
 }

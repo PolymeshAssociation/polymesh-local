@@ -1,9 +1,12 @@
 import Command from '@oclif/command';
 import { execSync } from 'child_process';
+import { createWriteStream } from 'fs-extra';
 import fetch from 'node-fetch';
+import { pipeline } from 'stream';
+import { promisify } from 'util';
 
 import { getMetadata } from '../common/snapshots';
-import { chain, checkSettings, dateFmt, postgres, rest, tooling } from '../consts';
+import { chain, checkSettings, dateFmt, postgres, rest, tooling, uis } from '../consts';
 
 async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -53,6 +56,10 @@ export function printInfo(cmd: Command): void {
   cmd.log(`chain version ${metadata.version} running`);
   cmd.log(`polymesh node listening at wss://${chain.url}`);
   cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);
+  cmd.log(`dashboard UI listening at http://${uis.dashboard}`);
+  cmd.log(`bridge UI listening at http://${uis.bridge}`);
+  cmd.log(`issuer UI listening at http://${uis.issuer}`);
+  cmd.log(`governance UI listening at http://${uis.governance}`);
   cmd.log(`rest API listening at http://${rest.url}`);
   cmd.log(`tooling-gql listening at http://${tooling.url}.`);
   cmd.log(`  note: tooling-gql requests need a header of: \`x-api-key: ${tooling.apiKey}\` set`);
@@ -60,4 +67,13 @@ export function printInfo(cmd: Command): void {
 
 export function hostTime(): string {
   return execSync(`date "${dateFmt}"`).toString().trim();
+}
+
+/**
+ * Fetches a file from a url and saves it to disk
+ * @param url The URL to download from
+ * @param dest The path to save the file to
+ */
+export async function downloadFile(url: string, dest: string): Promise<void> {
+  await promisify(pipeline)((await fetch(url)).body, createWriteStream(dest));
 }
