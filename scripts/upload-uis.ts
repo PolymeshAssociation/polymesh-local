@@ -41,6 +41,7 @@ function uploadUis() {
     ACL: 'public-read',
   };
 
+  console.log('beggining UI upload');
   client.upload(params, {}, err => {
     rmSync(fileName);
     if (err) {

@@ -20,6 +20,9 @@ export async function areUIsUp(): Promise<boolean> {
   return results.every(Boolean);
 }
 
+/**
+ * If the UI directory is empty this will fetch the most recent UI tarball from S3 and unzip it.
+ */
 export async function fetchUIs(): Promise<void> {
   if (haveUIs()) {
     return;
@@ -70,7 +73,7 @@ async function fetchList(): Promise<Record<string, unknown> | void> {
     .then(response => response?.ListBucketResult?.Contents)
     .then(contents => {
       const mostRecent = contents
-        .filter((obj: S3Metadata) => obj.Key[0] !== 'uis/')
+        .filter((obj: S3Metadata) => obj.Key[0] !== 'uis/' && obj.Key[0].includes('polymesh-uis'))
         .sort((a: S3Metadata, b: S3Metadata) => {
           return a.LastModified < b.LastModified ? 1 : a.LastModified > b.LastModified ? -1 : 0;
         })[0];

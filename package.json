@@ -8,6 +8,8 @@
   },
   "scripts": {
     "generate-snapshot": "ts-node scripts/generate-snapshot",
+    "build-uis": "ts-node scripts/build-uis",
+    "upload-uis": "ts-node scripts/upload-uis",
     "prepare": "husky install",
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
