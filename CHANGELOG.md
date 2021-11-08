@@ -1,3 +1,10 @@
+# [3.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.0.0...v3.1.0) (2021-11-08)
+
+
+### Features
+
+* 🎸 Add Polymesh UIs ([#16](https://github.com/PolymathNetwork/polymesh-local/issues/16)) ([9c9f8f4](https://github.com/PolymathNetwork/polymesh-local/commit/9c9f8f4750e27b55f3faea3f259af09af7ab1fa3))
+
 # [3.0.0](https://github.com/PolymathNetwork/polymesh-local/compare/v2.2.1...v3.0.0) (2021-10-23)
 
 
