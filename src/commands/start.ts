@@ -16,6 +16,7 @@ import { isRestUp, validateDidArgs } from '../common/rest';
 import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
+import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
 import { hostTime, printInfo, retry } from '../common/util';
 import { dataDir } from '../consts';
 import { chainRunningError, restArgsError } from '../errors';
@@ -67,10 +68,10 @@ export default class Start extends Command {
     }),
     only: flags.string({
       multiple: true,
-      default: ['chain', 'subquery', 'gql', 'rest'],
+      default: ['chain', 'subquery', 'gql', 'rest', 'uis'],
       char: 'o',
       description: 'Run only some services',
-      options: ['chain', 'subquery', 'gql', 'rest'],
+      options: ['chain', 'subquery', 'gql', 'rest', 'uis'],
     }),
     verbose: flags.boolean({
       description: 'enables verbose output',
@@ -85,12 +86,18 @@ export default class Start extends Command {
       description: 'Comma seperated list of mnemonics for dids. Defaults to `//Alice`',
       default: '//Alice',
     }),
+    uiLatest: flags.boolean({
+      char: 'u',
+      description: 'Clears saved UIs so the latest can be fetched',
+      default: false,
+    }),
   };
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version, image, chain, only, dids, mnemonics } = commandFlags;
-    const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest')[];
+    const { clean, snapshot, verbose, version, image, chain, only, dids, mnemonics, uiLatest } =
+      commandFlags;
+    const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
 
     if (await anyContainersUp()) {
       this.error(chainRunningError);
@@ -99,6 +106,12 @@ export default class Start extends Command {
     if (clean) {
       cli.action.start('Removing old state');
       removeVolumes();
+      cli.action.stop();
+    }
+
+    if (uiLatest) {
+      cli.action.start('Clearing current UIs');
+      clearUIs();
       cli.action.stop();
     }
 
@@ -144,6 +157,12 @@ export default class Start extends Command {
     metadata.startedAt = new Date().toISOString();
     writeMetadata(metadata);
 
+    if (only.includes('uis')) {
+      cli.action.start('Checking UIs');
+      fetchUIs();
+      cli.action.stop();
+    }
+
     cli.action.start(`Preparing dockerfile for Polymesh version: ${image || version}`);
     prepareDockerfile(version, image);
     cli.action.stop();
@@ -158,6 +177,8 @@ export default class Start extends Command {
           return ['tooling'];
         case 'rest':
           return ['rest_api'];
+        case 'uis':
+          return ['dashboard', 'bridge', 'governance', 'issuer'];
       }
       return [];
     });
@@ -179,6 +200,7 @@ export default class Start extends Command {
       subquery: isSubqueryUp,
       gql: isToolingUp,
       rest: isRestUp,
+      uis: areUIsUp,
     };
     const checks = typedOnly.map(o => allChecks[o]);
 

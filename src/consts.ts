@@ -16,8 +16,17 @@ export const chain = {
   url: 'localhost:9944',
 };
 
+export const uis = {
+  dir: path.resolve(localDir, 'uis'),
+  s3: 'https://polymesh-local.s3.amazonaws.com',
+  dashboard: 'localhost:3000',
+  bridge: 'localhost:3001',
+  issuer: 'localhost:3002',
+  governance: 'localhost:3003',
+};
+
 export const subquery = {
-  url: 'localhost:3002',
+  url: 'localhost:3006',
 };
 
 export const rest = {
@@ -27,7 +36,7 @@ export const rest = {
 
 export const tooling = {
   apiKey: 'd41d8cd98f00b204e9800998ecf8427e',
-  url: 'localhost:3000/dev/graphql',
+  url: 'localhost:3007/dev/graphql',
 };
 
 export const postgres = {
