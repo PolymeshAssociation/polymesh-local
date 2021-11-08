@@ -24,7 +24,7 @@ const client = new AWS.S3({
 function uploadUis() {
   // use date with TZ info stripped out
   const date = new Date().toISOString().replace(/T/, '_').replace(/\..+/, '');
-  const fileName = `${date}-test-polymesh-uis.tgz`;
+  const fileName = `${date}-polymesh-uis.tgz`;
 
   if (!existsSync(uiDir) && readdirSync(uiDir).length > 0) {
     throw new Error(`No contents detected in ${uiDir}`);
