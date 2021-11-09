@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.1.0...v3.2.0) (2021-11-09)
+
+
+### Features
+
+* 🎸 add the -C shorthand for the --chain flag ([#15](https://github.com/PolymathNetwork/polymesh-local/issues/15)) ([722b9d5](https://github.com/PolymathNetwork/polymesh-local/commit/722b9d5e6afa8a4fcedc9e04863bd539f5be9db7))
+
 # [3.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.0.0...v3.1.0) (2021-11-08)
 
 

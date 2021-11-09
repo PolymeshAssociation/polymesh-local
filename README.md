@@ -63,7 +63,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/3.1.0 linux-x64 node-v14.18.1
+polymesh-local/3.2.0 linux-x64 node-v14.18.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -93,7 +93,7 @@ USAGE
   $ polymesh-local clean
 ```
 
-_See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/clean.ts)_
+_See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/clean.ts)_
 
 ## `polymesh-local help [COMMAND]`
 
@@ -121,7 +121,7 @@ USAGE
   $ polymesh-local info
 ```
 
-_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/info.ts)_
+_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/info.ts)_
 
 ## `polymesh-local load FILE`
 
@@ -132,7 +132,7 @@ USAGE
   $ polymesh-local load FILE
 ```
 
-_See code: [src/commands/load.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/load.ts)_
+_See code: [src/commands/load.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/load.ts)_
 
 ## `polymesh-local ls`
 
@@ -143,7 +143,7 @@ USAGE
   $ polymesh-local ls
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/ls.ts)_
 
 ## `polymesh-local rm FILE`
 
@@ -154,7 +154,7 @@ USAGE
   $ polymesh-local rm FILE
 ```
 
-_See code: [src/commands/rm.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/rm.ts)_
+_See code: [src/commands/rm.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/rm.ts)_
 
 ## `polymesh-local save [name]`
 
@@ -168,7 +168,7 @@ ARGUMENTS
   NAME  A name or path for the snapshot
 ```
 
-_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/save.ts)_
+_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/save.ts)_
 
 ## `polymesh-local start [OPTIONS]`
 
@@ -179,6 +179,12 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
+  -C, 
+  --chain=dev|local|testnet-dev|ci-dev|ci-local|testnet-local|testnet-bootstrap|mainnet-dev|mainnet-local|mainnet-bootst
+  rap|mainnet|testnet
+      (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than 
+      testnet-dev
+
   -c, --clean
       Cleans state before starting
 
@@ -201,11 +207,6 @@ OPTIONS
   -v, --version=4.0.0
       [default: 4.0.0] version of the containers to run
 
-  --chain=dev|local|testnet-dev|ci-dev|ci-local|testnet-local|testnet-bootstrap|mainnet-dev|mainnet-local|mainnet-bootst
-  rap|mainnet|testnet
-      (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than 
-      testnet-dev
-
   --dids=dids
       [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma seperated list of dids available 
       in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`
@@ -217,7 +218,7 @@ OPTIONS
       enables verbose output
 ```
 
-_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/start.ts)_
 
 ## `polymesh-local stop [OPTIONS]`
 
@@ -231,5 +232,5 @@ OPTIONS
   -c, --clean  Cleans state after stopping
 ```
 
-_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.1.0/src/commands/stop.ts)_
+_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.2.0/src/commands/stop.ts)_
 <!-- commandsstop -->
