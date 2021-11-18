@@ -160,7 +160,7 @@ export default class Start extends Command {
 
     if (only.includes('uis')) {
       cli.action.start('Checking UIs');
-      fetchUIs();
+      await fetchUIs();
       cli.action.stop();
     }
 
