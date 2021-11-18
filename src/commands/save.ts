@@ -2,9 +2,10 @@ import { Command } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
-import { containersUp, containerTime, startContainers, stopContainers } from '../common/containers';
+import { containersUp, startContainers, stopContainers } from '../common/containers';
 import { getRelayerEnvs } from '../common/rest';
 import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
+import { containerNow } from '../common/util';
 import { dataDir, snapshotsDir } from '../consts';
 import { noData } from '../errors';
 
@@ -32,8 +33,8 @@ export default class Save extends Command {
     const metadata = getMetadata();
     const services = await containersUp();
     if (services.length > 0) {
-      metadata.time = containerTime(metadata);
       cli.action.start('Pausing all services');
+      metadata.time = containerNow(metadata);
       writeMetadata(metadata);
       await stopContainers();
       cli.action.stop();

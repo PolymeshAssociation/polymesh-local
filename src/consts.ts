@@ -31,7 +31,6 @@ export const subquery = {
 
 export const rest = {
   url: 'localhost:3004',
-  container: 'local_rest_api_1',
 };
 
 export const tooling = {
@@ -45,8 +44,4 @@ export const postgres = {
   host: 'postgres',
   port: '5432',
   db: 'postgres',
-};
-
-export const docker = {
-  execContainer: 'local_alice_1',
 };

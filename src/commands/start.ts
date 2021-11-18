@@ -17,7 +17,7 @@ import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/sn
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
-import { hostTime, printInfo, retry } from '../common/util';
+import { hostNow, printInfo, retry } from '../common/util';
 import { dataDir } from '../consts';
 import { chainRunningError, restArgsError } from '../errors';
 
@@ -135,7 +135,7 @@ export default class Start extends Command {
 
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
-      metadata = { version, time: hostTime(), startedAt: '', chain: chain || 'dev' };
+      metadata = { version, time: hostNow(), startedAt: '', chain: chain || 'dev' };
       if (image) {
         metadata.version = image;
       }

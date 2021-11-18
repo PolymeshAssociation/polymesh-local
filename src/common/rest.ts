@@ -1,4 +1,4 @@
-import { containersUp, getContainerEnv } from '../common/containers';
+import { containerName, containersUp, getContainerEnv } from '../common/containers';
 import { returnsExpectedStatus } from '../common/util';
 import { rest } from '../consts';
 
@@ -16,8 +16,9 @@ export function validateDidArgs(dids: string, mnemonics: string): boolean {
  */
 export async function getRelayerEnvs(): Promise<[string, string]> {
   if ((await containersUp()).includes('rest_api')) {
-    const dids = getContainerEnv(rest.container, 'RELAYER_DIDS');
-    const mnemonics = getContainerEnv(rest.container, 'RELAYER_MNEMONICS');
+    const restContainer = await containerName('rest_api');
+    const dids = getContainerEnv(restContainer, 'RELAYER_DIDS');
+    const mnemonics = getContainerEnv(restContainer, 'RELAYER_MNEMONICS');
     return [dids, mnemonics];
   } else {
     return ['', ''];
