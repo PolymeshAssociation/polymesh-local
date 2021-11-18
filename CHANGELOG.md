@@ -1,3 +1,10 @@
+## [3.2.1](https://github.com/PolymathNetwork/polymesh-local/compare/v3.2.0...v3.2.1) (2021-11-18)
+
+
+### Bug Fixes
+
+* 🐛 Await for UI step to finish ([#17](https://github.com/PolymathNetwork/polymesh-local/issues/17)) ([d9da9c4](https://github.com/PolymathNetwork/polymesh-local/commit/d9da9c4dbcf597d219dd7ed292b21055bd8e4785))
+
 # [3.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.1.0...v3.2.0) (2021-11-09)
 
 
