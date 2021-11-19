@@ -1,7 +1,7 @@
 {
   "name": "polymesh-local",
   "description": "Polymesh local environment for development and e2e testing",
-  "version": "3.2.1",
+  "version": "3.3.0",
   "author": "Jeremias Diaz @monitz87",
   "bin": {
     "polymesh-local": "./bin/run"

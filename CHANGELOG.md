@@ -1,3 +1,10 @@
+# [3.3.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.2.1...v3.3.0) (2021-11-19)
+
+
+### Features
+
+* 🎸 Add docker-compose V2 support ([#18](https://github.com/PolymathNetwork/polymesh-local/issues/18)) ([0018b1e](https://github.com/PolymathNetwork/polymesh-local/commit/0018b1e429a32146c2e10bbae37c2ebf3563e527))
+
 ## [3.2.1](https://github.com/PolymathNetwork/polymesh-local/compare/v3.2.0...v3.2.1) (2021-11-18)
 
 
