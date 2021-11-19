@@ -1,9 +1,9 @@
+import { Command } from '@oclif/command';
 import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
 
-import { Metadata } from '../common/snapshots';
-import { dataDir, dateFmt, docker, localDir, postgres, tooling, uis } from '../consts';
+import { dataDir, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
@@ -57,45 +57,89 @@ export async function stopContainers(): Promise<void> {
   });
 }
 
+interface psServiceV2 {
+  ID: string;
+  Name: string;
+  Service: string;
+  Project: string;
+  State: string;
+  Health: string;
+  ExitCode: number;
+}
 const serviceRegex = /local_(.+)_1/;
-export async function containersUp(): Promise<string[]> {
-  const ps = await compose.ps({
-    cwd: localDir,
-  });
+export async function containersUp(cmd: Command): Promise<string[]> {
+  // The docker-compose library 0.23.13 doesn't fully support docker-compose V2.
+  // With `ps` the library would truncate the first service with V2.
+  const composeVersion = composeMajorVersion();
+  if (composeVersion === 1) {
+    const ps = await compose.ps({
+      cwd: localDir,
+    });
 
-  return ps.data.services.map(s => {
-    const matches = serviceRegex.exec(s.name);
-    if (!matches || !matches[1]) {
-      throw new Error('Invalid docker-compose state');
-    }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return matches![1];
-  });
+    return ps.data.services.map(s => {
+      const matches = serviceRegex.exec(s.name);
+      if (!matches || !matches[1]) {
+        throw new Error('Invalid docker-compose state');
+      }
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      return matches![1];
+    });
+  } else if (composeVersion === 2) {
+    const services = JSON.parse(
+      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+    );
+    return services.map((s: psServiceV2) => s.Service);
+  } else {
+    cmd.error(
+      `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
+    );
+  }
+}
+
+function composeMajorVersion(): number {
+  const versionRegex = /(\d+)\.\d+\.\d+/;
+  const result = execSync('docker-compose --version').toString();
+  const versionMatches = versionRegex.exec(result);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return Number(versionMatches![1]);
+}
+
+/**
+ * @param serviceName
+ * @returns the running container name or empty string if service is not found
+ */
+export async function containerName(cmd: Command, serviceName: string): Promise<string> {
+  const composeVersion = composeMajorVersion();
+  if (composeVersion === 1) {
+    const regex = new RegExp(`local(?:_|-)${serviceName}(?:_|-)1`);
+
+    const ps = await compose.ps({
+      cwd: localDir,
+    });
+    const service = ps.data.services.find(s => s.name.match(regex));
+    return service?.name || '';
+  } else if (composeVersion === 2) {
+    const services = JSON.parse(
+      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+    );
+    const service = services.find((s: psServiceV2) => s.Service === serviceName);
+    return service?.Name || '';
+  } else {
+    cmd.error(
+      `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
+    );
+  }
 }
 
 export function getContainerEnv(container: string, env: string): string {
   return execSync(`docker exec ${container} bash -c 'echo "$${env}"'`).toString().trim();
 }
 
-export async function anyContainersUp(): Promise<boolean> {
-  return (await containersUp()).length > 0;
+export async function anyContainersUp(cmd: Command): Promise<boolean> {
+  return (await containersUp(cmd)).length > 0;
 }
 
-/**
- * Calculates the current time from the perspective of the container
- *   libfaketime produces a time relative to the start of a process
- *   offset is needed to recalculate this time without having to fork the Polymesh node process
- */
-export function containerTime(metadata: Metadata): string {
-  const offset = (new Date().getTime() - new Date(metadata.startedAt).getTime()) / 1000;
-  return execSync(
-    `docker exec ${docker.execContainer} sh -c 'date "${dateFmt}" -d "${offset} seconds"'`
-  )
-    .toString()
-    .trim();
-}
-
-// A simple bind mount to the data directory creates permission errors on linux. Instead named volumes are needed.
+// A bind mount to the data directory creates permission errors on linux. Instead named volumes are needed.
 // To export volumes we spin up a container to tar the contents, vice versa for importing.
 // Technique from: https://docs.docker.com/storage/volumes/#backup-restore-or-migrate-data-volumes
 const namedVolumes = ['polymesh_alice', 'polymesh_bob', 'polymesh_charlie', 'polymesh_postgres'];

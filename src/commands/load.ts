@@ -13,7 +13,7 @@ export default class Load extends Command {
 
   async run(): Promise<void> {
     const { args } = this.parse(Load);
-    if (await anyContainersUp()) {
+    if (await anyContainersUp(this)) {
       this.error(chainRunningError);
     }
 

@@ -1,13 +1,9 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
 
-import {
-  anyContainersUp,
-  containerTime,
-  removeVolumes,
-  stopContainers,
-} from '../common/containers';
+import { anyContainersUp, removeVolumes, stopContainers } from '../common/containers';
 import { getMetadata, writeMetadata } from '../common/snapshots';
+import { containerNow } from '../common/util';
 
 export default class Stop extends Command {
   static description = 'Stops all services started with the "start" command';
@@ -26,15 +22,17 @@ export default class Stop extends Command {
     const { flags: commandFlags } = this.parse(Stop);
     const { clean } = commandFlags;
 
-    if (!(await anyContainersUp())) {
+    if (!(await anyContainersUp(this))) {
       this.error('No containers to stop. Did you forget to run the "start" command?');
     }
 
-    cli.action.start('Updating metadata');
-    const metadata = getMetadata();
-    metadata.time = containerTime(metadata);
-    writeMetadata(metadata);
-    cli.action.stop();
+    if (!clean) {
+      cli.action.start('Updating metadata');
+      const metadata = getMetadata();
+      metadata.time = containerNow(metadata);
+      writeMetadata(metadata);
+      cli.action.stop();
+    }
 
     cli.action.start('Stopping all services');
     await stopContainers();
