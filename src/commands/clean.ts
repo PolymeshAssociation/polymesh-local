@@ -9,7 +9,7 @@ export default class Clean extends Command {
     'Clean removes the chain data so the next start is starts at a genisis block. Services must be stopped for this command to work';
 
   async run(): Promise<void> {
-    if (await anyContainersUp()) {
+    if (await anyContainersUp(this)) {
       this.error(chainRunningError);
     }
     cli.action.start('Removing data directory');

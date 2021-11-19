@@ -1,3 +1,4 @@
+import { Command } from '@oclif/command';
 import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
@@ -66,11 +67,11 @@ interface psServiceV2 {
   ExitCode: number;
 }
 const serviceRegex = /local_(.+)_1/;
-export async function containersUp(): Promise<string[]> {
+export async function containersUp(cmd: Command): Promise<string[]> {
   // The docker-compose library 0.23.13 doesn't fully support docker-compose V2.
   // With `ps` the library would truncate the first service with V2.
-
-  if (composeMajorVersion() === 1) {
+  const composeVersion = composeMajorVersion();
+  if (composeVersion === 1) {
     const ps = await compose.ps({
       cwd: localDir,
     });
@@ -83,12 +84,16 @@ export async function containersUp(): Promise<string[]> {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       return matches![1];
     });
+  } else if (composeVersion === 2) {
+    const services = JSON.parse(
+      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+    );
+    return services.map((s: psServiceV2) => s.Service);
+  } else {
+    cmd.error(
+      `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
+    );
   }
-
-  const services = JSON.parse(
-    execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
-  );
-  return services.map((s: psServiceV2) => s.Service);
 }
 
 function composeMajorVersion(): number {
@@ -103,8 +108,9 @@ function composeMajorVersion(): number {
  * @param serviceName
  * @returns the running container name or empty string if service is not found
  */
-export async function containerName(serviceName: string): Promise<string> {
-  if (composeMajorVersion() === 1) {
+export async function containerName(cmd: Command, serviceName: string): Promise<string> {
+  const composeVersion = composeMajorVersion();
+  if (composeVersion === 1) {
     const regex = new RegExp(`local(?:_|-)${serviceName}(?:_|-)1`);
 
     const ps = await compose.ps({
@@ -112,21 +118,25 @@ export async function containerName(serviceName: string): Promise<string> {
     });
     const service = ps.data.services.find(s => s.name.match(regex));
     return service?.name || '';
+  } else if (composeVersion === 2) {
+    const services = JSON.parse(
+      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+    );
+    const service = services.find((s: psServiceV2) => s.Service === serviceName);
+    return service?.Name || '';
+  } else {
+    cmd.error(
+      `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
+    );
   }
-
-  const services = JSON.parse(
-    execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
-  );
-  const service = services.find((s: psServiceV2) => s.Service === serviceName);
-  return service?.Name || '';
 }
 
 export function getContainerEnv(container: string, env: string): string {
   return execSync(`docker exec ${container} bash -c 'echo "$${env}"'`).toString().trim();
 }
 
-export async function anyContainersUp(): Promise<boolean> {
-  return (await containersUp()).length > 0;
+export async function anyContainersUp(cmd: Command): Promise<boolean> {
+  return (await containersUp(cmd)).length > 0;
 }
 
 // A bind mount to the data directory creates permission errors on linux. Instead named volumes are needed.

@@ -100,7 +100,7 @@ export default class Start extends Command {
       commandFlags;
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
 
-    if (await anyContainersUp()) {
+    if (await anyContainersUp(this)) {
       this.error(chainRunningError);
     }
 

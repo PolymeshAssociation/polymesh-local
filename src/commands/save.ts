@@ -29,9 +29,9 @@ export default class Save extends Command {
       this.error(noData);
     }
 
-    const restEnvs = await getRelayerEnvs();
+    const restEnvs = await getRelayerEnvs(this);
     const metadata = getMetadata();
-    const services = await containersUp();
+    const services = await containersUp(this);
     if (services.length > 0) {
       cli.action.start('Pausing all services');
       metadata.time = containerNow(metadata);

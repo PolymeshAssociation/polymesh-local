@@ -22,7 +22,7 @@ export default class Stop extends Command {
     const { flags: commandFlags } = this.parse(Stop);
     const { clean } = commandFlags;
 
-    if (!(await anyContainersUp())) {
+    if (!(await anyContainersUp(this))) {
       this.error('No containers to stop. Did you forget to run the "start" command?');
     }
 
