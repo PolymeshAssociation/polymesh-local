@@ -11,6 +11,7 @@ export default class Stop extends Command {
   static usage = 'stop [OPTIONS]';
 
   static flags = {
+    help: flags.help({ char: 'h' }),
     clean: flags.boolean({
       char: 'c',
       description: 'Cleans state after stopping',
