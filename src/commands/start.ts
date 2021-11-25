@@ -75,7 +75,7 @@ export default class Start extends Command {
       options: ['chain', 'subquery', 'gql', 'rest', 'uis'],
     }),
     verbose: flags.boolean({
-      description: 'enables verbose output',
+      description: 'enables verbose logging',
       default: false,
     }),
     dids: flags.string({
@@ -100,7 +100,7 @@ export default class Start extends Command {
       commandFlags;
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
 
-    if (await anyContainersUp(this)) {
+    if (await anyContainersUp(this, verbose)) {
       this.error(chainRunningError);
     }
 
@@ -209,7 +209,7 @@ export default class Start extends Command {
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);
-      await stopContainers();
+      await stopContainers(verbose);
       this.error(
         `At least one of the required services did not launch correctly. Results: \n${resultMsgs.join(
           '\n'

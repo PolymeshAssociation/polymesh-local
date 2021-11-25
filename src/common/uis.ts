@@ -1,7 +1,7 @@
-import { execSync } from 'child_process';
 import { existsSync, mkdirSync, readdirSync, rmdirSync, rmSync } from 'fs';
 import fetch from 'node-fetch';
 import path from 'path';
+import tar from 'tar';
 import { Parser } from 'xml2js';
 
 import { downloadFile, returnsExpectedStatus } from '../common/util';
@@ -36,7 +36,10 @@ export async function fetchUIs(): Promise<void> {
   if (!existsSync(uis.dir)) mkdirSync(uis.dir);
 
   try {
-    execSync(`tar -xf '${dest}' -C ${uis.dir}`);
+    await tar.x({
+      file: dest,
+      C: uis.dir,
+    });
   } catch (err) {
     console.error(
       'Could not unzip UIs. Try updating to the latest polymesh-local release. If the problem persists please contact Polymath'

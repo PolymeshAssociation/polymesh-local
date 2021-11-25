@@ -49,10 +49,10 @@ export async function startContainers(
   });
 }
 
-export async function stopContainers(): Promise<void> {
+export async function stopContainers(verbose: boolean): Promise<void> {
   await compose.down({
     cwd: localDir,
-    log: false,
+    log: verbose,
     commandOptions: ['--volumes'], // removes volumes
   });
 }
@@ -67,13 +67,14 @@ interface psServiceV2 {
   ExitCode: number;
 }
 const serviceRegex = /local_(.+)_1/;
-export async function containersUp(cmd: Command): Promise<string[]> {
+export async function containersUp(cmd: Command, verbose: boolean): Promise<string[]> {
   // The docker-compose library 0.23.13 doesn't fully support docker-compose V2.
   // With `ps` the library would truncate the first service with V2.
   const composeVersion = composeMajorVersion();
   if (composeVersion === 1) {
     const ps = await compose.ps({
       cwd: localDir,
+      log: verbose,
     });
 
     return ps.data.services.map(s => {
@@ -132,11 +133,11 @@ export async function containerName(cmd: Command, serviceName: string): Promise<
 }
 
 export function getContainerEnv(container: string, env: string): string {
-  return execSync(`docker exec ${container} bash -c 'echo "$${env}"'`).toString().trim();
+  return execSync(`docker exec ${container} bash -c "echo $${env}"`).toString().trim();
 }
 
-export async function anyContainersUp(cmd: Command): Promise<boolean> {
-  return (await containersUp(cmd)).length > 0;
+export async function anyContainersUp(cmd: Command, verbose: boolean): Promise<boolean> {
+  return (await containersUp(cmd, verbose)).length > 0;
 }
 
 // A bind mount to the data directory creates permission errors on linux. Instead named volumes are needed.

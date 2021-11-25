@@ -6,6 +6,7 @@ import path from 'path';
 import { existsSync, readdirSync, readFileSync } from 'fs-extra';
 import AWS from 'aws-sdk';
 import { rmSync } from 'fs';
+import tar from 'tar';
 
 const uiDir = path.join(__dirname, '..', 'src', 'local', 'uis');
 
@@ -31,7 +32,14 @@ function uploadUis() {
   }
 
   console.log('zipping ui dir');
-  execSync(`tar -czvf ${fileName} -C ${uiDir} .`, { stdio: 'ignore' });
+  tar.c(
+    {
+      file: fileName,
+      C: uiDir,
+      gzip: true,
+    },
+    ['.']
+  );
 
   const fileContent = readFileSync(fileName);
   const params = {

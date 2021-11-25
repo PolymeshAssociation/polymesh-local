@@ -1,6 +1,8 @@
 import Command from '@oclif/command';
-import { execSync } from 'child_process';
-import { existsSync, lstatSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { mkdirpSync } from 'fs-extra';
+import rimraf from 'rimraf';
+import tar from 'tar';
 
 import { backupVolumes, restoreVolumes } from '../common/containers';
 import { dataDir, snapshotsDir } from '../consts';
@@ -18,13 +20,20 @@ export interface Metadata {
 }
 
 export function createSnapshot(fileName: string): void {
-  execSync(`mkdir -p ${snapshotsDir}`);
+  mkdirpSync(snapshotsDir);
   backupVolumes();
-  execSync(`tar -czvf ${fileName} -C ${dataDir} .`, { stdio: 'ignore' });
+  tar.c(
+    {
+      gzip: true,
+      file: fileName,
+      C: dataDir,
+    },
+    ['.']
+  );
 }
 
 export function writeMetadata(data: Metadata): void {
-  execSync(`mkdir -p ${dataDir}`);
+  mkdirpSync(dataDir);
   writeFileSync(`${dataDir}/metadata.json`, JSON.stringify(data));
 }
 
@@ -36,10 +45,13 @@ export async function loadSnapshot(cmd: Command, snapshot: string): Promise<void
 
   if (existsSync(dataDir)) {
     cmd.log(`Removing old chain data at ${dataDir}`);
-    execSync(`rm -rf ${dataDir}`);
+    rimraf.sync(dataDir);
   }
-  execSync(`mkdir -p ${dataDir}`);
-  execSync(`tar -xf ${path} -C ${dataDir}`);
+  mkdirpSync(dataDir);
+  await tar.x({
+    file: path,
+    C: dataDir,
+  });
   restoreVolumes();
 }
 
@@ -49,10 +61,12 @@ export function getMetadata(): Metadata {
 }
 
 export function listSnapshots(cmd: Command): void {
-  execSync(`mkdir -p ${snapshotsDir}`);
-  const snapshots = execSync(`ls ${snapshotsDir}`).toString().replace(/\.tgz/g, '');
-  cmd.log('Local snapshots: \n');
-  cmd.log(snapshots);
+  mkdirpSync(snapshotsDir);
+  const snapshots = readdirSync(snapshotsDir, { withFileTypes: true })
+    .filter(dirent => dirent.isFile())
+    .map(dirent => dirent.name.replace(/\.tgz/g, ''));
+  cmd.log('Local snapshots:');
+  cmd.log(snapshots.join('\n'));
 }
 
 export function removeSnapshot(cmd: Command, snapshot: string): void {
@@ -63,7 +77,7 @@ export function removeSnapshot(cmd: Command, snapshot: string): void {
   if (!stat.isFile()) {
     cmd.error(`${snapshot} is not a file`);
   }
-  execSync(`rm ${snapshotPath(snapshot)}`);
+  rmSync(snapshotPath(snapshot));
 }
 
 export function snapshotPath(snapshot: string): string {
