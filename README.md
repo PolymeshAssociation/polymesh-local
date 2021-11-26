@@ -63,7 +63,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/3.3.0 linux-x64 node-v14.18.1
+polymesh-local/3.3.0 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -91,6 +91,10 @@ Clean removes the chain data so the next start is starts at a genisis block. Ser
 ```
 USAGE
   $ polymesh-local clean
+
+OPTIONS
+  -h, --help  show CLI help
+  --verbose   enables verbose logging
 ```
 
 _See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.3.0/src/commands/clean.ts)_
@@ -130,6 +134,10 @@ Loads a snapshot into the data directory. Services must be stopped for this comm
 ```
 USAGE
   $ polymesh-local load FILE
+
+OPTIONS
+  -h, --help  show CLI help
+  --verbose   enables verbose logging
 ```
 
 _See code: [src/commands/load.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.3.0/src/commands/load.ts)_
@@ -166,6 +174,10 @@ USAGE
 
 ARGUMENTS
   NAME  A name or path for the snapshot
+
+OPTIONS
+  -h, --help  show CLI help
+  --verbose   enables verbose logging
 ```
 
 _See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.3.0/src/commands/save.ts)_
@@ -215,7 +227,7 @@ OPTIONS
       [default: //Alice] Comma seperated list of mnemonics for dids. Defaults to `//Alice`
 
   --verbose
-      enables verbose output
+      enables verbose logging
 ```
 
 _See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.3.0/src/commands/start.ts)_
@@ -230,6 +242,7 @@ USAGE
 
 OPTIONS
   -c, --clean  Cleans state after stopping
+  --verbose    enables verbose logging
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.3.0/src/commands/stop.ts)_

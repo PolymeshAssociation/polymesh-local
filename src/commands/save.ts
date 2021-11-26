@@ -1,4 +1,4 @@
-import { Command } from '@oclif/command';
+import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
@@ -14,6 +14,14 @@ export default class Save extends Command {
 
   static usage = 'save [name]';
 
+  static flags = {
+    help: flags.help({ char: 'h' }),
+    verbose: flags.boolean({
+      description: 'enables verbose logging',
+      default: false,
+    }),
+  };
+
   static args = [
     {
       name: 'name',
@@ -22,21 +30,22 @@ export default class Save extends Command {
   ];
 
   async run(): Promise<void> {
-    const { args } = this.parse(Save);
+    const { args, flags: commandFlags } = this.parse(Save);
+    const { verbose } = commandFlags;
     const output = args.name;
 
     if (!existsSync(dataDir)) {
       this.error(noData);
     }
 
-    const restEnvs = await getRelayerEnvs(this);
+    const restEnvs = await getRelayerEnvs(this, verbose);
     const metadata = getMetadata();
-    const services = await containersUp(this);
+    const services = await containersUp(this, verbose);
     if (services.length > 0) {
       cli.action.start('Pausing all services');
       metadata.time = containerNow(metadata);
       writeMetadata(metadata);
-      await stopContainers();
+      await stopContainers(verbose);
       cli.action.stop();
     }
 
@@ -50,7 +59,7 @@ export default class Save extends Command {
       await startContainers(
         metadata.version,
         metadata.time,
-        false,
+        verbose,
         metadata.chain,
         services,
         restEnvs[0],
@@ -64,7 +73,8 @@ export default class Save extends Command {
 }
 
 function defaultFilename(version: string): string {
+  // strip the timezone so the file name looks cleaner. Replace `:` so the file name is valid on windows
   return `${snapshotsDir}/${version}_${
-    new Date().toISOString().replace('T', '_').split('.')[0]
+    new Date().toISOString().replace('T', '_').replace(/:/g, '-').split('.')[0]
   }.tgz`;
 }

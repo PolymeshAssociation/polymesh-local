@@ -11,18 +11,23 @@ export default class Stop extends Command {
   static usage = 'stop [OPTIONS]';
 
   static flags = {
+    help: flags.help({ char: 'h' }),
     clean: flags.boolean({
       char: 'c',
       description: 'Cleans state after stopping',
+      default: false,
+    }),
+    verbose: flags.boolean({
+      description: 'enables verbose logging',
       default: false,
     }),
   };
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Stop);
-    const { clean } = commandFlags;
+    const { clean, verbose } = commandFlags;
 
-    if (!(await anyContainersUp(this))) {
+    if (!(await anyContainersUp(this, verbose))) {
       this.error('No containers to stop. Did you forget to run the "start" command?');
     }
 
@@ -35,7 +40,7 @@ export default class Stop extends Command {
     }
 
     cli.action.start('Stopping all services');
-    await stopContainers();
+    await stopContainers(verbose);
     cli.action.stop();
 
     if (clean) {
