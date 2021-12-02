@@ -1,3 +1,10 @@
+# [3.4.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.3.0...v3.4.0) (2021-12-02)
+
+
+### Features
+
+* 🎸 Add support for 4.1.0-rc1 ([6092bf8](https://github.com/PolymathNetwork/polymesh-local/commit/6092bf805bdee8034ee05cf77ac5b4c8907f3581))
+
 # [3.3.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.2.1...v3.3.0) (2021-11-19)
 
 
