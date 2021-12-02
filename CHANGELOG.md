@@ -1,3 +1,10 @@
+## [3.5.1](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.0...v3.5.1) (2021-12-02)
+
+
+### Bug Fixes
+
+* 🐛 change schema port to 3008 and replace pull_policy ([79e10d0](https://github.com/PolymathNetwork/polymesh-local/commit/79e10d09e0765467acdb2e5a8abaf27901364f9f))
+
 # [3.5.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.4.0...v3.5.0) (2021-12-02)
 
 
