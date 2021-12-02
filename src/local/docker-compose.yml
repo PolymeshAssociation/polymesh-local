@@ -90,7 +90,6 @@ services:
 
   subquery:
     image: 'polymathnet/polymesh-subquery:latest'
-    pull_policy: always
     restart: always
     depends_on:
       - 'postgres'
@@ -111,7 +110,6 @@ services:
 
   tooling:
     image: polymathnet/tooling-gql:latest
-    pull_policy: always
     restart: always
     depends_on:
       - 'postgres'
@@ -125,7 +123,6 @@ services:
 
   rest_api:
     image: polymathnet/polymesh-rest-api:latest
-    pull_policy: always
     restart: always
     ports:
       - 3004:3000
@@ -176,7 +173,7 @@ services:
     image: nginx
     restart: always
     ports:
-      - 3004:80
+      - 3008:80
     volumes:
       - '${LOCAL_DIR}/schemas/polymesh_schema_${POLYMESH_VERSION}.json:/var/www/app/polymesh_schema.json:ro'
       - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
