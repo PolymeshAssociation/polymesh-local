@@ -32,7 +32,7 @@ export default class Start extends Command {
       char: 'v',
       default: '4.0.0',
       description: 'version of the containers to run',
-      options: ['4.0.0'],
+      options: ['4.0.0', '4.1.0-rc1'],
     }),
     image: flags.string({
       char: 'i',
