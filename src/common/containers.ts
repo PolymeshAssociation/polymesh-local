@@ -25,6 +25,7 @@ export async function startContainers(
   dids: string,
   mnemonics: string
 ): Promise<void> {
+  await compose.pullAll();
   await compose.upMany(services, {
     cwd: localDir,
     log,
