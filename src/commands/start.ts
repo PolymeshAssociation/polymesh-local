@@ -171,7 +171,7 @@ export default class Start extends Command {
     const services = typedOnly.flatMap(o => {
       switch (o) {
         case 'chain':
-          return ['alice', 'bob', 'charlie'];
+          return ['alice', 'bob', 'charlie', 'schema'];
         case 'subquery':
           return ['subquery'];
         case 'gql':
