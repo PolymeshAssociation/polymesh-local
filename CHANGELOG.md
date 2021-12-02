@@ -1,3 +1,10 @@
+# [3.5.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.4.0...v3.5.0) (2021-12-02)
+
+
+### Features
+
+* 🎸 Serve schema on port 3004 ([8c1ede6](https://github.com/PolymathNetwork/polymesh-local/commit/8c1ede63a33b465831adc01afca678a2d6094bb4))
+
 # [3.4.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.3.0...v3.4.0) (2021-12-02)
 
 
