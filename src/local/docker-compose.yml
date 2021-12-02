@@ -90,6 +90,7 @@ services:
 
   subquery:
     image: 'polymathnet/polymesh-subquery:latest'
+    pull_policy: always
     restart: always
     depends_on:
       - 'postgres'
@@ -110,6 +111,7 @@ services:
 
   tooling:
     image: polymathnet/tooling-gql:latest
+    pull_policy: always
     restart: always
     depends_on:
       - 'postgres'
@@ -123,6 +125,7 @@ services:
 
   rest_api:
     image: polymathnet/polymesh-rest-api:latest
+    pull_policy: always
     restart: always
     ports:
       - 3004:3000
