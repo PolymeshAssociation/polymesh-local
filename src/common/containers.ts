@@ -53,9 +53,9 @@ export async function startContainers(
         LOCAL_DIR: localDir,
       },
     });
-  } catch (err: any) {
+  } catch (err) {
     await stopContainers(log);
-    throw new Error('Error trying to start containers: ' + err.err);
+    throw new Error('Error trying to start containers: ' + (err as { err: string }).err);
   }
 }
 
@@ -66,8 +66,8 @@ export async function stopContainers(verbose: boolean): Promise<void> {
       log: verbose,
       commandOptions: ['--volumes'], // removes volumes
     });
-  } catch (err: any) {
-    throw new Error('Error trying to start containers: ' + err.err);
+  } catch (err) {
+    throw new Error('Error trying to stop containers: ' + (err as { err: string }).err);
   }
 }
 
