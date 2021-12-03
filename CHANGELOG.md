@@ -1,3 +1,10 @@
+## [3.5.2](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.1...v3.5.2) (2021-12-03)
+
+
+### Bug Fixes
+
+* 🐛 compose error handling ([e8507a6](https://github.com/PolymathNetwork/polymesh-local/commit/e8507a611d9133b8bf7c13226f2acf2fea8652f3))
+
 ## [3.5.1](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.0...v3.5.1) (2021-12-02)
 
 
