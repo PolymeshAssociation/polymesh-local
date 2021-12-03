@@ -17,6 +17,7 @@ export function prepareDockerfile(version: string, image?: string): void {
 }
 
 export async function startContainers(
+  cmd: Command,
   version: string,
   timestamp: string,
   log: boolean,
@@ -54,12 +55,14 @@ export async function startContainers(
       },
     });
   } catch (err) {
-    await stopContainers(log);
-    throw new Error('Error trying to start containers: ' + (err as { err: string }).err);
+    if (await anyContainersUp(cmd, log)) {
+      await stopContainers(cmd, log);
+    }
+    cmd.error('Error trying to start containers: ' + (err as { err: string }).err);
   }
 }
 
-export async function stopContainers(verbose: boolean): Promise<void> {
+export async function stopContainers(cmd: Command, verbose: boolean): Promise<void> {
   try {
     await compose.down({
       cwd: localDir,
@@ -67,7 +70,7 @@ export async function stopContainers(verbose: boolean): Promise<void> {
       commandOptions: ['--volumes'], // removes volumes
     });
   } catch (err) {
-    throw new Error('Error trying to stop containers: ' + (err as { err: string }).err);
+    cmd.error('Error trying to stop containers: ' + (err as { err: string }).err);
   }
 }
 
