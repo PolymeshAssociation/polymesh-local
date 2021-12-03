@@ -25,37 +25,50 @@ export async function startContainers(
   dids: string,
   mnemonics: string
 ): Promise<void> {
-  await compose.pullAll();
-  await compose.upMany(services, {
-    cwd: localDir,
-    log,
-    commandOptions: ['--build'],
-    env: {
-      ...process.env,
-      POLYMESH_VERSION: version,
-      DATA_DIR: dataDir,
-      PG_USER: postgres.user,
-      PG_HOST: postgres.host,
-      PG_PASSWORD: postgres.password,
-      PG_PORT: postgres.port,
-      PG_DB: postgres.db,
-      FAKETIME: `@${timestamp}`,
-      CHAIN: chain,
-      TOOLING_API_KEY: tooling.apiKey,
-      RELAYER_DIDS: dids,
-      RELAYER_MNEMONICS: mnemonics,
-      UI_DIR: uis.dir,
-      LOCAL_DIR: localDir,
-    },
-  });
+  try {
+    await compose.pullMany(
+      services.filter(service => ['subquery', 'tooling'].includes(service)),
+      { log, cwd: localDir }
+    );
+
+    await compose.upMany(services, {
+      cwd: localDir,
+      log,
+      commandOptions: ['--build'],
+      env: {
+        ...process.env,
+        POLYMESH_VERSION: version,
+        DATA_DIR: dataDir,
+        PG_USER: postgres.user,
+        PG_HOST: postgres.host,
+        PG_PASSWORD: postgres.password,
+        PG_PORT: postgres.port,
+        PG_DB: postgres.db,
+        FAKETIME: `@${timestamp}`,
+        CHAIN: chain,
+        TOOLING_API_KEY: tooling.apiKey,
+        RELAYER_DIDS: dids,
+        RELAYER_MNEMONICS: mnemonics,
+        UI_DIR: uis.dir,
+        LOCAL_DIR: localDir,
+      },
+    });
+  } catch (err) {
+    await stopContainers(log);
+    throw new Error('Error trying to start containers: ' + (err as { err: string }).err);
+  }
 }
 
 export async function stopContainers(verbose: boolean): Promise<void> {
-  await compose.down({
-    cwd: localDir,
-    log: verbose,
-    commandOptions: ['--volumes'], // removes volumes
-  });
+  try {
+    await compose.down({
+      cwd: localDir,
+      log: verbose,
+      commandOptions: ['--volumes'], // removes volumes
+    });
+  } catch (err) {
+    throw new Error('Error trying to stop containers: ' + (err as { err: string }).err);
+  }
 }
 
 interface psServiceV2 {
