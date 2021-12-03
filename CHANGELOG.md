@@ -1,3 +1,10 @@
+## [3.5.3](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.2...v3.5.3) (2021-12-03)
+
+
+### Bug Fixes
+
+* 🐛 even better error handling ([8231ede](https://github.com/PolymathNetwork/polymesh-local/commit/8231ede77b2673accbc796d2eb65c11107f2d380))
+
 ## [3.5.2](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.1...v3.5.2) (2021-12-03)
 
 
