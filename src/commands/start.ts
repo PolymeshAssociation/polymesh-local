@@ -186,6 +186,7 @@ export default class Start extends Command {
 
     cli.action.start('Starting the containers');
     await startContainers(
+      this,
       version,
       metadata.time,
       verbose,
@@ -209,7 +210,7 @@ export default class Start extends Command {
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);
-      await stopContainers(verbose);
+      await stopContainers(this, verbose);
       this.error(
         `At least one of the required services did not launch correctly. Results: \n${resultMsgs.join(
           '\n'

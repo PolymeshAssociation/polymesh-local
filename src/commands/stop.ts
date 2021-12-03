@@ -40,7 +40,7 @@ export default class Stop extends Command {
     }
 
     cli.action.start('Stopping all services');
-    await stopContainers(verbose);
+    await stopContainers(this, verbose);
     cli.action.stop();
 
     if (clean) {

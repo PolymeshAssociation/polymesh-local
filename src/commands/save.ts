@@ -45,7 +45,7 @@ export default class Save extends Command {
       cli.action.start('Pausing all services');
       metadata.time = containerNow(metadata);
       writeMetadata(metadata);
-      await stopContainers(verbose);
+      await stopContainers(this, verbose);
       cli.action.stop();
     }
 
@@ -57,6 +57,7 @@ export default class Save extends Command {
     if (services.length > 0) {
       cli.action.start('Restarting services');
       await startContainers(
+        this,
         metadata.version,
         metadata.time,
         verbose,
