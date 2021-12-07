@@ -18,8 +18,7 @@ export function prepareDockerfile(version: string, image?: string): void {
 
 export async function startContainers(
   cmd: Command,
-  version: string,
-  timestamp: string,
+  versionOrImage: string,
   log: boolean,
   chain: string,
   services: string[],
@@ -32,6 +31,12 @@ export async function startContainers(
       { log, cwd: localDir }
     );
 
+    const versionRegex = /\d+.\d+.\d+/;
+    const results = versionRegex.exec(versionOrImage);
+    if (!results || !results[0]) {
+      cmd.error('invalid version format');
+    }
+    const version = results[0];
     await compose.upMany(services, {
       cwd: localDir,
       log,
@@ -45,7 +50,6 @@ export async function startContainers(
         PG_PASSWORD: postgres.password,
         PG_PORT: postgres.port,
         PG_DB: postgres.db,
-        FAKETIME: `@${timestamp}`,
         CHAIN: chain,
         TOOLING_API_KEY: tooling.apiKey,
         RELAYER_DIDS: dids,

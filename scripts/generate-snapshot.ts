@@ -58,10 +58,12 @@ async function main() {
 
   try {
     execSync(
-      `${cliDir}/run start --chain ci-dev --clean ${image ? imageFlag : versionFlag} --verbose`
+      `${cliDir}/run start --chain ci-dev -o chain --clean ${
+        image ? imageFlag : versionFlag
+      } --verbose`
     );
     runTests();
-    execSync(`${cliDir}/run save ${version}`);
+    execSync(`${cliDir}/run save --iKnowWhatImDoing ${version}`);
   } finally {
     execSync(`${cliDir}/run stop --clean`);
   }
