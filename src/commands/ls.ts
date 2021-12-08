@@ -1,5 +1,6 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 
+import Command from '../base';
 import { listSnapshots } from '../common/snapshots';
 
 export default class Ls extends Command {

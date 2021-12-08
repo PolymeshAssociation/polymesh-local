@@ -1,11 +1,13 @@
 import Command from '@oclif/command';
+import fs from 'fs';
 import { createWriteStream } from 'fs-extra';
 import fetch from 'node-fetch';
+import path from 'path';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
 import { getMetadata, Metadata } from '../common/snapshots';
-import { chain, checkSettings, postgres, rest, tooling, uis } from '../consts';
+import { chain, checkSettings, configFileName, postgres, rest, tooling, uis } from '../consts';
 
 const millisecondsPerMinute = 60 * 1000;
 
@@ -54,6 +56,10 @@ export async function returnsExpectedStatus(
 
 export function printInfo(cmd: Command): void {
   const metadata = getMetadata();
+  const configLocation = path.join(cmd.config.configDir, configFileName);
+  if (fs.existsSync(configLocation)) {
+    cmd.log(`config file located at: ${configLocation}`);
+  }
   cmd.log(`chain version ${metadata.version} running`);
   cmd.log(`polymesh node listening at wss://${chain.url}`);
   cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);

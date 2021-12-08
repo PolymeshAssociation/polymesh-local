@@ -1,7 +1,8 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
+import Command from '../base';
 import { isChainUp } from '../common/chain';
 import {
   anyContainersUp,
@@ -30,7 +31,9 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '4.0.0',
+      default: (ctx: any) => {
+        return ctx.userConfig?.chainTag || '4.0.0';
+      },
       description: 'version of the containers to run',
       options: ['4.0.0', '4.1.0-rc1'],
     }),
@@ -80,12 +83,19 @@ export default class Start extends Command {
     }),
     dids: flags.string({
       description:
-        'Comma seperated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
-      default: '0x0600000000000000000000000000000000000000000000000000000000000000',
+        'Comma separated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
+      default: (ctx: any) => {
+        return (
+          ctx.userConfig?.restDids ||
+          '0x0600000000000000000000000000000000000000000000000000000000000000'
+        );
+      },
     }),
     mnemonics: flags.string({
-      description: 'Comma seperated list of mnemonics for dids. Defaults to `//Alice`',
-      default: '//Alice',
+      description: 'Comma separated list of mnemonics for dids. Defaults to `//Alice`',
+      default: (ctx: any) => {
+        return ctx.userConfig?.restMnemonics || '//Alice';
+      },
     }),
     uiLatest: flags.boolean({
       char: 'u',
@@ -193,7 +203,8 @@ export default class Start extends Command {
       metadata.chain,
       services,
       dids,
-      mnemonics
+      mnemonics,
+      this.userConfig
     );
     cli.action.stop();
 

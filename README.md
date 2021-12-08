@@ -63,7 +63,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/3.5.3 linux-x64 node-v14.18.1
+polymesh-local/3.5.3 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -86,7 +86,7 @@ USAGE
 
 ## `polymesh-local clean`
 
-Clean removes the chain data so the next start is starts at a genisis block. Services must be stopped for this command to work
+Clean removes the chain data so the next start is starts at a genesis block. Services must be stopped for this command to work
 
 ```
 USAGE
@@ -229,11 +229,11 @@ OPTIONS
       [default: 4.0.0] version of the containers to run
 
   --dids=dids
-      [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma seperated list of dids available 
+      [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma separated list of dids available 
       in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`
 
   --mnemonics=mnemonics
-      [default: //Alice] Comma seperated list of mnemonics for dids. Defaults to `//Alice`
+      [default: //Alice] Comma separated list of mnemonics for dids. Defaults to `//Alice`
 
   --verbose
       enables verbose logging
