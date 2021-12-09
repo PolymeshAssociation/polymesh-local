@@ -1,6 +1,5 @@
 import Command from '@oclif/command';
-import fs from 'fs';
-import { createWriteStream } from 'fs-extra';
+import * as fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 import { pipeline } from 'stream';
@@ -8,6 +7,20 @@ import { promisify } from 'util';
 
 import { getMetadata, Metadata } from '../common/snapshots';
 import { chain, checkSettings, configFileName, postgres, rest, tooling, uis } from '../consts';
+
+/**
+ * Values a user can set in a config file to control what images to use
+ */
+export interface UserConfig {
+  // image versions
+  chainTag: string;
+  toolingTag: string;
+  restTag: string;
+  subqueryTag: string;
+
+  restMnemonics: string;
+  restDids: string;
+}
 
 const millisecondsPerMinute = 60 * 1000;
 
@@ -78,7 +91,7 @@ export function printInfo(cmd: Command): void {
  * @param dest The path to save the file to
  */
 export async function downloadFile(url: string, dest: string): Promise<void> {
-  await promisify(pipeline)((await fetch(url)).body, createWriteStream(dest));
+  await promisify(pipeline)((await fetch(url)).body, fs.createWriteStream(dest));
 }
 
 /**
@@ -107,4 +120,25 @@ function dateToFakeTime(date: Date): string {
   // Adjust the date for the timezone since the TZ gets removed
   const tzAdjusted = new Date(date.getTime() - date.getTimezoneOffset() * millisecondsPerMinute);
   return tzAdjusted.toISOString().replace(/T/, ' ').replace(/\..*$/, '');
+}
+
+/**
+ * Reads user config settings
+ * @param cmd
+ * @returns user config if set, otherwise null
+ */
+export async function getUserConfig(cmd: Command): Promise<UserConfig | null> {
+  const configPath = path.join(cmd.config.configDir, configFileName);
+  if (fs.existsSync(configPath)) {
+    return fs.readJSON(configPath);
+  } else {
+    return null;
+  }
+}
+
+export function saveUserConfig(cmd: Command, config: UserConfig): void {
+  const configPath = path.join(cmd.config.configDir, configFileName);
+  const contents = JSON.stringify(config, undefined, 2);
+  fs.writeFileSync(configPath, contents);
+  cmd.log(`config file was saved at ${configPath}`);
 }
