@@ -1,5 +1,6 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
+import { containerNow } from 'src/common/util';
 
 import { anyContainersUp, removeVolumes, stopContainers } from '../common/containers';
 import { getMetadata, writeMetadata } from '../common/snapshots';
@@ -33,6 +34,7 @@ export default class Stop extends Command {
     if (!clean) {
       cli.action.start('Updating metadata');
       const metadata = getMetadata();
+      metadata.time = containerNow(metadata);
       writeMetadata(metadata);
       cli.action.stop();
     }

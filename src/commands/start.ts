@@ -136,7 +136,7 @@ export default class Start extends Command {
 
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
-      metadata = { version, chain: chain || 'dev' };
+      metadata = { version, chain: chain || 'dev', time: hostNow(), startedAt: '' };
       if (image) {
         metadata.version = image;
       }
@@ -156,6 +156,8 @@ export default class Start extends Command {
         `Polymesh chain ${chain} was specified, but data was for ${metadata.chain}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the chain`
       );
     }
+
+    metadata.startedAt = new Date().toISOString();
     writeMetadata(metadata);
 
     if (only.includes('uis')) {
@@ -185,7 +187,16 @@ export default class Start extends Command {
     });
 
     cli.action.start('Starting the containers');
-    await startContainers(this, version, verbose, metadata.chain, services, dids, mnemonics);
+    await startContainers(
+      this,
+      version,
+      metadata.time,
+      verbose,
+      metadata.chain,
+      services,
+      dids,
+      mnemonics
+    );
     cli.action.stop();
 
     const allChecks = {
@@ -215,7 +226,7 @@ export default class Start extends Command {
     this.log(''); // implicit newline
     if (snapshot) {
       this.warn(
-        'When you load a snapshot, the chain nodes will be read only, meaning no new extrinsics will be executed.'
+        'When you load a snapshot the chain will think it is running in the past, meaning extrinsics that validate input times will likely fail.'
       );
     }
     this.log('\nHappy testing!');

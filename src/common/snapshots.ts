@@ -11,6 +11,11 @@ import { dataDir, snapshotsDir } from '../consts';
 
 export interface Metadata {
   version: string;
+  // time represents the time to set inside the container so the node considers it live
+  time: string;
+  // startedAt is a timestamp recorded when starting. Used to calculate time when shutting down.
+  // libfaketime advances on a per process basis making it difficult to query directly form the container.
+  startedAt: string;
   chain: string;
 }
 

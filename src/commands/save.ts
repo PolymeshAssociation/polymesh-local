@@ -1,6 +1,7 @@
 import { Command, flags } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
+import { containerNow } from 'src/common/util';
 
 import { containersUp, startContainers, stopContainers } from '../common/containers';
 import { getRelayerEnvs } from '../common/rest';
@@ -37,8 +38,8 @@ export default class Save extends Command {
 
     if (!iKnowWhatImDoing) {
       this.error(
-        'When you load a saved snapshot, it will be read only, meaning no new blocks will be produced, to get rid of this message ' +
-          'pass the --iKnowWhatImDoing flag'
+        'When you load a saved snapshot the chain will think it is running in the past, meaning extrinsics that validate input times will likely fail. ' +
+          'to get rid of this message, pass the --iKnowWhatImDoing flag'
       );
     }
 
@@ -51,6 +52,7 @@ export default class Save extends Command {
     const services = await containersUp(this, verbose);
     if (services.length > 0) {
       cli.action.start('Pausing all services');
+      metadata.time = containerNow(metadata);
       writeMetadata(metadata);
       await stopContainers(this, verbose);
       cli.action.stop();
@@ -66,12 +68,14 @@ export default class Save extends Command {
       await startContainers(
         this,
         metadata.version,
+        metadata.time,
         verbose,
         metadata.chain,
         services,
         restEnvs[0],
         restEnvs[1]
       );
+      metadata.startedAt = new Date().toISOString();
       writeMetadata(metadata);
       cli.action.stop();
     }

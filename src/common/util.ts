@@ -76,6 +76,16 @@ export async function downloadFile(url: string, dest: string): Promise<void> {
 }
 
 /**
+ * Calculates the time a node should set its clock to the next time it starts up by adding its run time to its old start time
+ */
+export function containerNow(metadata: Metadata): string {
+  const startedTime = new Date(metadata.time);
+  const upTime = new Date().getTime() - new Date(metadata.startedAt).getTime();
+  const newTime = new Date(+startedTime + upTime);
+  return dateToFakeTime(newTime);
+}
+
+/**
  * @returns The current moment in fake time format
  */
 export function hostNow(): string {

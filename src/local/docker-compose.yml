@@ -21,6 +21,8 @@ services:
       - '40333:30333'
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
     command:
       [
         '-d',
@@ -45,6 +47,8 @@ services:
       - '30333:30333'
     volumes:
       - 'polymesh_bob:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
     command:
       [
         '-d',
@@ -69,6 +73,8 @@ services:
       - '50333:30333'
     volumes:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
     command:
       [
         '-d',
