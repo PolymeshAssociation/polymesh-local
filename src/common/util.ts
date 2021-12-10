@@ -12,7 +12,6 @@ import { chain, checkSettings, configFileName, postgres, rest, tooling, uis } fr
  * Values a user can set in a config file to control what images to use
  */
 export interface UserConfig {
-  // image versions
   chainTag: string;
   toolingTag: string;
   restTag: string;
