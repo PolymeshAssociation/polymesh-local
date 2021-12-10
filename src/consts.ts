@@ -4,6 +4,7 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
+export const supportedChainVersions = ['4.0.0', '4.1.0-rc1'];
 
 // This format is compatible with libfaketime is using
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';

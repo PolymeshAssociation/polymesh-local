@@ -1,12 +1,21 @@
 import { flags } from '@oclif/command';
 import * as inquirer from 'inquirer';
-import fetch from 'node-fetch';
 
 import Command from '../base';
-import { getUserConfig, saveUserConfig } from '../common/util';
+import { validateDids, validateMnemonics } from '../common/rest';
+import { fetchDockerHubTags, getUserConfig, saveUserConfig } from '../common/util';
+import { supportedChainVersions } from '../consts';
 
-export default class Info extends Command {
-  static description = 'Helps create configuration for polymesh-local';
+const defaultConfig = {
+  chainTag: '4.0.0',
+  restTag: '0.0.3',
+  subqueryTag: 'v4.0.0',
+  toolingTag: 'v6.0.0-alpha.1',
+  restDids: '0x0600000000000000000000000000000000000000000000000000000000000000',
+  restMnemonics: '//Alice',
+};
+export default class Configure extends Command {
+  static description = 'Manages the configuration file for polymesh-local';
 
   static usage = 'configure';
   static flags = {
@@ -33,6 +42,21 @@ export default class Info extends Command {
       this.log('No previous configuration was detected');
     }
 
+    this.log('Default config settings: ');
+    this.log(JSON.stringify(defaultConfig, undefined, 2));
+    const { useDefault } = await inquirer.prompt([
+      {
+        name: 'useDefault',
+        type: 'confirm',
+        default: !this.userConfig, // default to yes only if there is no config
+        message: 'Do you want to use the default config?',
+      },
+    ]);
+    if (useDefault) {
+      saveUserConfig(this, defaultConfig);
+      return;
+    }
+
     const [restTags, subqueryTags, toolingTags] = await Promise.all([
       fetchDockerHubTags('polymathnet/polymesh-rest-api'),
       fetchDockerHubTags('polymathnet/polymesh-subquery'),
@@ -43,40 +67,44 @@ export default class Info extends Command {
         name: 'chain',
         message: 'Select chain version',
         type: 'list',
-        choices: [{ name: '4.0.0' }, { name: '4.1.0-rc' }],
+        default: this.userConfig?.chainTag,
+        choices: supportedChainVersions.map(v => ({ name: v })),
       },
       {
         name: 'restTag',
         message: 'Select rest api version',
         type: 'list',
+        default: this.userConfig?.restTag,
         choices: restTags,
       },
       {
         name: 'subqueryTag',
         message: 'Select subquery version',
         type: 'list',
+        default: this.userConfig?.subqueryTag,
         choices: subqueryTags,
       },
       {
         name: 'toolingTag',
         message: 'Select tooling version',
         type: 'list',
+        default: this.userConfig?.toolingTag,
         choices: toolingTags,
       },
       {
         name: 'restDids',
         type: 'input',
-        default: '0x0600000000000000000000000000000000000000000000000000000000000000',
+        default:
+          this.userConfig?.restDids ||
+          '0x0600000000000000000000000000000000000000000000000000000000000000',
         message:
           'Please enter a comma separated list of the DIDs you want to use with the REST API',
-        validate: (input: string) => {
-          return validateDids(input);
-        },
+        validate: validateDids,
       },
       {
         name: 'restMnemonics',
         type: 'input',
-        default: '//Alice',
+        default: this.userConfig?.restMnemonics || '//Alice',
         message:
           'Please enter a comma separated list of mnemonics. Provide one for each DID in the same order',
         validate: (input: string, answers) => {
@@ -87,66 +115,4 @@ export default class Info extends Command {
 
     saveUserConfig(this, responses);
   }
-}
-
-function validateMnemonics(input: string, rawDids: string): boolean | string {
-  const mnemonics = input.split(',');
-  const dids = rawDids.split(',');
-  if (mnemonics.length !== dids.length) {
-    return `Each DID requires a mnemonic to be passed. Received ${mnemonics.length} mnemonics for ${dids.length} DIDs`;
-  }
-  for (let i = 0; i < mnemonics.length; i++) {
-    const words = input.split(' ');
-    if (words.length === 1 && words[0].match(/\/\/w+/)) continue; // i.e is shorthand mnemonic
-    if (words.length !== 12) {
-      return `Mnemonics should be 12 words separated by spaces. ${mnemonics[i]} did not meet this rule`;
-    }
-  }
-  return true;
-}
-
-const didRegex = /0x[0-9a-z]{64}/;
-function validateDids(input: string): boolean | string {
-  const dids = input.split(',');
-  for (let i = 0; i < dids.length; i++) {
-    const did = dids[i];
-    if (!did.match(didRegex)) {
-      return 'DIDs should be 64 hex characters prefixed with 0x';
-    }
-  }
-  return true;
-}
-
-interface DockerTag {
-  name: string;
-}
-
-interface DockerTagResponse {
-  next?: string;
-  results: DockerTag[];
-}
-/**
- * Fetches docker hub tags for a given repo
- * @param repo The repo to fetch tags for
- * @returns available tags sorted by most recent first
- */
-async function fetchDockerHubTags(repo: string): Promise<DockerTag[]> {
-  const options = [];
-  let response: DockerTagResponse = { results: [] };
-  do {
-    const url =
-      response?.next ||
-      `https://registry.hub.docker.com/v2/repositories/${repo}/tags/?${new URLSearchParams({
-        page_size: '100',
-      })}`;
-    const rawResponse = await fetch(url);
-    response = await rawResponse.json();
-    options.push(
-      ...response.results.map(r => {
-        return { name: r.name };
-      })
-    );
-  } while (response?.next);
-
-  return options;
 }

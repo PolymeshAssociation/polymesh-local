@@ -3,7 +3,7 @@ import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
 
-import { UserConfig } from '../base';
+import { UserConfig } from '../common/util';
 import { dataDir, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
@@ -26,19 +26,12 @@ export async function startContainers(
   services: string[],
   dids: string,
   mnemonics: string,
-  userConfig: UserConfig
+  userConfig: UserConfig | null
 ): Promise<void> {
   try {
-    // TODO, clarify why pull is needed here
-
-    // await compose.pullMany(
-    //   services.filter(service => ['subquery', 'tooling'].includes(service)),
-    //   { log, cwd: localDir }
-    // );
-
-    const toolingTag = userConfig.toolingTag || 'latest';
-    const subqueryTag = userConfig.subqueryTag || 'latest';
-    const restTag = userConfig.restTag || 'latest';
+    const toolingTag = userConfig?.toolingTag || 'latest';
+    const subqueryTag = userConfig?.subqueryTag || 'latest';
+    const restTag = userConfig?.restTag || 'latest';
 
     await compose.upMany(services, {
       cwd: localDir,

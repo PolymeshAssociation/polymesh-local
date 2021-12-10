@@ -13,14 +13,14 @@ import {
   startContainers,
   stopContainers,
 } from '../common/containers';
-import { isRestUp, validateDidArgs } from '../common/rest';
+import { isRestUp, validateDids, validateMnemonics } from '../common/rest';
 import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
 import { hostNow, printInfo, retry } from '../common/util';
-import { dataDir } from '../consts';
-import { chainRunningError, restArgsError } from '../errors';
+import { dataDir, supportedChainVersions } from '../consts';
+import { chainRunningError } from '../errors';
 
 export default class Start extends Command {
   static description = 'Start all the services';
@@ -35,7 +35,7 @@ export default class Start extends Command {
         return ctx.userConfig?.chainTag || '4.0.0';
       },
       description: 'version of the containers to run',
-      options: ['4.0.0', '4.1.0-rc1'],
+      options: supportedChainVersions,
     }),
     image: flags.string({
       char: 'i',
@@ -126,8 +126,13 @@ export default class Start extends Command {
       cli.action.stop();
     }
 
-    if (!validateDidArgs(dids, mnemonics)) {
-      this.error(restArgsError);
+    const didValidation = validateDids(dids);
+    if (typeof didValidation === 'string') {
+      this.error(didValidation);
+    }
+    const mnemonicValidation = validateMnemonics(mnemonics, dids);
+    if (typeof mnemonicValidation === 'string') {
+      this.error(mnemonicValidation);
     }
 
     if (!anyVolumes()) {

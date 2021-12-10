@@ -75,6 +75,7 @@ USAGE
 
 <!-- commands -->
 * [`polymesh-local clean`](#polymesh-local-clean)
+* [`polymesh-local configure`](#polymesh-local-configure)
 * [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
 * [`polymesh-local info`](#polymesh-local-info)
 * [`polymesh-local load FILE`](#polymesh-local-load-file)
@@ -98,6 +99,20 @@ OPTIONS
 ```
 
 _See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.5.3/src/commands/clean.ts)_
+
+## `polymesh-local configure`
+
+Manages the configuration file for polymesh-local
+
+```
+USAGE
+  $ polymesh-local configure
+
+OPTIONS
+  -h, --help  show CLI help
+```
+
+_See code: [src/commands/configure.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.5.3/src/commands/configure.ts)_
 
 ## `polymesh-local help [COMMAND]`
 
