@@ -2,5 +2,8 @@
 
 FROM polymathnet/polymesh:{{VERSION}}-debian
 USER root
-RUN apt-get update && apt-get install -y libfaketime
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
+RUN apt-get update && apt-get install -y libfaketime node.js
+
+COPY fast-forward.js /fast-forward.js
+
+ENTRYPOINT ["/usr/bin/node", "/fast-forward.js"]

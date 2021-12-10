@@ -7,6 +7,7 @@ import {
   anyContainersUp,
   anyVolumes,
   createEmptyVolumes,
+  fastForward,
   prepareDockerfile,
   removeVolumes,
   startContainers,
@@ -17,7 +18,7 @@ import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/sn
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
-import { hostNow, printInfo, retry } from '../common/util';
+import { epochDuration, printInfo, retry } from '../common/util';
 import { dataDir } from '../consts';
 import { chainRunningError, restArgsError } from '../errors';
 
@@ -135,7 +136,7 @@ export default class Start extends Command {
 
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
-      metadata = { version, time: hostNow(), startedAt: '', chain: chain || 'dev' };
+      metadata = { version, stopTimestamp: Date.now(), chain: chain || 'dev' };
       if (image) {
         metadata.version = image;
       }
@@ -155,7 +156,6 @@ export default class Start extends Command {
         `Polymesh chain ${chain} was specified, but data was for ${metadata.chain}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the chain`
       );
     }
-    metadata.startedAt = new Date().toISOString();
     writeMetadata(metadata);
 
     if (only.includes('uis')) {
@@ -167,6 +167,12 @@ export default class Start extends Command {
     cli.action.start(`Preparing dockerfile for Polymesh version: ${image || version}`);
     prepareDockerfile(version, image);
     cli.action.stop();
+
+    if (Date.now() - metadata.stopTimestamp > epochDuration(metadata.chain)) {
+      cli.action.start('Fast forwarding chain');
+      await fastForward(this, metadata.stopTimestamp, verbose, metadata.chain);
+      cli.action.stop();
+    }
 
     const services = typedOnly.flatMap(o => {
       switch (o) {
@@ -185,16 +191,7 @@ export default class Start extends Command {
     });
 
     cli.action.start('Starting the containers');
-    await startContainers(
-      this,
-      version,
-      metadata.time,
-      verbose,
-      metadata.chain,
-      services,
-      dids,
-      mnemonics
-    );
+    await startContainers(this, version, verbose, metadata.chain, services, dids, mnemonics);
     cli.action.stop();
 
     const allChecks = {

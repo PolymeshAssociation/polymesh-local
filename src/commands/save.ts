@@ -5,7 +5,6 @@ import { existsSync } from 'fs';
 import { containersUp, startContainers, stopContainers } from '../common/containers';
 import { getRelayerEnvs } from '../common/rest';
 import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
-import { containerNow } from '../common/util';
 import { dataDir, snapshotsDir } from '../consts';
 import { noData } from '../errors';
 
@@ -43,7 +42,7 @@ export default class Save extends Command {
     const services = await containersUp(this, verbose);
     if (services.length > 0) {
       cli.action.start('Pausing all services');
-      metadata.time = containerNow(metadata);
+      metadata.stopTimestamp = Date.now();
       writeMetadata(metadata);
       await stopContainers(this, verbose);
       cli.action.stop();
@@ -59,14 +58,12 @@ export default class Save extends Command {
       await startContainers(
         this,
         metadata.version,
-        metadata.time,
         verbose,
         metadata.chain,
         services,
         restEnvs[0],
         restEnvs[1]
       );
-      metadata.startedAt = new Date().toISOString();
       writeMetadata(metadata);
       cli.action.stop();
     }

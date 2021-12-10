@@ -10,10 +10,70 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
 
-  alice:
+  fast-forward-alice:
+    ports:
+      - '30333:30333'
     build:
       context: .
       dockerfile: mesh.Dockerfile
+    restart: "no"
+    volumes:
+      - 'polymesh_alice:/var/lib/polymesh/chains'
+    environment:
+      - START_TIME=${START_TIME}
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=${CHAIN}',
+        '--alice',
+        '--validator',
+        '--force-authoring',
+      ]
+  fast-forward-bob:
+    ports:
+      - '40333:30333'
+    build:
+      context: .
+      dockerfile: mesh.Dockerfile
+    restart: "no"
+    volumes:
+      - 'polymesh_bob:/var/lib/polymesh/chains'
+    environment:
+      - START_TIME=${START_TIME}
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=${CHAIN}',
+        '--bob',
+        '--validator',
+        '--force-authoring',
+      ]
+  fast-forward-charlie:
+    ports:
+      - '50333:30333'
+    build:
+      context: .
+      dockerfile: mesh.Dockerfile
+    restart: "no"
+    volumes:
+      - 'polymesh_charlie:/var/lib/polymesh/chains'
+    environment:
+      - START_TIME=${START_TIME}
+    command:
+      [
+        '-d',
+        '/var/lib/polymesh',
+        '--chain=${CHAIN}',
+        '--charlie',
+        '--validator',
+        '--force-authoring',
+      ]
+
+  alice:
+    image: "polymathnet/polymesh:${POLYMESH_VERSION}-debian"
+    user: root
     restart: always
     ports:
       - '9944:9944'
@@ -21,8 +81,6 @@ services:
       - '40333:30333'
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
-    environment:
-      - FAKETIME=${FAKETIME}
     command:
       [
         '-d',
@@ -37,9 +95,8 @@ services:
       ]
 
   bob:
-    build:
-      context: .
-      dockerfile: mesh.Dockerfile
+    image: "polymathnet/polymesh:${POLYMESH_VERSION}-debian"
+    user: root
     restart: always
     ports:
       - '8833:9933'
@@ -47,8 +104,6 @@ services:
       - '30333:30333'
     volumes:
       - 'polymesh_bob:/var/lib/polymesh/chains'
-    environment:
-      - FAKETIME=${FAKETIME}
     command:
       [
         '-d',
@@ -63,9 +118,8 @@ services:
       ]
 
   charlie:
-    build:
-      context: .
-      dockerfile: mesh.Dockerfile
+    image: "polymathnet/polymesh:${POLYMESH_VERSION}-debian"
+    user: root
     restart: always
     ports:
       - '7733:9933'
@@ -73,8 +127,6 @@ services:
       - '50333:30333'
     volumes:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
-    environment:
-      - FAKETIME=${FAKETIME}
     command:
       [
         '-d',
