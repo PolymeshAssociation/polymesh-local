@@ -31,6 +31,8 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
+      // Note: The actual value passed to the default function doesn't match its type. We use any so we can access the user config if its present
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
         return ctx.userConfig?.chainTag || '4.0.0';
       },
@@ -84,6 +86,7 @@ export default class Start extends Command {
     dids: flags.string({
       description:
         'Comma separated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
         return (
           ctx.userConfig?.restDids ||
@@ -93,6 +96,7 @@ export default class Start extends Command {
     }),
     mnemonics: flags.string({
       description: 'Comma separated list of mnemonics for dids. Defaults to `//Alice`',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
         return ctx.userConfig?.restMnemonics || '//Alice';
       },

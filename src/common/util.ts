@@ -16,7 +16,6 @@ export interface UserConfig {
   toolingTag: string;
   restTag: string;
   subqueryTag: string;
-
   restMnemonics: string;
   restDids: string;
 }
