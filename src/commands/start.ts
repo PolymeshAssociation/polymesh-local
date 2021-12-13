@@ -109,7 +109,6 @@ export default class Start extends Command {
     const { clean, snapshot, verbose, version, image, chain, only, dids, mnemonics, uiLatest } =
       commandFlags;
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
-
     if (await anyContainersUp(this, verbose)) {
       this.error(chainRunningError);
     }

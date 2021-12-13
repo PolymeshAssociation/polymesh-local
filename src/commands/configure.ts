@@ -64,7 +64,7 @@ export default class Configure extends Command {
     ]);
     const responses = await inquirer.prompt([
       {
-        name: 'chain',
+        name: 'chainTag',
         message: 'Select chain version',
         type: 'list',
         default: this.userConfig?.chainTag,

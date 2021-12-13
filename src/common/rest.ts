@@ -20,7 +20,6 @@ export function validateMnemonics(input: string, rawDids: string): boolean | str
   }
   for (let i = 0; i < mnemonics.length; i++) {
     const words = input.split(' ');
-    console.log(words);
     if (words.length === 1 && words[0].match(/\/\/\w+/)) continue; // i.e is shorthand mnemonic
     if (words.length !== 12) {
       return `Mnemonics should be 12 words separated by spaces or a shorthand like //Alice. ${mnemonics[i]} did not meet this rule`;
