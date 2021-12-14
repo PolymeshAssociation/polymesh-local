@@ -19,15 +19,14 @@ async function main() {
     chain = chainArg.replace(chainArgPrefix, '');
   }
 
-  const epochDurationMs = chain.startsWith('ci') ? MINUTE : 30 * MINUTE;
+  const epochDurationMs = chain.startsWith('ci') ? 1 * MINUTE : 30 * MINUTE;
   const blockTimeMs = chain.startsWith('ci') ? 500 : 5 * SECOND;
 
-  const timeDeltaMs = Date.now() - startTimeMs;
-  const missingEpochs = Math.floor(timeDeltaMs / epochDurationMs);
-
-  for (let i = 0; i < missingEpochs; i++) {
-    const t = formatFakeTime(startTimeMs + i * epochDurationMs);
+  let stepMs = startTimeMs + epochDurationMs;
+  while (stepMs < Date.now()) {
+    const t = formatFakeTime(stepMs);
     await runPolymeshUntilBlockEmitted(t, blockTimeMs);
+    stepMs += epochDurationMs;
   }
 }
 
@@ -36,7 +35,7 @@ main().catch(e => {
   process.exit(1);
 });
 
-const newEpochRegex = /New epoch(?:.|\n)+Pre-sealed block for proposal(?:.|\n)+Imported/gm;
+const newEpochRegex = /New epoch(?:.|\n)+Imported/gm;
 
 // Runs polymesh at the specified fakeTime until a new epoch is finalized, then kills it.
 // If waitKill is true, it will wait a few seconds before killing the process to give time for
@@ -48,35 +47,31 @@ function runPolymeshUntilBlockEmitted(fakeTime, blockTimeMs) {
       FAKETIME: fakeTime,
       LD_PRELOAD: '/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1',
     },
-    stdio: 'inherit',
+    stdio: 'pipe',
   });
   return new Promise(async (resolve, reject) => {
-    const result = '';
-    /*
+    let result = '';
+
     proc.stderr.on('data', async function (data) {
       data = data.toString();
       console.log(data);
       result += data;
       if (newEpochRegex.test(result)) {
-        if (waitKill) {
-          //give other processes time in the last iteration to catch up
-          await sleep(10000);
-        }
-        proc.kill();
-        resolve();
+        proc.kill('SIGINT');
       }
     });
     proc.stdout.on('data', function (data) {
       console.log(data.toString());
     });
-    */
     proc.on('error', reject);
+
     proc.on('exit', code => {
-      reject(new Error(`polymesh process exited with code ${code}`));
+      if (code != 0) {
+        reject(new Error(`polymesh process exited with code ${code}`));
+      } else {
+        resolve();
+      }
     });
-    await sleep(blockTimeMs * 10);
-    proc.kill();
-    resolve();
   });
 }
 
