@@ -1,9 +1,11 @@
 import { Command } from '@oclif/command';
-import { execSync } from 'child_process';
+import { execSync, spawn, spawnSync } from 'child_process';
 import compose from 'docker-compose';
-import fs from 'fs';
+import fs, { rmSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
-import { dataDir, localDir, postgres, tooling, uis } from '../consts';
+import { dateToFaketime, epochDuration,sleep } from '../common/util';
+import { dataDir, faketimeFile,localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
@@ -16,10 +18,97 @@ export function prepareDockerfile(version: string, image?: string): void {
   fs.writeFileSync(`${localDir}/mesh.Dockerfile`, dockerfile);
 }
 
+const dateRegex = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g;
+const importedRegex = /Imported/g;
+const fakeTimePath = join(localDir, faketimeFile);
+
+export async function fastForward(cmd: Command, time: number, log: boolean, chain: string) {
+  const multiplier = chain.startsWith('ci') ? 1000 : 2000;
+  const fakeDateString = dateToFaketime(new Date(time));
+  try {
+    writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+    const p = spawn(
+      'docker-compose',
+      ['up', '--build', 'fast-forward-alice', 'fast-forward-bob', 'fast-forward-charlie'],
+      {
+        cwd: localDir,
+        env: {
+          ...process.env,
+          DATA_DIR: dataDir,
+          CHAIN: chain,
+          LOCAL_DIR: localDir,
+        },
+      }
+    );
+    const startedMS = Date.now();
+    p.stdin.setDefaultEncoding('ascii');
+    await new Promise((resolve, reject) => {
+      let spedUp = false;
+      let slowedDown = false;
+
+      p.stdout.on('data', data => {
+        const dataString = data.toString();
+        if (log) console.log(dataString);
+
+        if (!spedUp && importedRegex.test(data)) {
+          writeFileSync(fakeTimePath, `@${fakeDateString} x${multiplier}`);
+          spedUp = true;
+        }
+
+        const dateStr = dateRegex.exec(dataString);
+        if (dateStr && dateStr[0]) {
+          try {
+            const timestamp = Date.parse(dateStr[0] + ' GMT');
+            if (!slowedDown && timestamp >= Date.now() - epochDuration(chain) * 2) {
+              writeFileSync(fakeTimePath, `@${fakeDateString} x100`);
+              slowedDown = true;
+            }
+
+            if (timestamp >= Date.now() - epochDuration(chain)) {
+              console.log('KILLLLLLLLLLLL');
+              writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+              p.kill('SIGKILL');
+            }
+          } catch {}
+        }
+      });
+      p.stderr.on('data', data => {
+        const dataString = data.toString();
+        if (log) console.error(dataString);
+      });
+
+      p.on('error', reject);
+
+      p.on('exit', code => {
+        if (code != 0 && code != null) {
+          reject(
+            new Error(
+              `Fast forward process exited with code ${code}, try --verbose to debug the problem`
+            )
+          );
+        } else {
+          resolve(undefined);
+        }
+      });
+    });
+  } catch (err) {
+    cmd.error('Error trying to fast forward chain: ' + err);
+  } finally {
+    if (await anyContainersUp(cmd, log)) {
+      await stopContainers(cmd, log);
+    }
+    rmSync(fakeTimePath);
+  }
+}
+
+function parseISOLocal(s: string) {
+  const b: any = s.split(/\D/);
+  const d = new Date(b[0], b[1] - 1, b[2], b[3], b[4], b[5]);
+  return d.getTime();
+}
 export async function startContainers(
   cmd: Command,
   version: string,
-  timestamp: string,
   log: boolean,
   chain: string,
   services: string[],
@@ -27,38 +116,43 @@ export async function startContainers(
   mnemonics: string
 ): Promise<void> {
   try {
+    const env = {
+      ...process.env,
+      POLYMESH_VERSION: version,
+      DATA_DIR: dataDir,
+      PG_USER: postgres.user,
+      PG_HOST: postgres.host,
+      PG_PASSWORD: postgres.password,
+      PG_PORT: postgres.port,
+      PG_DB: postgres.db,
+      CHAIN: chain,
+      TOOLING_API_KEY: tooling.apiKey,
+      RELAYER_DIDS: dids,
+      RELAYER_MNEMONICS: mnemonics,
+      UI_DIR: uis.dir,
+      LOCAL_DIR: localDir,
+    };
     await compose.pullMany(
       services.filter(service => ['subquery', 'tooling'].includes(service)),
-      { log, cwd: localDir }
+      {
+        log,
+        cwd: localDir,
+        env,
+      }
     );
 
     await compose.upMany(services, {
       cwd: localDir,
       log,
       commandOptions: ['--build'],
-      env: {
-        ...process.env,
-        POLYMESH_VERSION: version,
-        DATA_DIR: dataDir,
-        PG_USER: postgres.user,
-        PG_HOST: postgres.host,
-        PG_PASSWORD: postgres.password,
-        PG_PORT: postgres.port,
-        PG_DB: postgres.db,
-        FAKETIME: `@${timestamp}`,
-        CHAIN: chain,
-        TOOLING_API_KEY: tooling.apiKey,
-        RELAYER_DIDS: dids,
-        RELAYER_MNEMONICS: mnemonics,
-        UI_DIR: uis.dir,
-        LOCAL_DIR: localDir,
-      },
+      env,
     });
   } catch (err) {
     if (await anyContainersUp(cmd, log)) {
       await stopContainers(cmd, log);
     }
-    cmd.error('Error trying to start containers: ' + (err as { err: string }).err);
+    const error = (err as { err: string }).err ? (err as { err: string }).err : err;
+    cmd.error('Error trying to start containers: ' + error);
   }
 }
 
@@ -84,7 +178,11 @@ interface psServiceV2 {
   ExitCode: number;
 }
 const serviceRegex = /local_(.+)_1/;
-export async function containersUp(cmd: Command, verbose: boolean): Promise<string[]> {
+type ContainerState = {
+  name: string;
+  state: string;
+};
+export async function containersState(cmd: Command, verbose: boolean): Promise<ContainerState[]> {
   // The docker-compose library 0.23.13 doesn't fully support docker-compose V2.
   // With `ps` the library would truncate the first service with V2.
   const composeVersion = composeMajorVersion();
@@ -100,18 +198,28 @@ export async function containersUp(cmd: Command, verbose: boolean): Promise<stri
         throw new Error('Invalid docker-compose state');
       }
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return matches![1];
+      return { name: matches![1], state: s.state };
     });
   } else if (composeVersion === 2) {
     const services = JSON.parse(
       execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
     );
-    return services.map((s: psServiceV2) => s.Service);
+    return services.map((s: psServiceV2) => ({ name: s.Service, state: s.State }));
   } else {
     cmd.error(
       `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
     );
   }
+}
+export async function containersUp(cmd: Command, verbose: boolean) {
+  return (await containersState(cmd, verbose)).map(s => s.name);
+}
+export async function anyContainersRunning(cmd: Command, verbose: boolean) {
+  return (
+    (await containersState(cmd, verbose)).filter(s => {
+      return s.state == 'Up';
+    }).length > 0
+  );
 }
 
 function composeMajorVersion(): number {
@@ -154,7 +262,7 @@ export function getContainerEnv(container: string, env: string): string {
 }
 
 export async function anyContainersUp(cmd: Command, verbose: boolean): Promise<boolean> {
-  return (await containersUp(cmd, verbose)).length > 0;
+  return (await containersState(cmd, verbose)).length > 0;
 }
 
 // A bind mount to the data directory creates permission errors on linux. Instead named volumes are needed.

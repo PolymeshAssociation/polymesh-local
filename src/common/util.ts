@@ -9,7 +9,7 @@ import { chain, checkSettings, postgres, rest, tooling, uis } from '../consts';
 
 const millisecondsPerMinute = 60 * 1000;
 
-async function sleep(time: number): Promise<void> {
+export async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
@@ -76,29 +76,29 @@ export async function downloadFile(url: string, dest: string): Promise<void> {
 }
 
 /**
- * Calculates the time a node should set its clock to the next time it starts up by adding its run time to its old start time
- */
-export function containerNow(metadata: Metadata): string {
-  const startedTime = new Date(metadata.time);
-  const upTime = new Date().getTime() - new Date(metadata.startedAt).getTime();
-  const newTime = new Date(+startedTime + upTime);
-  return dateToFakeTime(newTime);
-}
-
-/**
- * @returns The current moment in fake time format
- */
-export function hostNow(): string {
-  return dateToFakeTime(new Date());
-}
-
-/**
  * Converts a JS Date to fake time format
  * @param date to convert
  * @returns string as YYYY-MM-DD HH:MM:SS
  */
-function dateToFakeTime(date: Date): string {
-  // Adjust the date for the timezone since the TZ gets removed
-  const tzAdjusted = new Date(date.getTime() - date.getTimezoneOffset() * millisecondsPerMinute);
-  return tzAdjusted.toISOString().replace(/T/, ' ').replace(/\..*$/, '');
+export function dateToFaketime(d: Date): string {
+  let month = '' + (d.getUTCMonth() + 1);
+  let day = '' + d.getUTCDate();
+  const year = d.getUTCFullYear();
+  let hour = '' + d.getUTCHours();
+  let minute = '' + d.getUTCMinutes();
+  let seconds = '' + d.getUTCSeconds();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+  if (hour.length < 2) hour = '0' + hour;
+  if (minute.length < 2) minute = '0' + minute;
+  if (seconds.length < 2) seconds = '0' + seconds;
+
+  return `${year}-${month}-${day} ${hour}:${minute}:${seconds}`;
+}
+
+const SECOND = 1000;
+const MINUTE = 60 * SECOND;
+export function epochDuration(chain: string) {
+  return chain.startsWith('ci') ? MINUTE : 30 * MINUTE;
 }
