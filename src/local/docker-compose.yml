@@ -19,8 +19,7 @@ services:
     restart: "no"
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
-    environment:
-      - START_TIME=${START_TIME}
+      - './faketime:/faketime'
     command:
       [
         '-d',
@@ -39,8 +38,7 @@ services:
     restart: "no"
     volumes:
       - 'polymesh_bob:/var/lib/polymesh/chains'
-    environment:
-      - START_TIME=${START_TIME}
+      - './faketime:/faketime'
     command:
       [
         '-d',
@@ -59,8 +57,7 @@ services:
     restart: "no"
     volumes:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
-    environment:
-      - START_TIME=${START_TIME}
+      - './faketime:/faketime'
     command:
       [
         '-d',

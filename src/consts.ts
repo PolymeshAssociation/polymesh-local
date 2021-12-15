@@ -4,14 +4,11 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 
-// This format is compatible with libfaketime is using
-export const dateFmt = '+%Y-%m-%d %H:%M:%S';
-
 export const checkSettings = {
   timeout: 90 * 1000,
   iterations: 45,
 };
-
+export const faketimeFile = './faketime';
 export const chain = {
   url: 'localhost:9944',
 };

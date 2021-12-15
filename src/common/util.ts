@@ -80,10 +80,21 @@ export async function downloadFile(url: string, dest: string): Promise<void> {
  * @param date to convert
  * @returns string as YYYY-MM-DD HH:MM:SS
  */
-function dateToFakeTime(date: Date): string {
-  // Adjust the date for the timezone since the TZ gets removed
-  const tzAdjusted = new Date(date.getTime() - date.getTimezoneOffset() * millisecondsPerMinute);
-  return tzAdjusted.toISOString().replace(/T/, ' ').replace(/\..*$/, '');
+export function dateToFaketime(d: Date): string {
+  let month = '' + (d.getUTCMonth() + 1);
+  let day = '' + d.getUTCDate();
+  const year = d.getUTCFullYear();
+  let hour = '' + d.getUTCHours();
+  let minute = '' + d.getUTCMinutes();
+  let seconds = '' + d.getUTCSeconds();
+
+  if (month.length < 2) month = '0' + month;
+  if (day.length < 2) day = '0' + day;
+  if (hour.length < 2) hour = '0' + hour;
+  if (minute.length < 2) minute = '0' + minute;
+  if (seconds.length < 2) seconds = '0' + seconds;
+
+  return `${year}-${month}-${day} ${hour}:${minute}:${seconds}`;
 }
 
 const SECOND = 1000;

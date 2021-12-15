@@ -1,10 +1,11 @@
 import { Command } from '@oclif/command';
-import { execSync } from 'child_process';
+import { execSync, spawn, spawnSync } from 'child_process';
 import compose from 'docker-compose';
-import fs from 'fs';
+import fs, { rmSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
-import { sleep } from '../common/util';
-import { dataDir, localDir, postgres, tooling, uis } from '../consts';
+import { dateToFaketime, epochDuration,sleep } from '../common/util';
+import { dataDir, faketimeFile,localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
@@ -16,45 +17,95 @@ export function prepareDockerfile(version: string, image?: string): void {
   }
   fs.writeFileSync(`${localDir}/mesh.Dockerfile`, dockerfile);
 }
+
+const dateRegex = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g;
+const importedRegex = /Imported/g;
+const fakeTimePath = join(localDir, faketimeFile);
+
 export async function fastForward(cmd: Command, time: number, log: boolean, chain: string) {
+  const multiplier = chain.startsWith('ci') ? 1000 : 2000;
+  const fakeDateString = dateToFaketime(new Date(time));
   try {
-    execSync('docker-compose up --build fast-forward-alice fast-forward-bob fast-forward-charlie', {
-      cwd: localDir,
-      stdio: log ? 'inherit' : 'ignore',
-      env: {
-        ...process.env,
-        START_TIME: '' + time,
-        DATA_DIR: dataDir,
-        CHAIN: chain,
-        LOCAL_DIR: localDir,
-      },
+    writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+    const p = spawn(
+      'docker-compose',
+      ['up', '--build', 'fast-forward-alice', 'fast-forward-bob', 'fast-forward-charlie'],
+      {
+        cwd: localDir,
+        env: {
+          ...process.env,
+          DATA_DIR: dataDir,
+          CHAIN: chain,
+          LOCAL_DIR: localDir,
+        },
+      }
+    );
+    const startedMS = Date.now();
+    p.stdin.setDefaultEncoding('ascii');
+    await new Promise((resolve, reject) => {
+      let spedUp = false;
+      let slowedDown = false;
+
+      p.stdout.on('data', data => {
+        const dataString = data.toString();
+        if (log) console.log(dataString);
+
+        if (!spedUp && importedRegex.test(data)) {
+          writeFileSync(fakeTimePath, `@${fakeDateString} x${multiplier}`);
+          spedUp = true;
+        }
+
+        const dateStr = dateRegex.exec(dataString);
+        if (dateStr && dateStr[0]) {
+          try {
+            const timestamp = Date.parse(dateStr[0] + ' GMT');
+            if (!slowedDown && timestamp >= Date.now() - epochDuration(chain) * 2) {
+              writeFileSync(fakeTimePath, `@${fakeDateString} x100`);
+              slowedDown = true;
+            }
+
+            if (timestamp >= Date.now() - epochDuration(chain)) {
+              console.log('KILLLLLLLLLLLL');
+              writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+              p.kill('SIGKILL');
+            }
+          } catch {}
+        }
+      });
+      p.stderr.on('data', data => {
+        const dataString = data.toString();
+        if (log) console.error(dataString);
+      });
+
+      p.on('error', reject);
+
+      p.on('exit', code => {
+        if (code != 0 && code != null) {
+          reject(
+            new Error(
+              `Fast forward process exited with code ${code}, try --verbose to debug the problem`
+            )
+          );
+        } else {
+          resolve(undefined);
+        }
+      });
     });
-    /*
-    await compose.upMany(['fast-forward-alice', 'fast-forward-bob', 'fast-forward-charlie'], {
-      cwd: localDir,
-      log,
-      commandOptions: ['--build'],
-      env: {
-        ...process.env,
-        START_TIME: '' + time,
-        DATA_DIR: dataDir,
-        CHAIN: chain,
-        LOCAL_DIR: localDir,
-      },
-    });
-    while (await anyContainersRunning(cmd, log)) {
-      await sleep(1000);
-    }
-    */
   } catch (err) {
-    cmd.error('Error trying to fast forward chain: ' + (err as { err: string }).err);
+    cmd.error('Error trying to fast forward chain: ' + err);
   } finally {
     if (await anyContainersUp(cmd, log)) {
       await stopContainers(cmd, log);
     }
+    rmSync(fakeTimePath);
   }
 }
 
+function parseISOLocal(s: string) {
+  const b: any = s.split(/\D/);
+  const d = new Date(b[0], b[1] - 1, b[2], b[3], b[4], b[5]);
+  return d.getTime();
+}
 export async function startContainers(
   cmd: Command,
   version: string,
