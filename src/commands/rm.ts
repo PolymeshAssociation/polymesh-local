@@ -1,5 +1,6 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 
+import Command from '../base';
 import { removeSnapshot, snapshotPath } from '../common/snapshots';
 
 export default class Rm extends Command {

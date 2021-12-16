@@ -63,7 +63,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/3.5.3 linux-x64 node-v14.18.1
+polymesh-local/3.5.3 darwin-arm64 node-v14.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -75,6 +75,7 @@ USAGE
 
 <!-- commands -->
 * [`polymesh-local clean`](#polymesh-local-clean)
+* [`polymesh-local configure`](#polymesh-local-configure)
 * [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
 * [`polymesh-local info`](#polymesh-local-info)
 * [`polymesh-local load FILE`](#polymesh-local-load-file)
@@ -86,7 +87,7 @@ USAGE
 
 ## `polymesh-local clean`
 
-Clean removes the chain data so the next start is starts at a genisis block. Services must be stopped for this command to work
+Clean removes the chain data so the next start is starts at a genesis block. Services must be stopped for this command to work
 
 ```
 USAGE
@@ -98,6 +99,20 @@ OPTIONS
 ```
 
 _See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.5.3/src/commands/clean.ts)_
+
+## `polymesh-local configure`
+
+Manages the configuration file for polymesh-local
+
+```
+USAGE
+  $ polymesh-local configure
+
+OPTIONS
+  -h, --help  show CLI help
+```
+
+_See code: [src/commands/configure.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v3.5.3/src/commands/configure.ts)_
 
 ## `polymesh-local help [COMMAND]`
 
@@ -229,11 +244,11 @@ OPTIONS
       [default: 4.0.0] version of the containers to run
 
   --dids=dids
-      [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma seperated list of dids available 
+      [default: 0x0600000000000000000000000000000000000000000000000000000000000000] Comma separated list of dids available 
       in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`
 
   --mnemonics=mnemonics
-      [default: //Alice] Comma seperated list of mnemonics for dids. Defaults to `//Alice`
+      [default: //Alice] Comma separated list of mnemonics for dids. Defaults to `//Alice`
 
   --verbose
       enables verbose logging

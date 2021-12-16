@@ -1,6 +1,7 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 import { cli } from 'cli-ux';
 
+import Command from '../base';
 import { anyContainersUp } from '../common/containers';
 import { loadSnapshot } from '../common/snapshots';
 import { chainRunningError } from '../errors';

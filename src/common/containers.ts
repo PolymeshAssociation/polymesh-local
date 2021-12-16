@@ -3,6 +3,7 @@ import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
 
+import { UserConfig } from '../common/util';
 import { dataDir, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
@@ -24,13 +25,13 @@ export async function startContainers(
   chain: string,
   services: string[],
   dids: string,
-  mnemonics: string
+  mnemonics: string,
+  userConfig: UserConfig
 ): Promise<void> {
   try {
-    await compose.pullMany(
-      services.filter(service => ['subquery', 'tooling'].includes(service)),
-      { log, cwd: localDir }
-    );
+    const toolingTag = userConfig.toolingTag || 'latest';
+    const subqueryTag = userConfig.subqueryTag || 'latest';
+    const restTag = userConfig.restTag || 'latest';
 
     await compose.upMany(services, {
       cwd: localDir,
@@ -52,6 +53,9 @@ export async function startContainers(
         RELAYER_MNEMONICS: mnemonics,
         UI_DIR: uis.dir,
         LOCAL_DIR: localDir,
+        TOOLING_TAG: toolingTag,
+        SUBQUERY_TAG: subqueryTag,
+        REST_TAG: restTag,
       },
     });
   } catch (err) {
