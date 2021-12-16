@@ -26,12 +26,12 @@ export async function startContainers(
   services: string[],
   dids: string,
   mnemonics: string,
-  userConfig: UserConfig | null
+  userConfig: UserConfig
 ): Promise<void> {
   try {
-    const toolingTag = userConfig?.toolingTag || 'latest';
-    const subqueryTag = userConfig?.subqueryTag || 'latest';
-    const restTag = userConfig?.restTag || 'latest';
+    const toolingTag = userConfig.toolingTag || 'latest';
+    const subqueryTag = userConfig.subqueryTag || 'latest';
+    const restTag = userConfig.restTag || 'latest';
 
     await compose.upMany(services, {
       cwd: localDir,

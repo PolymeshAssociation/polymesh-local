@@ -6,6 +6,15 @@ export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
 export const supportedChainVersions = ['4.0.0', '4.1.0-rc1'];
 
+export const defaultUserConfig = {
+  chainTag: '4.0.0',
+  restTag: 'v0.0.3',
+  subqueryTag: 'v4.0.0',
+  toolingTag: 'v6.0.0-alpha.1',
+  restDids: '0x0600000000000000000000000000000000000000000000000000000000000000',
+  restMnemonics: '//Alice',
+};
+
 // This format is compatible with libfaketime is using
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
