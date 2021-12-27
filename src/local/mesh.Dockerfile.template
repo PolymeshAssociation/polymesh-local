@@ -6,11 +6,11 @@ USER root
 
 RUN apt-get update && apt-get install -y libfaketime dumb-init
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/polymesh"]
-
 ENV FAKETIME_XRESET=1
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1
 ENV FAKETIME_CACHE_DURATION=0.001
 ENV FAKETIME_TIMESTAMP_FILE=/faketime
 ENV FAKETIME_DONT_RESET=1
 
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "/usr/local/bin/polymesh"]

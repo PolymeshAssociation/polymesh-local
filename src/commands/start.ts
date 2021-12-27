@@ -63,6 +63,10 @@ export default class Start extends Command {
       char: 's',
       description: 'Loads snapshot before starting. Current state used if not passed',
     }),
+    fastForwardRate: flags.integer({
+      char: 'r',
+      description: 'Time multiplier to apply to the fast forwarding of snapshots or local state',
+    }),
     clean: flags.boolean({
       char: 'c',
       default: false,
@@ -97,8 +101,19 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version, image, chain, only, dids, mnemonics, uiLatest } =
-      commandFlags;
+    const {
+      clean,
+      snapshot,
+      verbose,
+      version,
+      image,
+      chain,
+      only,
+      dids,
+      mnemonics,
+      uiLatest,
+      fastForwardRate = chain?.startsWith('ci') ? 1000 : 2000,
+    } = commandFlags;
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
 
     if (await anyContainersUp(this, verbose)) {
@@ -170,7 +185,7 @@ export default class Start extends Command {
 
     if (Date.now() - metadata.stopTimestamp > epochDuration(metadata.chain)) {
       cli.action.start('Fast forwarding chain');
-      await fastForward(this, metadata.stopTimestamp, verbose, metadata.chain);
+      await fastForward(this, fastForwardRate, metadata.stopTimestamp, verbose, metadata.chain);
       cli.action.stop();
     }
 

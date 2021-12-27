@@ -1,11 +1,11 @@
 import { Command } from '@oclif/command';
-import { execSync, spawn, spawnSync } from 'child_process';
+import { execSync, spawn } from 'child_process';
 import compose from 'docker-compose';
 import fs, { rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
-import { dateToFaketime, epochDuration,sleep } from '../common/util';
-import { dataDir, faketimeFile,localDir, postgres, tooling, uis } from '../consts';
+import { dateToFaketime, epochDuration } from '../common/util';
+import { dataDir, faketimeFile, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
@@ -18,18 +18,32 @@ export function prepareDockerfile(version: string, image?: string): void {
   fs.writeFileSync(`${localDir}/mesh.Dockerfile`, dockerfile);
 }
 
-const dateRegex = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/g;
-const importedRegex = /Imported/g;
+const dateImportedRegex = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.+Imported/;
+const importedTimeoutMs = 1000;
 const fakeTimePath = join(localDir, faketimeFile);
+const composeFile = 'internal-compose.yml';
 
-export async function fastForward(cmd: Command, time: number, log: boolean, chain: string) {
-  const multiplier = chain.startsWith('ci') ? 1000 : 2000;
+export async function fastForward(
+  cmd: Command,
+  rate: number,
+  time: number,
+  log: boolean,
+  chain: string
+): Promise<void> {
   const fakeDateString = dateToFaketime(new Date(time));
   try {
     writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
     const p = spawn(
       'docker-compose',
-      ['up', '--build', 'fast-forward-alice', 'fast-forward-bob', 'fast-forward-charlie'],
+      [
+        '-f',
+        composeFile,
+        'up',
+        '--build',
+        'fast-forward-alice',
+        'fast-forward-bob',
+        'fast-forward-charlie',
+      ],
       {
         cwd: localDir,
         env: {
@@ -40,32 +54,46 @@ export async function fastForward(cmd: Command, time: number, log: boolean, chai
         },
       }
     );
-    const startedMS = Date.now();
     p.stdin.setDefaultEncoding('ascii');
     await new Promise((resolve, reject) => {
       let spedUp = false;
       let slowedDown = false;
 
+      let importedTimeout: NodeJS.Timeout | undefined;
+      let timedOut = false;
+      let lastSeenTimestamp = time;
+
+      const resetTimeout = (lastSeen: number) => {
+        lastSeenTimestamp = lastSeen;
+        if (importedTimeout !== undefined) {
+          clearTimeout(importedTimeout);
+        }
+        importedTimeout = setTimeout(() => {
+          timedOut = true;
+          p.kill();
+        }, importedTimeoutMs);
+      };
+
       p.stdout.on('data', data => {
         const dataString = data.toString();
         if (log) console.log(dataString);
 
-        if (!spedUp && importedRegex.test(data)) {
-          writeFileSync(fakeTimePath, `@${fakeDateString} x${multiplier}`);
+        if (!spedUp && dateImportedRegex.test(data)) {
+          writeFileSync(fakeTimePath, `@${fakeDateString} x${rate}`);
           spedUp = true;
         }
 
-        const dateStr = dateRegex.exec(dataString);
+        const dateStr = dateImportedRegex.exec(dataString);
         if (dateStr && dateStr[0]) {
           try {
             const timestamp = Date.parse(dateStr[0] + ' GMT');
+            resetTimeout(timestamp);
             if (!slowedDown && timestamp >= Date.now() - epochDuration(chain) * 2) {
               writeFileSync(fakeTimePath, `@${fakeDateString} x100`);
               slowedDown = true;
             }
 
             if (timestamp >= Date.now() - epochDuration(chain)) {
-              console.log('KILLLLLLLLLLLL');
               writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
               p.kill('SIGKILL');
             }
@@ -80,10 +108,18 @@ export async function fastForward(cmd: Command, time: number, log: boolean, chai
       p.on('error', reject);
 
       p.on('exit', code => {
-        if (code != 0 && code != null) {
+        if (code !== 0 && code != null) {
           reject(
             new Error(
               `Fast forward process exited with code ${code}, try --verbose to debug the problem`
+            )
+          );
+        } else if (timedOut) {
+          reject(
+            new Error(
+              `Fast forwarding failed on ${rate}x speed, try reducing it with using -s ${Math.floor(
+                rate / 2
+              )}`
             )
           );
         } else {
@@ -135,6 +171,7 @@ export async function startContainers(
     await compose.pullMany(
       services.filter(service => ['subquery', 'tooling'].includes(service)),
       {
+        config: composeFile,
         log,
         cwd: localDir,
         env,
@@ -143,8 +180,9 @@ export async function startContainers(
 
     await compose.upMany(services, {
       cwd: localDir,
+      config: composeFile,
       log,
-      commandOptions: ['--build'],
+      commandOptions: ['--build', '--remove-orphans'],
       env,
     });
   } catch (err) {
@@ -159,6 +197,7 @@ export async function startContainers(
 export async function stopContainers(cmd: Command, verbose: boolean): Promise<void> {
   try {
     await compose.down({
+      config: composeFile,
       cwd: localDir,
       log: verbose,
       commandOptions: ['--volumes'], // removes volumes
@@ -188,6 +227,7 @@ export async function containersState(cmd: Command, verbose: boolean): Promise<C
   const composeVersion = composeMajorVersion();
   if (composeVersion === 1) {
     const ps = await compose.ps({
+      config: composeFile,
       cwd: localDir,
       log: verbose,
     });
@@ -202,7 +242,10 @@ export async function containersState(cmd: Command, verbose: boolean): Promise<C
     });
   } else if (composeVersion === 2) {
     const services = JSON.parse(
-      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+      execSync(`docker-compose -f ${composeFile} ps --format json`, {
+        cwd: localDir,
+        stdio: 'pipe',
+      }).toString()
     );
     return services.map((s: psServiceV2) => ({ name: s.Service, state: s.State }));
   } else {
@@ -211,13 +254,13 @@ export async function containersState(cmd: Command, verbose: boolean): Promise<C
     );
   }
 }
-export async function containersUp(cmd: Command, verbose: boolean) {
+export async function containersUp(cmd: Command, verbose: boolean): Promise<string[]> {
   return (await containersState(cmd, verbose)).map(s => s.name);
 }
-export async function anyContainersRunning(cmd: Command, verbose: boolean) {
+export async function anyContainersRunning(cmd: Command, verbose: boolean): Promise<boolean> {
   return (
     (await containersState(cmd, verbose)).filter(s => {
-      return s.state == 'Up';
+      return s.state === 'Up';
     }).length > 0
   );
 }
@@ -240,13 +283,17 @@ export async function containerName(cmd: Command, serviceName: string): Promise<
     const regex = new RegExp(`local(?:_|-)${serviceName}(?:_|-)1`);
 
     const ps = await compose.ps({
+      config: composeFile,
       cwd: localDir,
     });
     const service = ps.data.services.find(s => s.name.match(regex));
     return service?.name || '';
   } else if (composeVersion === 2) {
     const services = JSON.parse(
-      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+      execSync(`docker-compose -f ${composeFile} ps --format json`, {
+        cwd: localDir,
+        stdio: 'pipe',
+      }).toString()
     );
     const service = services.find((s: psServiceV2) => s.Service === serviceName);
     return service?.Name || '';
