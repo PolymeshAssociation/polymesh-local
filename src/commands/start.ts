@@ -1,7 +1,8 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
+import Command from '../base';
 import { isChainUp } from '../common/chain';
 import {
   anyContainersUp,
@@ -13,14 +14,21 @@ import {
   startContainers,
   stopContainers,
 } from '../common/containers';
-import { isRestUp, validateDidArgs } from '../common/rest';
-import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
+import { isRestUp, validateDids, validateMnemonics } from '../common/rest';
+import {
+  getMetadata,
+  loadSnapshot,
+  Metadata,
+  replaceSnapshot,
+  snapshotPath,
+  writeMetadata,
+} from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
 import { epochDuration, printInfo, retry } from '../common/util';
-import { dataDir } from '../consts';
-import { chainRunningError, restArgsError } from '../errors';
+import { dataDir, supportedChainVersions } from '../consts';
+import { chainRunningError } from '../errors';
 
 export default class Start extends Command {
   static description = 'Start all the services';
@@ -31,9 +39,13 @@ export default class Start extends Command {
     help: flags.help({ char: 'h' }),
     version: flags.string({
       char: 'v',
-      default: '4.0.0',
+      // Note: The actual value passed to the default function doesn't match its type. We use any so we can access the user config if its present
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      default: (ctx: any) => {
+        return ctx.userConfig?.chainTag || '4.0.0';
+      },
       description: 'version of the containers to run',
-      options: ['4.0.0', '4.1.0-rc1'],
+      options: supportedChainVersions,
     }),
     image: flags.string({
       char: 'i',
@@ -85,12 +97,21 @@ export default class Start extends Command {
     }),
     dids: flags.string({
       description:
-        'Comma seperated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
-      default: '0x0600000000000000000000000000000000000000000000000000000000000000',
+        'Comma separated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      default: (ctx: any) => {
+        return (
+          ctx.userConfig?.restDids ||
+          '0x0600000000000000000000000000000000000000000000000000000000000000'
+        );
+      },
     }),
     mnemonics: flags.string({
-      description: 'Comma seperated list of mnemonics for dids. Defaults to `//Alice`',
-      default: '//Alice',
+      description: 'Comma separated list of mnemonics for dids. Defaults to `//Alice`',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      default: (ctx: any) => {
+        return ctx.userConfig?.restMnemonics || '//Alice';
+      },
     }),
     uiLatest: flags.boolean({
       char: 'u',
@@ -112,10 +133,9 @@ export default class Start extends Command {
       dids,
       mnemonics,
       uiLatest,
-      fastForwardRate = chain?.startsWith('ci') ? 1000 : 2000,
+      fastForwardRate,
     } = commandFlags;
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
-
     if (await anyContainersUp(this, verbose)) {
       this.error(chainRunningError);
     }
@@ -132,8 +152,13 @@ export default class Start extends Command {
       cli.action.stop();
     }
 
-    if (!validateDidArgs(dids, mnemonics)) {
-      this.error(restArgsError);
+    const didValidation = validateDids(dids);
+    if (typeof didValidation === 'string') {
+      this.error(didValidation);
+    }
+    const mnemonicValidation = validateMnemonics(mnemonics, dids);
+    if (typeof mnemonicValidation === 'string') {
+      this.error(mnemonicValidation);
     }
 
     if (!anyVolumes()) {
@@ -185,7 +210,21 @@ export default class Start extends Command {
 
     if (Date.now() - metadata.stopTimestamp > epochDuration(metadata.chain)) {
       cli.action.start('Fast forwarding chain');
-      await fastForward(this, fastForwardRate, metadata.stopTimestamp, verbose, metadata.chain);
+      const fastForwardedTo = await fastForward(
+        this,
+        fastForwardRate,
+        snapshot,
+        metadata.stopTimestamp,
+        verbose,
+        metadata.chain,
+        version
+      );
+      if (snapshot) {
+        const oldTime = metadata.stopTimestamp;
+        metadata.stopTimestamp = fastForwardedTo.getTime();
+        writeMetadata(metadata);
+        replaceSnapshot(this, snapshotPath(snapshot), verbose, new Date(oldTime), fastForwardedTo);
+      }
       cli.action.stop();
     }
 
@@ -206,7 +245,16 @@ export default class Start extends Command {
     });
 
     cli.action.start('Starting the containers');
-    await startContainers(this, version, verbose, metadata.chain, services, dids, mnemonics);
+    await startContainers(
+      this,
+      version,
+      verbose,
+      metadata.chain,
+      services,
+      dids,
+      mnemonics,
+      this.userConfig
+    );
     cli.action.stop();
 
     const allChecks = {

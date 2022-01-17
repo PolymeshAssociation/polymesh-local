@@ -1,12 +1,13 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 import { cli } from 'cli-ux';
 
+import Command from '../base';
 import { anyContainersUp, removeVolumes } from '../common/containers';
 import { chainRunningError } from '../errors';
 
 export default class Clean extends Command {
   static description =
-    'Clean removes the chain data so the next start is starts at a genisis block. Services must be stopped for this command to work';
+    'Clean removes the chain data so the next start is starts at a genesis block. Services must be stopped for this command to work';
 
   static flags = {
     help: flags.help({ char: 'h' }),

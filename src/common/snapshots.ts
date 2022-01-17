@@ -1,10 +1,19 @@
 import Command from '@oclif/command';
-import { existsSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import {
+  existsSync,
+  lstatSync,
+  readdirSync,
+  readFileSync,
+  renameSync,
+  rmSync,
+  writeFileSync,
+} from 'fs';
 import { mkdirpSync } from 'fs-extra';
 import rimraf from 'rimraf';
 import tar from 'tar';
 
 import { backupVolumes, restoreVolumes } from '../common/containers';
+import { dateToFilename } from '../common/util';
 import { dataDir, snapshotsDir } from '../consts';
 
 // A snapshot is a collection of docker volumes for containers along with additional meta data.
@@ -18,9 +27,9 @@ export interface Metadata {
   chain: string;
 }
 
-export function createSnapshot(fileName: string): void {
+export function createSnapshot(fileName: string, verbose: boolean): void {
   mkdirpSync(snapshotsDir);
-  backupVolumes();
+  backupVolumes(verbose);
   tar.c(
     {
       gzip: true,
@@ -28,6 +37,23 @@ export function createSnapshot(fileName: string): void {
       C: dataDir,
     },
     ['.']
+  );
+}
+
+export function replaceSnapshot(
+  cmd: Command,
+  snapshotFile: string,
+  verbose: boolean,
+  oldDate: Date,
+  fastForwardedUntil: Date
+): void {
+  const oldFileName = snapshotFile + '_' + dateToFilename(oldDate);
+  renameSync(snapshotFile, oldFileName);
+  createSnapshot(snapshotFile, verbose);
+  cmd.log(
+    `Fast forwarded${
+      fastForwardedUntil && ` snapshot until ${fastForwardedUntil}`
+    }, old snapshot saved in ${oldFileName}`
   );
 }
 

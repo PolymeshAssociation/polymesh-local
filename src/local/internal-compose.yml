@@ -1,4 +1,4 @@
-version: '2'
+version: "2"
 services:
   postgres:
     image: postgres:12-alpine
@@ -6,66 +6,69 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - 'polymesh_postgres:/var/lib/postgresql/data'
+      - "polymesh_postgres:/var/lib/postgresql/data"
     environment:
       POSTGRES_PASSWORD: postgres
 
   fast-forward-alice:
     ports:
-      - '30333:30333'
+      - "10044:9944"
+      - "30333:30333"
     build:
       context: .
       dockerfile: mesh.Dockerfile
     restart: "no"
     volumes:
-      - 'polymesh_alice:/var/lib/polymesh/chains'
-      - './faketime:/faketime'
+      - "polymesh_alice:/var/lib/polymesh/chains"
+      - "${PWD}/faketime:/faketime"
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--alice',
-        '--validator',
-        '--force-authoring',
+        "-d",
+        "/var/lib/polymesh",
+        "--chain=${CHAIN}",
+        "--alice",
+        "--validator",
+        "--force-authoring",
+        "--unsafe-ws-external",
+        "--rpc-cors=all",
       ]
   fast-forward-bob:
     ports:
-      - '40333:30333'
+      - "40333:30333"
     build:
       context: .
       dockerfile: mesh.Dockerfile
     restart: "no"
     volumes:
-      - 'polymesh_bob:/var/lib/polymesh/chains'
-      - './faketime:/faketime'
+      - "polymesh_bob:/var/lib/polymesh/chains"
+      - "${PWD}/faketime:/faketime"
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--bob',
-        '--validator',
-        '--force-authoring',
+        "-d",
+        "/var/lib/polymesh",
+        "--chain=${CHAIN}",
+        "--bob",
+        "--validator",
+        "--force-authoring",
       ]
   fast-forward-charlie:
     ports:
-      - '50333:30333'
+      - "50333:30333"
     build:
       context: .
       dockerfile: mesh.Dockerfile
     restart: "no"
     volumes:
-      - 'polymesh_charlie:/var/lib/polymesh/chains'
-      - './faketime:/faketime'
+      - "polymesh_charlie:/var/lib/polymesh/chains"
+      - "${PWD}/faketime:/faketime"
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--charlie',
-        '--validator',
-        '--force-authoring',
+        "-d",
+        "/var/lib/polymesh",
+        "--chain=${CHAIN}",
+        "--charlie",
+        "--validator",
+        "--force-authoring",
       ]
 
   alice:
@@ -73,22 +76,22 @@ services:
     user: root
     restart: always
     ports:
-      - '9944:9944'
-      - '9933:9933'
-      - '40333:30333'
+      - "9944:9944"
+      - "9933:9933"
+      - "40333:30333"
     volumes:
-      - 'polymesh_alice:/var/lib/polymesh/chains'
+      - "polymesh_alice:/var/lib/polymesh/chains"
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--alice',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        "-d",
+        "/var/lib/polymesh",
+        "--chain=${CHAIN}",
+        "--alice",
+        "--validator",
+        "--unsafe-rpc-external",
+        "--unsafe-ws-external",
+        "--rpc-cors=all",
+        "--force-authoring",
       ]
 
   bob:
@@ -96,22 +99,22 @@ services:
     user: root
     restart: always
     ports:
-      - '8833:9933'
-      - '8844:9944'
-      - '30333:30333'
+      - "8833:9933"
+      - "8844:9944"
+      - "30333:30333"
     volumes:
-      - 'polymesh_bob:/var/lib/polymesh/chains'
+      - "polymesh_bob:/var/lib/polymesh/chains"
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--bob',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        "-d",
+        "/var/lib/polymesh",
+        "--chain=${CHAIN}",
+        "--bob",
+        "--validator",
+        "--unsafe-rpc-external",
+        "--unsafe-ws-external",
+        "--rpc-cors=all",
+        "--force-authoring",
       ]
 
   charlie:
@@ -119,38 +122,38 @@ services:
     user: root
     restart: always
     ports:
-      - '7733:9933'
-      - '7744:9944'
-      - '50333:30333'
+      - "7733:9933"
+      - "7744:9944"
+      - "50333:30333"
     volumes:
-      - 'polymesh_charlie:/var/lib/polymesh/chains'
+      - "polymesh_charlie:/var/lib/polymesh/chains"
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--charlie',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        "-d",
+        "/var/lib/polymesh",
+        "--chain=${CHAIN}",
+        "--charlie",
+        "--validator",
+        "--unsafe-rpc-external",
+        "--unsafe-ws-external",
+        "--rpc-cors=all",
+        "--force-authoring",
       ]
 
   subquery:
-    image: 'polymathnet/polymesh-subquery:latest'
+    image: "polymathnet/polymesh-subquery:${SUBQUERY_TAG}"
     restart: always
     depends_on:
-      - 'postgres'
+      - "postgres"
     ports:
       - 3006:3000
     environment:
       NETWORK_ENDPOINT: ws://alice:9944
-      DB_USER: '${PG_USER}'
-      DB_PASS: '${PG_PASSWORD}'
-      DB_DATABASE: '${PG_DB}'
-      DB_PORT: '${PG_PORT}'
-      DB_HOST: '${PG_HOST}'
+      DB_USER: "${PG_USER}"
+      DB_PASS: "${PG_PASSWORD}"
+      DB_DATABASE: "${PG_DB}"
+      DB_PORT: "${PG_PORT}"
+      DB_HOST: "${PG_HOST}"
       NODE_ENV: local
     command:
       - --batch-size=500
@@ -158,29 +161,29 @@ services:
       - --local
 
   tooling:
-    image: polymathnet/tooling-gql:latest
+    image: polymathnet/tooling-gql:${TOOLING_TAG}
     restart: always
     depends_on:
-      - 'postgres'
+      - "postgres"
     ports:
       - 3007:3000
     environment:
-      PG_HOST: '${PG_HOST}'
-      PG_USERNAME: '${PG_USER}'
-      PG_PASSWORD: '${PG_PASSWORD}'
+      PG_HOST: "${PG_HOST}"
+      PG_USERNAME: "${PG_USER}"
+      PG_PASSWORD: "${PG_PASSWORD}"
       STAGE: dev
 
   rest_api:
-    image: polymathnet/polymesh-rest-api:latest
+    image: polymathnet/polymesh-rest-api:${REST_TAG}
     restart: always
     ports:
       - 3004:3000
     environment:
-      POLYMESH_NODE_URL: 'ws://alice:9944'
-      POLYMESH_MIDDLEWARE_URL: 'http://tooling:3000'
-      POLYMESH_MIDDLEWARE_API_KEY: '${TOOLING_API_KEY}'
-      RELAYER_DIDS: '${RELAYER_DIDS}'
-      RELAYER_MNEMONICS: '${RELAYER_MNEMONICS}'
+      POLYMESH_NODE_URL: "ws://alice:9944"
+      POLYMESH_MIDDLEWARE_URL: "http://tooling:3000"
+      POLYMESH_MIDDLEWARE_API_KEY: "${TOOLING_API_KEY}"
+      RELAYER_DIDS: "${RELAYER_DIDS}"
+      RELAYER_MNEMONICS: "${RELAYER_MNEMONICS}"
 
   dashboard:
     image: nginx
@@ -188,8 +191,8 @@ services:
     ports:
       - 3000:80
     volumes:
-      - '${UI_DIR}/dashboard:/var/www/app:ro' # :ro -> read only
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - "${UI_DIR}/dashboard:/var/www/app:ro" # :ro -> read only
+      - "${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro"
 
   bridge:
     image: nginx
@@ -197,8 +200,8 @@ services:
     ports:
       - 3001:80
     volumes:
-      - '${UI_DIR}/bridge:/var/www/app:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - "${UI_DIR}/bridge:/var/www/app:ro"
+      - "${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro"
 
   governance:
     image: nginx
@@ -206,8 +209,8 @@ services:
     ports:
       - 3002:80
     volumes:
-      - '${UI_DIR}/governance:/var/www/app:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - "${UI_DIR}/governance:/var/www/app:ro"
+      - "${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro"
 
   issuer:
     image: nginx
@@ -215,8 +218,8 @@ services:
     ports:
       - 3003:80
     volumes:
-      - '${UI_DIR}/issuer:/var/www/app:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - "${UI_DIR}/issuer:/var/www/app:ro"
+      - "${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro"
 
   schema:
     image: nginx
@@ -224,8 +227,8 @@ services:
     ports:
       - 3008:80
     volumes:
-      - '${LOCAL_DIR}/schemas/polymesh_schema_${POLYMESH_VERSION}.json:/var/www/app/polymesh_schema.json:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - "${LOCAL_DIR}/schemas/polymesh_schema_${POLYMESH_VERSION}.json:/var/www/app/polymesh_schema.json:ro"
+      - "${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro"
 
 volumes:
   polymesh_alice:
@@ -239,4 +242,4 @@ volumes:
 
 networks:
   default:
-    name: 'polymesh-local'
+    name: "polymesh-local"

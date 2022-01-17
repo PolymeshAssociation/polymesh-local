@@ -1,11 +1,24 @@
 import Command from '@oclif/command';
-import { createWriteStream } from 'fs-extra';
+import * as fs from 'fs-extra';
 import fetch from 'node-fetch';
+import path from 'path';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
 import { getMetadata, Metadata } from '../common/snapshots';
-import { chain, checkSettings, postgres, rest, tooling, uis } from '../consts';
+import { chain, checkSettings, configFileName, postgres, rest, tooling, uis } from '../consts';
+
+/**
+ * Values a user can set in a config file to control what images to use
+ */
+export interface UserConfig {
+  chainTag: string;
+  toolingTag: string;
+  restTag: string;
+  subqueryTag: string;
+  restMnemonics: string;
+  restDids: string;
+}
 
 const millisecondsPerMinute = 60 * 1000;
 
@@ -54,6 +67,10 @@ export async function returnsExpectedStatus(
 
 export function printInfo(cmd: Command): void {
   const metadata = getMetadata();
+  const configLocation = path.join(cmd.config.configDir, configFileName);
+  if (fs.existsSync(configLocation)) {
+    cmd.log(`config file located at: ${configLocation}`);
+  }
   cmd.log(`chain version ${metadata.version} running`);
   cmd.log(`polymesh node listening at wss://${chain.url}`);
   cmd.log(`postgreSQL listening at postgresql://localhost:${postgres.port}`);
@@ -72,7 +89,7 @@ export function printInfo(cmd: Command): void {
  * @param dest The path to save the file to
  */
 export async function downloadFile(url: string, dest: string): Promise<void> {
-  await promisify(pipeline)((await fetch(url)).body, createWriteStream(dest));
+  await promisify(pipeline)((await fetch(url)).body, fs.createWriteStream(dest));
 }
 
 /**
@@ -81,6 +98,19 @@ export async function downloadFile(url: string, dest: string): Promise<void> {
  * @returns string as YYYY-MM-DD HH:MM:SS
  */
 export function dateToFaketime(d: Date): string {
+  return formatDate(d, ' ');
+}
+
+/**
+ * Converts a JS Date to filename format
+ * @param date to convert
+ * @returns string as YYYY-MM-DD_HH:MM:SS
+ */
+export function dateToFilename(d: Date): string {
+  return formatDate(d, '_');
+}
+
+function formatDate(d: Date, separator: string) {
   let month = '' + (d.getUTCMonth() + 1);
   let day = '' + d.getUTCDate();
   const year = d.getUTCFullYear();
@@ -94,11 +124,67 @@ export function dateToFaketime(d: Date): string {
   if (minute.length < 2) minute = '0' + minute;
   if (seconds.length < 2) seconds = '0' + seconds;
 
-  return `${year}-${month}-${day} ${hour}:${minute}:${seconds}`;
+  return `${year}-${month}-${day}${separator}${hour}:${minute}:${seconds}`;
 }
 
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
-export function epochDuration(chain: string) {
-  return chain.startsWith('ci') ? MINUTE : 30 * MINUTE;
+export function epochDuration(c: string): number {
+  return c.startsWith('ci') ? MINUTE : 30 * MINUTE;
+}
+
+/**
+ * Reads user config settings
+ * @param cmd
+ * @returns user config if set, otherwise null
+ */
+export async function getUserConfig(cmd: Command): Promise<UserConfig | null> {
+  const configPath = path.join(cmd.config.configDir, configFileName);
+  if (fs.existsSync(configPath)) {
+    return fs.readJSON(configPath);
+  } else {
+    return null;
+  }
+}
+
+export function saveUserConfig(cmd: Command, config: UserConfig): void {
+  const configPath = path.join(cmd.config.configDir, configFileName);
+  fs.mkdirpSync(cmd.config.configDir);
+  const contents = JSON.stringify(config, undefined, 2);
+  fs.writeFileSync(configPath, contents);
+  cmd.log(`config file was saved at ${configPath}`);
+}
+
+interface DockerTag {
+  name: string;
+}
+
+interface DockerTagResponse {
+  next?: string;
+  results: DockerTag[];
+}
+/**
+ * Fetches docker hub tags for a given repo
+ * @param repo The repo to fetch tags for
+ * @returns available tags
+ */
+export async function fetchDockerHubTags(repo: string): Promise<DockerTag[]> {
+  const options = [];
+  let response: DockerTagResponse = { results: [] };
+  do {
+    const url =
+      response?.next ||
+      `https://registry.hub.docker.com/v2/repositories/${repo}/tags/?${new URLSearchParams({
+        page_size: '100',
+      })}`;
+    const rawResponse = await fetch(url);
+    response = await rawResponse.json();
+    options.push(
+      ...response.results.map(r => {
+        return { name: r.name };
+      })
+    );
+  } while (response?.next);
+
+  return options;
 }

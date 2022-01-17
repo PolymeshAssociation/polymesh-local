@@ -1,6 +1,7 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 import cli from 'cli-ux';
 
+import Command from '../base';
 import { anyContainersUp, removeVolumes, stopContainers } from '../common/containers';
 import { getMetadata, writeMetadata } from '../common/snapshots';
 

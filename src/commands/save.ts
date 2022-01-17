@@ -1,7 +1,8 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 import cli from 'cli-ux';
 import { existsSync } from 'fs';
 
+import Command from '../base';
 import { containersUp, startContainers, stopContainers } from '../common/containers';
 import { getRelayerEnvs } from '../common/rest';
 import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
@@ -50,7 +51,7 @@ export default class Save extends Command {
 
     const fileName = output ? snapshotPath(output) : defaultFilename(metadata.version);
     cli.action.start(`Creating snapshot at: ${fileName}`);
-    createSnapshot(fileName);
+    createSnapshot(fileName, verbose);
     cli.action.stop();
 
     if (services.length > 0) {
@@ -62,7 +63,8 @@ export default class Save extends Command {
         metadata.chain,
         services,
         restEnvs[0],
-        restEnvs[1]
+        restEnvs[1],
+        this.userConfig
       );
       writeMetadata(metadata);
       cli.action.stop();

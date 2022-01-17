@@ -3,6 +3,17 @@ import path from 'path';
 export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
+export const configFileName = 'config.json';
+export const supportedChainVersions = ['4.0.0', '4.1.0-rc1'];
+
+export const defaultUserConfig = {
+  chainTag: '4.0.0',
+  restTag: 'v0.0.3',
+  subqueryTag: 'v4.0.0',
+  toolingTag: 'v6.0.0-alpha.1',
+  restDids: '0x0600000000000000000000000000000000000000000000000000000000000000',
+  restMnemonics: '//Alice',
+};
 
 export const checkSettings = {
   timeout: 90 * 1000,

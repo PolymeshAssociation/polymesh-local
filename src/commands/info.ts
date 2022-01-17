@@ -1,5 +1,6 @@
-import { Command, flags } from '@oclif/command';
+import { flags } from '@oclif/command';
 
+import Command from '../base';
 import { printInfo } from '../common/util';
 
 export default class Info extends Command {

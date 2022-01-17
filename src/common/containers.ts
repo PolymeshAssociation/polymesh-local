@@ -1,10 +1,15 @@
 import { Command } from '@oclif/command';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import { Events } from '@polkadot/api/base/Events';
+import { Data } from '@polkadot/types';
 import { execSync, spawn } from 'child_process';
 import compose from 'docker-compose';
-import fs, { rmSync, writeFileSync } from 'fs';
+import fs, { existsSync, lstatSync, readFileSync, rmdirSync, rmSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import process from 'process';
 
-import { dateToFaketime, epochDuration } from '../common/util';
+import { getMetadata, replaceSnapshot, snapshotPath, writeMetadata } from '../common/snapshots';
+import { dateToFaketime, epochDuration, UserConfig } from '../common/util';
 import { dataDir, faketimeFile, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
@@ -18,51 +23,100 @@ export function prepareDockerfile(version: string, image?: string): void {
   fs.writeFileSync(`${localDir}/mesh.Dockerfile`, dockerfile);
 }
 
-const dateImportedRegex = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}.+Imported/;
-const importedTimeoutMs = 1000;
+const startTimeoutMs = 20_000;
 const fakeTimePath = join(localDir, faketimeFile);
 const composeFile = 'internal-compose.yml';
 
 export async function fastForward(
   cmd: Command,
-  rate: number,
+  fastForwardRate: number | undefined,
+  snapshotFile: string | undefined,
   time: number,
   log: boolean,
-  chain: string
-): Promise<void> {
+  chain: string,
+  version: string
+): Promise<Date> {
+  const rate = fastForwardRate || (chain.startsWith('ci') ? 400 : 1000);
+  // const rate = 1;
+  const importedTimeoutMs = (chain.startsWith('ci') ? 500 : 60_000) * 10;
   const fakeDateString = dateToFaketime(new Date(time));
-  try {
-    writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
-    const p = spawn(
-      'docker-compose',
-      [
-        '-f',
-        composeFile,
-        'up',
-        '--build',
-        'fast-forward-alice',
-        'fast-forward-bob',
-        'fast-forward-charlie',
-      ],
-      {
-        cwd: localDir,
-        env: {
-          ...process.env,
-          DATA_DIR: dataDir,
-          CHAIN: chain,
-          LOCAL_DIR: localDir,
-        },
-      }
-    );
-    p.stdin.setDefaultEncoding('ascii');
-    await new Promise((resolve, reject) => {
-      let spedUp = false;
-      let slowedDown = false;
 
+  if (existsSync(fakeTimePath) && lstatSync(fakeTimePath).isDirectory()) {
+    rmdirSync(fakeTimePath);
+  }
+  writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+
+  const p = spawn(
+    'docker-compose',
+    [
+      '-f',
+      composeFile,
+      'up',
+      '--build',
+      'fast-forward-alice',
+      'fast-forward-bob',
+      'fast-forward-charlie',
+    ],
+    {
+      cwd: localDir,
+      env: {
+        ...process.env,
+        DATA_DIR: dataDir,
+        CHAIN: chain,
+        LOCAL_DIR: localDir,
+      },
+    }
+  );
+  if (log) {
+    p.stderr.on('data', chunk => console.error(chunk.toString()));
+    p.stdout.on('data', chunk => console.log(chunk.toString()));
+  }
+
+  // Handle Ctrl-C
+  let nForceQuit = 3;
+  let quit = false;
+  const sigIntHandler = () => {
+    quit = true;
+
+    writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+    p.kill('SIGKILL');
+
+    if (nForceQuit === 0) {
+      process.exit(1);
+    } else {
+      cmd.log(`Stopping gracefully, press CTRL-C ${nForceQuit} more times to force quit`);
+      nForceQuit--;
+    }
+  };
+
+  process.stdin.resume();
+  process.on('SIGINT', sigIntHandler);
+  let api: ApiPromise | undefined;
+
+  try {
+    const wsProvider = new WsProvider('ws://0.0.0.0:10044');
+    const { rpc, types } = JSON.parse(
+      readFileSync(join(localDir, `schemas/polymesh_schema_${version}.json`), { encoding: 'utf-8' })
+    );
+    api = await ApiPromise.create({ provider: wsProvider, types, rpc });
+
+    return await new Promise((resolve, reject) => {
       let importedTimeout: NodeJS.Timeout | undefined;
       let timedOut = false;
       let lastSeenTimestamp = time;
 
+      // Timeout in case the chain produces no blocks
+      let startTimeout: NodeJS.Timeout | undefined = setTimeout(() => {
+        importedTimeout && clearTimeout(importedTimeout);
+        timedOut = true;
+        writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+        p.kill('SIGKILL');
+      }, startTimeoutMs);
+
+      let spedUp = false;
+      let createdBlockWhileSpedUp = false;
+
+      // Timeout in case the chain stops producing blocks in the middle of fast forwarding
       const resetTimeout = (lastSeen: number) => {
         lastSeenTimestamp = lastSeen;
         if (importedTimeout !== undefined) {
@@ -70,39 +124,47 @@ export async function fastForward(
         }
         importedTimeout = setTimeout(() => {
           timedOut = true;
-          p.kill();
-        }, importedTimeoutMs);
+          writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+          p.kill('SIGKILL');
+        }, importedTimeoutMs / (createdBlockWhileSpedUp && !slowedDown ? rate : 1));
       };
 
-      p.stdout.on('data', data => {
-        const dataString = data.toString();
-        if (log) console.log(dataString);
+      let slowedDown = false;
+      let oldTimestamp: number | undefined;
+      api!.rpc.chain.subscribeFinalizedHeads(async () => {
+        const timestamp = (await api!.query.timestamp.now()).toJSON() as number;
+        if (!oldTimestamp || timestamp <= oldTimestamp) {
+          oldTimestamp = timestamp;
+          return;
+        }
+        oldTimestamp = timestamp;
+        if (spedUp) {
+          createdBlockWhileSpedUp = true;
+        }
 
-        if (!spedUp && dateImportedRegex.test(data)) {
+        startTimeout && clearTimeout(startTimeout);
+        startTimeout = undefined;
+
+        if (!spedUp) {
           writeFileSync(fakeTimePath, `@${fakeDateString} x${rate}`);
           spedUp = true;
         }
+        // 1636478810354
+        // aaa 1636459700354
+        try {
+          resetTimeout(timestamp);
+          if (!slowedDown && timestamp >= Date.now() - epochDuration(chain) * 2) {
+            writeFileSync(fakeTimePath, `@${fakeDateString} x100`);
+            slowedDown = true;
+          }
 
-        const dateStr = dateImportedRegex.exec(dataString);
-        if (dateStr && dateStr[0]) {
-          try {
-            const timestamp = Date.parse(dateStr[0] + ' GMT');
-            resetTimeout(timestamp);
-            if (!slowedDown && timestamp >= Date.now() - epochDuration(chain) * 2) {
-              writeFileSync(fakeTimePath, `@${fakeDateString} x100`);
-              slowedDown = true;
-            }
+          if (timestamp >= Date.now() - epochDuration(chain)) {
+            importedTimeout && clearTimeout(importedTimeout);
 
-            if (timestamp >= Date.now() - epochDuration(chain)) {
-              writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
-              p.kill('SIGKILL');
-            }
-          } catch {}
-        }
-      });
-      p.stderr.on('data', data => {
-        const dataString = data.toString();
-        if (log) console.error(dataString);
+            writeFileSync(fakeTimePath, `@${fakeDateString} x1`);
+            p.kill('SIGKILL');
+          }
+        } catch {}
       });
 
       p.on('error', reject);
@@ -114,34 +176,47 @@ export async function fastForward(
               `Fast forward process exited with code ${code}, try --verbose to debug the problem`
             )
           );
-        } else if (timedOut) {
-          reject(
-            new Error(
-              `Fast forwarding failed on ${rate}x speed, try reducing it with using -s ${Math.floor(
-                rate / 2
-              )}`
-            )
-          );
+        } else if (timedOut || quit) {
+          const metadata = getMetadata();
+          metadata.stopTimestamp = lastSeenTimestamp;
+          writeMetadata(metadata);
+
+          if (snapshotFile && lastSeenTimestamp !== time) {
+            replaceSnapshot(
+              cmd,
+              snapshotPath(snapshotFile),
+              log,
+              new Date(time),
+              new Date(lastSeenTimestamp)
+            );
+          }
+          timedOut
+            ? reject(
+                new Error(
+                  `Fast forwarding failed on ${rate}x speed, try reducing it using -r ${Math.floor(
+                    rate * 0.8
+                  )}`
+                )
+              )
+            : reject(new Error('Fast forward process stopped by interrupt signal.'));
         } else {
-          resolve(undefined);
+          resolve(new Date(lastSeenTimestamp));
         }
       });
     });
   } catch (err) {
     cmd.error('Error trying to fast forward chain: ' + err);
   } finally {
+    api?.disconnect();
+    process.off('SIGINT', sigIntHandler);
     if (await anyContainersUp(cmd, log)) {
       await stopContainers(cmd, log);
     }
     rmSync(fakeTimePath);
   }
+  return new Date(); // Unreachable
 }
 
-function parseISOLocal(s: string) {
-  const b: any = s.split(/\D/);
-  const d = new Date(b[0], b[1] - 1, b[2], b[3], b[4], b[5]);
-  return d.getTime();
-}
 export async function startContainers(
   cmd: Command,
   version: string,
@@ -149,9 +224,13 @@ export async function startContainers(
   chain: string,
   services: string[],
   dids: string,
-  mnemonics: string
+  mnemonics: string,
+  userConfig: UserConfig
 ): Promise<void> {
   try {
+    const toolingTag = userConfig.toolingTag || 'latest';
+    const subqueryTag = userConfig.subqueryTag || 'latest';
+    const restTag = userConfig.restTag || 'latest';
     const env = {
       ...process.env,
       POLYMESH_VERSION: version,
@@ -167,6 +246,9 @@ export async function startContainers(
       RELAYER_MNEMONICS: mnemonics,
       UI_DIR: uis.dir,
       LOCAL_DIR: localDir,
+      TOOLING_TAG: toolingTag,
+      SUBQUERY_TAG: subqueryTag,
+      REST_TAG: restTag,
     };
     await compose.pullMany(
       services.filter(service => ['subquery', 'tooling'].includes(service)),
@@ -343,12 +425,12 @@ export function anyVolumes(): boolean {
   );
 }
 
-export function backupVolumes(): void {
+export function backupVolumes(verbose: boolean): void {
   execSync('docker pull ubuntu');
   namedVolumes.forEach(volume => {
     execSync(
       `docker run --name polymesh_archiver --rm -v ${volume}:/source -v ${dataDir}:/data ubuntu tar cvf /data/${volume}.tar /source`,
-      { stdio: 'ignore' }
+      { stdio: verbose ? 'inherit' : 'ignore' }
     );
   });
 }
