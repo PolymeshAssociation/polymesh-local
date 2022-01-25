@@ -139,8 +139,8 @@ services:
     ports:
       - 3000:80
     volumes:
-      - '${UI_DIR}/dashboard:/var/www/app:ro' # :ro -> read only
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '${DATA_DIR}/uis/dashboard:/var/www/app:ro' # :ro -> read only
+      - '${DATA_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
 
   bridge:
     image: nginx
@@ -148,8 +148,8 @@ services:
     ports:
       - 3001:80
     volumes:
-      - '${UI_DIR}/bridge:/var/www/app:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '${DATA_DIR}/uis/bridge:/var/www/app:ro'
+      - '${DATA_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
 
   governance:
     image: nginx
@@ -157,8 +157,8 @@ services:
     ports:
       - 3002:80
     volumes:
-      - '${UI_DIR}/governance:/var/www/app:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '${DATA_DIR}/uis/governance:/var/www/app:ro'
+      - '${DATA_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
 
   issuer:
     image: nginx
@@ -166,8 +166,8 @@ services:
     ports:
       - 3003:80
     volumes:
-      - '${UI_DIR}/issuer:/var/www/app:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '${DATA_DIR}/uis/issuer:/var/www/app:ro'
+      - '${DATA_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
 
   schema:
     image: nginx
@@ -175,8 +175,8 @@ services:
     ports:
       - 3008:80
     volumes:
-      - '${LOCAL_DIR}/schemas/polymesh_schema_${POLYMESH_VERSION}.json:/var/www/app/polymesh_schema.json:ro'
-      - '${LOCAL_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '${DATA_DIR}/schemas/polymesh_schema_${POLYMESH_VERSION}.json:/var/www/app/polymesh_schema.json:ro'
+      - '${DATA_DIR}/nginx.conf:/etc/nginx/nginx.conf:ro'
 
 volumes:
   polymesh_alice:

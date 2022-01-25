@@ -2,6 +2,7 @@ import { Command } from '@oclif/command';
 import { execSync } from 'child_process';
 import compose from 'docker-compose';
 import fs from 'fs';
+import { copy, mkdirpSync } from 'fs-extra';
 
 import { UserConfig } from '../common/util';
 import { dataDir, localDir, postgres, tooling, uis } from '../consts';
@@ -32,6 +33,9 @@ export async function startContainers(
     const toolingTag = userConfig.toolingTag || 'latest';
     const subqueryTag = userConfig.subqueryTag || 'latest';
     const restTag = userConfig.restTag || 'latest';
+    const appData = cmd.config.dataDir;
+
+    await copyContainerData(cmd);
 
     await compose.upMany(services, {
       cwd: localDir,
@@ -40,7 +44,6 @@ export async function startContainers(
       env: {
         ...process.env,
         POLYMESH_VERSION: version,
-        DATA_DIR: dataDir,
         PG_USER: postgres.user,
         PG_HOST: postgres.host,
         PG_PASSWORD: postgres.password,
@@ -51,8 +54,7 @@ export async function startContainers(
         TOOLING_API_KEY: tooling.apiKey,
         RELAYER_DIDS: dids,
         RELAYER_MNEMONICS: mnemonics,
-        UI_DIR: uis.dir,
-        LOCAL_DIR: localDir,
+        DATA_DIR: appData,
         TOOLING_TAG: toolingTag,
         SUBQUERY_TAG: subqueryTag,
         REST_TAG: restTag,
@@ -211,4 +213,19 @@ export function restoreVolumes(): void {
       { stdio: 'ignore' }
     );
   });
+}
+
+/**
+ * Moves files that are bind mounted into containers to the data directory
+ * Depending on how node was installed docker may not be able to access the files otherwise
+ **/
+async function copyContainerData(cmd: Command): Promise<void> {
+  const systemData = cmd.config.dataDir;
+  mkdirpSync(systemData);
+
+  await Promise.all([
+    fs.promises.copyFile(`${localDir}/nginx.conf`, `${systemData}/nginx.conf`),
+    copy(`${localDir}/schemas/`, `${systemData}/schemas/`),
+    copy(uis.dir, `${systemData}/uis/`),
+  ]);
 }
