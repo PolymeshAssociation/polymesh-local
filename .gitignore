@@ -11,3 +11,4 @@ scripts/tmp
 /src/local/data/
 /src/local/uis/
 mesh.Dockerfile
+/coverage
