@@ -1,3 +1,10 @@
+## [3.5.4](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.3...v3.5.4) (2022-02-01)
+
+
+### Bug Fixes
+
+* 🐛 Fix mnemnoic validation bug when given a list ([#29](https://github.com/PolymathNetwork/polymesh-local/issues/29)) ([f478a68](https://github.com/PolymathNetwork/polymesh-local/commit/f478a684db63dc855a4d87f34b30a7fe89a5c180))
+
 ## [3.5.3](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.2...v3.5.3) (2021-12-03)
 
 
