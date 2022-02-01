@@ -202,7 +202,7 @@ export default class Start extends Command {
       return [];
     });
 
-    cli.action.start('Starting the containers');
+    cli.action.start('Starting the containers (this may take a while)');
     await startContainers(
       this,
       version,

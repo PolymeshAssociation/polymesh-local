@@ -18,7 +18,9 @@ Tool for managing a Polymesh development or CI environment. This environment inc
 
 Individual pieces can be brought up by using the `--only` flag on start
 
-_NOTE: This package requires docker and docker-compose to run. They must be installed on the user's system beforehand_
+_NOTE: This package requires docker and docker-compose to run. They must be installed on the user's system beforehand. The docker daemon must be running for this tool to work_
+
+_NOTE: For Mac and Windows users, docker should be allocated at least 4GB of memory. This can be done through the docker UI_
 
 ### Getting Started
 
@@ -63,7 +65,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/3.5.4 linux-x64 node-v14.18.3
+polymesh-local/3.5.4 darwin-arm64 node-v16.13.2
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
