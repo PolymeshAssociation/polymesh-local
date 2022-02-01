@@ -1,3 +1,10 @@
+## [3.5.5](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.4...v3.5.5) (2022-02-01)
+
+
+### Bug Fixes
+
+* 🐛 Couldn't start when node was installed in certain ways ([#28](https://github.com/PolymathNetwork/polymesh-local/issues/28)) ([461da23](https://github.com/PolymathNetwork/polymesh-local/commit/461da23cc686289f82077f2e2d317ca8ef52bf9c))
+
 ## [3.5.4](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.3...v3.5.4) (2022-02-01)
 
 
