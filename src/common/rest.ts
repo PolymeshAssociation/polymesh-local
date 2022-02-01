@@ -19,14 +19,17 @@ export function validateMnemonics(input: string, rawDids: string): boolean | str
     return `Each DID requires a mnemonic to be passed. Received ${mnemonics.length} mnemonics for ${dids.length} DIDs`;
   }
 
+  const errors: string[] = [];
   for (const mnemonic of mnemonics) {
     const words = mnemonic.split(' ');
     if (words.length === 1 && words[0].match(/\/\/\w+/)) continue; // i.e is shorthand mnemonic
     if (words.length !== 12) {
-      return `Mnemonics should be 12 words separated by spaces or a shorthand like //Alice. "${mnemonic}" did not meet this rule`;
+      errors.push(
+        `Mnemonic "${mnemonic}" is not valid. Mnemonics should be 12 words separated by spaces or a shorthand like //Alice`
+      );
     }
   }
-  return true;
+  return errors.length ? errors.join('\n') : true;
 }
 
 const didRegex = /0x[0-9a-z]{64}/;

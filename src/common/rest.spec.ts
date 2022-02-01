@@ -19,7 +19,7 @@ describe('validateMnemonics', () => {
     const input = 'one two three';
     const result = validateMnemonics(input, fakeDid);
     expect(result).toEqual(
-      'Mnemonics should be 12 words separated by spaces or a shorthand like //Alice. "one two three" did not meet this rule'
+      'Mnemonic "one two three" is not valid. Mnemonics should be 12 words separated by spaces or a shorthand like //Alice'
     );
   });
 
@@ -27,7 +27,7 @@ describe('validateMnemonics', () => {
     const input = `${validMnemonic} extra words`;
     const result = validateMnemonics(input, fakeDid);
     expect(result).toEqual(
-      'Mnemonics should be 12 words separated by spaces or a shorthand like //Alice. "apple banana cherry dog egress fog good hat igloo jug llama nope extra words" did not meet this rule'
+      'Mnemonic "apple banana cherry dog egress fog good hat igloo jug llama nope extra words" is not valid. Mnemonics should be 12 words separated by spaces or a shorthand like //Alice'
     );
   });
 
@@ -51,7 +51,17 @@ describe('validateMnemonics', () => {
     const dids = `${fakeDid},${fakeDid}`;
     const result = validateMnemonics(input, dids);
     expect(result).toEqual(
-      'Mnemonics should be 12 words separated by spaces or a shorthand like //Alice. "not enough" did not meet this rule'
+      'Mnemonic "not enough" is not valid. Mnemonics should be 12 words separated by spaces or a shorthand like //Alice'
+    );
+  });
+
+  it('should handle multiple errors', () => {
+    const input = 'abc def, lmn xyz';
+    const dids = `${fakeDid},${fakeDid}`;
+    const result = validateMnemonics(input, dids);
+    expect(result).toEqual(
+      'Mnemonic "abc def" is not valid. Mnemonics should be 12 words separated by spaces or a shorthand like //Alice\n' +
+        'Mnemonic "lmn xyz" is not valid. Mnemonics should be 12 words separated by spaces or a shorthand like //Alice'
     );
   });
 });
