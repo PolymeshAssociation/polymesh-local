@@ -223,9 +223,14 @@ async function copyContainerData(cmd: Command): Promise<void> {
   const systemData = cmd.config.dataDir;
   mkdirpSync(systemData);
 
-  await Promise.all([
+  const tasks = [
     fs.promises.copyFile(`${localDir}/nginx.conf`, `${systemData}/nginx.conf`),
     copy(`${localDir}/schemas/`, `${systemData}/schemas/`),
-    copy(uis.dir, `${systemData}/uis/`),
-  ]);
+  ];
+
+  if (fs.existsSync(uis.dir)) {
+    tasks.push(copy(uis.dir, `${systemData}/uis/`));
+  }
+
+  await Promise.all(tasks);
 }
