@@ -64,7 +64,7 @@ export async function startContainers(
     if (await anyContainersUp(cmd, log)) {
       await stopContainers(cmd, log);
     }
-    cmd.error('Error trying to start containers: ' + (err as { err: string }).err);
+    cmd.error('Error trying to start containers: ' + JSON.stringify(err));
   }
 }
 
@@ -76,7 +76,7 @@ export async function stopContainers(cmd: Command, verbose: boolean): Promise<vo
       commandOptions: ['--volumes'], // removes volumes
     });
   } catch (err) {
-    cmd.error('Error trying to stop containers: ' + (err as { err: string }).err);
+    cmd.error('Error trying to stop containers: ' + JSON.stringify(err));
   }
 }
 
