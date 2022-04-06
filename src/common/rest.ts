@@ -12,11 +12,11 @@ export async function isRestUp(): Promise<boolean> {
  * Validates user inputted mnemonics in accordance to inquisitors validation interface
  * @returns true if input is valid otherwise returns a string describing the issue
  */
-export function validateMnemonics(input: string, rawDids: string): boolean | string {
+export function validateMnemonics(input: string, rawSigners: string): boolean | string {
   const mnemonics = input.split(',').map(m => m.trim());
-  const dids = rawDids.split(',').map(d => d.trim());
-  if (mnemonics.length !== dids.length) {
-    return `Each DID requires a mnemonic to be passed. Received ${mnemonics.length} mnemonics for ${dids.length} DIDs`;
+  const signers = rawSigners.split(',').map(d => d.trim());
+  if (mnemonics.length !== signers.length) {
+    return `Each signer requires a mnemonic to be passed. Received ${mnemonics.length} mnemonics for ${signers.length} signers`;
   }
 
   const errors: string[] = [];
@@ -32,33 +32,22 @@ export function validateMnemonics(input: string, rawDids: string): boolean | str
   return errors.length ? errors.join('\n') : true;
 }
 
-const didRegex = /0x[0-9a-z]{64}/;
 /**
- * Validates user inputted DIDs in accordance to inquisitors validation interface
- * @returns true if input is valid otherwise returns string describing the issue
- */
-export function validateDids(input: string): boolean | string {
-  const dids = input.split(',');
-  for (let i = 0; i < dids.length; i++) {
-    const did = dids[i];
-    if (!did.match(didRegex)) {
-      return 'DIDs should be 64 hex characters prefixed with 0x';
-    }
-  }
-  return true;
-}
-
-/**
- * extracts the dids and mnemonics from the rest api so that it can be restarted during `save()
+ * extracts the signers with their mnemonics from the rest api so that it can be restarted during `save()
  * @returns {Promise<[string, string]>}
  */
-export async function getRelayerEnvs(cmd: Command, verbose: boolean): Promise<[string, string]> {
+export async function getRestEnv(
+  cmd: Command,
+  verbose: boolean
+): Promise<[string, string, string, string]> {
   if ((await containersUp(cmd, verbose)).includes('rest_api')) {
     const restContainer = await containerName(cmd, 'rest_api');
-    const dids = getContainerEnv(restContainer, 'RELAYER_DIDS');
-    const mnemonics = getContainerEnv(restContainer, 'RELAYER_MNEMONICS');
-    return [dids, mnemonics];
+    const signers = getContainerEnv(restContainer, 'LOCAL_SIGNERS');
+    const mnemonics = getContainerEnv(restContainer, 'LOCAL_MNEMONICS');
+    const vaultUrl = getContainerEnv(restContainer, 'VAULT_URL');
+    const vaultToken = getContainerEnv(restContainer, 'VAULT_TOKEN');
+    return [signers, mnemonics, vaultUrl, vaultToken];
   } else {
-    return ['', ''];
+    return ['', '', '', ''];
   }
 }

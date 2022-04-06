@@ -25,8 +25,10 @@ export async function startContainers(
   log: boolean,
   chain: string,
   services: string[],
-  dids: string,
-  mnemonics: string,
+  restSigners: string,
+  restMnemonics: string,
+  vaultUrl: string,
+  vaultToken: string,
   userConfig: UserConfig
 ): Promise<void> {
   try {
@@ -37,6 +39,15 @@ export async function startContainers(
 
     await copyContainerData(cmd);
 
+    let restSignerConfig;
+    if (vaultUrl && vaultToken) {
+      restSignerConfig = { VAULT_URL: vaultUrl, VAULT_TOKEN: vaultToken };
+    } else {
+      restSignerConfig = {
+        LOCAL_SIGNERS: restSigners.replace(/, /g, ','), // some rest api versions don't tolerate a space after ,
+        LOCAL_MNEMONICS: restMnemonics.replace(/, /g, ','),
+      };
+    }
     await compose.upMany(services, {
       cwd: localDir,
       log,
@@ -52,12 +63,11 @@ export async function startContainers(
         FAKETIME: `@${timestamp}`,
         CHAIN: chain,
         TOOLING_API_KEY: tooling.apiKey,
-        RELAYER_DIDS: dids.replace(/, /g, ','), // some rest api versions don't tolerate a space after ,
-        RELAYER_MNEMONICS: mnemonics.replace(/, /g, ','),
         DATA_DIR: appData,
         TOOLING_TAG: toolingTag,
         SUBQUERY_TAG: subqueryTag,
         REST_TAG: restTag,
+        ...restSignerConfig,
       },
     });
   } catch (err) {
@@ -99,7 +109,6 @@ export async function containersUp(cmd: Command, verbose: boolean): Promise<stri
       cwd: localDir,
       log: verbose,
     });
-
     return ps.data.services.map(s => {
       const matches = serviceRegex.exec(s.name);
       if (!matches || !matches[1]) {
@@ -156,7 +165,7 @@ export async function containerName(cmd: Command, serviceName: string): Promise<
 }
 
 export function getContainerEnv(container: string, env: string): string {
-  return execSync(`docker exec ${container} bash -c "echo $${env}"`).toString().trim();
+  return execSync(`docker exec ${container} bash -c 'echo $${env}'`).toString().trim();
 }
 
 export async function anyContainersUp(cmd: Command, verbose: boolean): Promise<boolean> {
