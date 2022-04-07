@@ -8,7 +8,7 @@ export const supportedChainVersions = ['4.0.0', '4.1.1'];
 
 export const defaultUserConfig = {
   chainTag: '4.1.1',
-  restTag: 'v0.0.5',
+  restTag: 'v0.0.6',
   subqueryTag: 'v4.1.0-s3',
   toolingTag: 'v6.0.0-alpha.1',
   restSigners: 'alice',
