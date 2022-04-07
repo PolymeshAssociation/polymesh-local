@@ -65,7 +65,7 @@ $ npm install -g polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-polymesh-local/4.0.0 linux-x64 node-v14.19.1
+polymesh-local/4.1.0 linux-x64 node-v14.19.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -100,7 +100,7 @@ OPTIONS
   --verbose   enables verbose logging
 ```
 
-_See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/clean.ts)_
+_See code: [src/commands/clean.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/clean.ts)_
 
 ## `polymesh-local configure`
 
@@ -114,7 +114,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/configure.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/configure.ts)_
+_See code: [src/commands/configure.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/configure.ts)_
 
 ## `polymesh-local help [COMMAND]`
 
@@ -145,7 +145,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/info.ts)_
+_See code: [src/commands/info.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/info.ts)_
 
 ## `polymesh-local load FILE`
 
@@ -160,7 +160,7 @@ OPTIONS
   --verbose   enables verbose logging
 ```
 
-_See code: [src/commands/load.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/load.ts)_
+_See code: [src/commands/load.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/load.ts)_
 
 ## `polymesh-local ls`
 
@@ -174,7 +174,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/ls.ts)_
 
 ## `polymesh-local rm FILE`
 
@@ -188,7 +188,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/rm.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/rm.ts)_
+_See code: [src/commands/rm.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/rm.ts)_
 
 ## `polymesh-local save [name]`
 
@@ -206,7 +206,7 @@ OPTIONS
   --verbose   enables verbose logging
 ```
 
-_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/save.ts)_
+_See code: [src/commands/save.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/save.ts)_
 
 ## `polymesh-local start [OPTIONS]`
 
@@ -261,7 +261,7 @@ OPTIONS
       enables verbose logging
 ```
 
-_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/start.ts)_
 
 ## `polymesh-local stop [OPTIONS]`
 
@@ -277,5 +277,5 @@ OPTIONS
   --verbose    enables verbose logging
 ```
 
-_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.0.0/src/commands/stop.ts)_
+_See code: [src/commands/stop.ts](https://github.com/PolymathNetwork/polymesh-local/blob/v4.1.0/src/commands/stop.ts)_
 <!-- commandsstop -->

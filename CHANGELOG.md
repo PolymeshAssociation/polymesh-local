@@ -1,3 +1,10 @@
+# [4.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.0.0...v4.1.0) (2022-04-07)
+
+
+### Features
+
+* 🎸 Use rest api v0.0.6 as default ([#34](https://github.com/PolymathNetwork/polymesh-local/issues/34)) ([d21f45c](https://github.com/PolymathNetwork/polymesh-local/commit/d21f45ce4c0794e7f5d0d7f9c778a88033f88f1b))
+
 # [4.0.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.5...v4.0.0) (2022-04-07)
 
 
