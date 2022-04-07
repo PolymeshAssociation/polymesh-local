@@ -1,3 +1,15 @@
+# [4.0.0](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.5...v4.0.0) (2022-04-07)
+
+
+### Features
+
+* 🎸 Add support for 4.1.1 chains ([#32](https://github.com/PolymathNetwork/polymesh-local/issues/32)) ([a511c10](https://github.com/PolymathNetwork/polymesh-local/commit/a511c10b3094567dd4324557ed35f5d66c6af068))
+
+
+### BREAKING CHANGES
+
+* 🧨 restDids is now restSigners
+
 ## [3.5.5](https://github.com/PolymathNetwork/polymesh-local/compare/v3.5.4...v3.5.5) (2022-02-01)
 
 
