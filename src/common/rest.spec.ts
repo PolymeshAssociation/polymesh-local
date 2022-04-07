@@ -35,7 +35,7 @@ describe('validateMnemonics', () => {
     const dids = `${fakeDid}, ${fakeDid}`;
     const result = validateMnemonics(validMnemonic, dids);
     expect(result).toEqual(
-      'Each DID requires a mnemonic to be passed. Received 1 mnemonics for 2 DIDs'
+      'Each signer requires a mnemonic to be passed. Received 1 mnemonics for 2 signers'
     );
   });
 

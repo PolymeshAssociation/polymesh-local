@@ -4,14 +4,14 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
-export const supportedChainVersions = ['4.0.0', '4.1.0-rc1'];
+export const supportedChainVersions = ['4.0.0', '4.1.1'];
 
 export const defaultUserConfig = {
-  chainTag: '4.0.0',
-  restTag: 'v0.0.3',
-  subqueryTag: 'v4.0.0',
+  chainTag: '4.1.1',
+  restTag: 'v0.0.5',
+  subqueryTag: 'v4.1.0-s3',
   toolingTag: 'v6.0.0-alpha.1',
-  restDids: '0x0600000000000000000000000000000000000000000000000000000000000000',
+  restSigners: 'alice',
   restMnemonics: '//Alice',
 };
 
@@ -29,6 +29,7 @@ export const chain = {
 
 export const uis = {
   dir: path.resolve(localDir, 'uis'),
+  versionFile: path.resolve(localDir, 'uis', 'version.txt'),
   s3: 'https://polymesh-local.s3.amazonaws.com',
   dashboard: 'localhost:3000',
   bridge: 'localhost:3001',

@@ -17,7 +17,7 @@ export interface UserConfig {
   restTag: string;
   subqueryTag: string;
   restMnemonics: string;
-  restDids: string;
+  restSigners: string;
 }
 
 const millisecondsPerMinute = 60 * 1000;

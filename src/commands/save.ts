@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 
 import Command from '../base';
 import { containersUp, startContainers, stopContainers } from '../common/containers';
-import { getRelayerEnvs } from '../common/rest';
+import { getRestEnv } from '../common/rest';
 import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
 import { containerNow } from '../common/util';
 import { dataDir, snapshotsDir } from '../consts';
@@ -39,7 +39,7 @@ export default class Save extends Command {
       this.error(noData);
     }
 
-    const restEnvs = await getRelayerEnvs(this, verbose);
+    const restEnvs = await getRestEnv(this, verbose);
     const metadata = getMetadata();
     const services = await containersUp(this, verbose);
     if (services.length > 0) {
@@ -66,6 +66,8 @@ export default class Save extends Command {
         services,
         restEnvs[0],
         restEnvs[1],
+        restEnvs[2],
+        restEnvs[3],
         this.userConfig
       );
       metadata.startedAt = new Date().toISOString();

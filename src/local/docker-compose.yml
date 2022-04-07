@@ -130,8 +130,12 @@ services:
       POLYMESH_NODE_URL: 'ws://alice:9944'
       POLYMESH_MIDDLEWARE_URL: 'http://tooling:3000'
       POLYMESH_MIDDLEWARE_API_KEY: '${TOOLING_API_KEY}'
-      RELAYER_DIDS: '${RELAYER_DIDS}'
-      RELAYER_MNEMONICS: '${RELAYER_MNEMONICS}'
+      RELAYER_DIDS: '${LOCAL_SIGNERS}' # Pass the old name in case its an older REST API
+      RELAYER_MNEMONICS: '${LOCAL_MNEMONICS}' # Pass the old name in case its an older REST API
+      LOCAL_SIGNERS: ${LOCAL_SIGNERS}
+      LOCAL_MNEMONICS: ${LOCAL_MNEMONICS}
+      VAULT_URL: '${VAULT_URL}'
+      VAULT_TOKEN: '${VAULT_TOKEN}'
 
   dashboard:
     image: nginx

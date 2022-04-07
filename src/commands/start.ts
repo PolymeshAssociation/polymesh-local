@@ -13,7 +13,7 @@ import {
   startContainers,
   stopContainers,
 } from '../common/containers';
-import { isRestUp, validateDids, validateMnemonics } from '../common/rest';
+import { isRestUp, validateMnemonics } from '../common/rest';
 import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
@@ -34,7 +34,7 @@ export default class Start extends Command {
       // Note: The actual value passed to the default function doesn't match its type. We use any so we can access the user config if its present
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
-        return ctx.userConfig?.chainTag || '4.0.0';
+        return ctx.userConfig?.chainTag || '4.1.1';
       },
       description: 'version of the containers to run',
       options: supportedChainVersions,
@@ -83,23 +83,27 @@ export default class Start extends Command {
       description: 'enables verbose logging',
       default: false,
     }),
-    dids: flags.string({
-      description:
-        'Comma separated list of dids available in the rest api. Defaults to `0x0600000000000000000000000000000000000000000000000000000000000000`',
+    restSigners: flags.string({
+      description: 'Comma separated list of signers available in the rest api. Defaults to `alice`',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
-        return (
-          ctx.userConfig?.restDids ||
-          '0x0600000000000000000000000000000000000000000000000000000000000000'
-        );
+        return ctx.userConfig?.restDids || 'alice';
       },
     }),
-    mnemonics: flags.string({
-      description: 'Comma separated list of mnemonics for dids. Defaults to `//Alice`',
+    restMnemonics: flags.string({
+      description: 'Comma separated list of signer mnemonics. Defaults to `//Alice`',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
         return ctx.userConfig?.restMnemonics || '//Alice';
       },
+    }),
+    vaultUrl: flags.string({
+      description: 'The URL the Vault transit engine to use with the REST API',
+      default: '',
+    }),
+    vaultToken: flags.string({
+      description: 'The Vault API key to use with the REST API',
+      default: '',
     }),
     uiLatest: flags.boolean({
       char: 'u',
@@ -110,8 +114,20 @@ export default class Start extends Command {
 
   async run(): Promise<void> {
     const { flags: commandFlags } = this.parse(Start);
-    const { clean, snapshot, verbose, version, image, chain, only, dids, mnemonics, uiLatest } =
-      commandFlags;
+    const {
+      clean,
+      snapshot,
+      verbose,
+      version,
+      image,
+      chain,
+      only,
+      restSigners,
+      restMnemonics,
+      uiLatest,
+      vaultUrl,
+      vaultToken,
+    } = commandFlags;
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
     if (await anyContainersUp(this, verbose)) {
       this.error(chainRunningError);
@@ -129,11 +145,7 @@ export default class Start extends Command {
       cli.action.stop();
     }
 
-    const didValidation = validateDids(dids);
-    if (typeof didValidation === 'string') {
-      this.error(didValidation);
-    }
-    const mnemonicValidation = validateMnemonics(mnemonics, dids);
+    const mnemonicValidation = validateMnemonics(restMnemonics, restSigners);
     if (typeof mnemonicValidation === 'string') {
       this.error(mnemonicValidation);
     }
@@ -178,7 +190,7 @@ export default class Start extends Command {
 
     if (only.includes('uis')) {
       cli.action.start('Checking UIs');
-      await fetchUIs();
+      await fetchUIs(version);
       cli.action.stop();
     }
 
@@ -210,8 +222,10 @@ export default class Start extends Command {
       verbose,
       metadata.chain,
       services,
-      dids,
-      mnemonics,
+      restSigners,
+      restMnemonics,
+      vaultUrl,
+      vaultToken,
       this.userConfig
     );
     cli.action.stop();

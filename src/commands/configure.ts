@@ -2,7 +2,7 @@ import { flags } from '@oclif/command';
 import * as inquirer from 'inquirer';
 
 import Command from '../base';
-import { validateDids, validateMnemonics } from '../common/rest';
+import { validateMnemonics } from '../common/rest';
 import { fetchDockerHubTags, saveUserConfig } from '../common/util';
 import { defaultUserConfig, supportedChainVersions } from '../consts';
 
@@ -80,14 +80,11 @@ export default class Configure extends Command {
         choices: toolingTags,
       },
       {
-        name: 'restDids',
+        name: 'restSigners',
         type: 'input',
-        default:
-          this.userConfig.restDids ||
-          '0x0600000000000000000000000000000000000000000000000000000000000000',
+        default: this.userConfig.restSigners || 'alice',
         message:
-          'Please enter a comma separated list of the DIDs you want to use with the REST API',
-        validate: validateDids,
+          'Please enter a comma separated list of the strings you want to use to identify signers in the REST API',
       },
       {
         name: 'restMnemonics',
