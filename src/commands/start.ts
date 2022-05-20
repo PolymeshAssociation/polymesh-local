@@ -133,6 +133,12 @@ export default class Start extends Command {
       this.error(chainRunningError);
     }
 
+    if (version === '5.0.0') {
+      this.warn(
+        '5.0.0 is still under active development. Using the flag `--only chain` is recommended as not all services are compatible with 5.0.0 chains yet'
+      );
+    }
+
     if (clean) {
       cli.action.start('Removing old state');
       removeVolumes();
