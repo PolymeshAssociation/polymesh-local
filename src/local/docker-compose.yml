@@ -18,22 +18,14 @@ services:
     ports:
       - '9944:9944'
       - '9933:9933'
-      - '40333:30333'
+      - '30333:30333'
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--alice',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        '--alice --node-key 0000000000000000000000000000000000000000000000000000000000000001',
       ]
 
   bob:
@@ -44,23 +36,25 @@ services:
     ports:
       - '8833:9933'
       - '8844:9944'
-      - '30333:30333'
+      - '40333:30333'
     volumes:
       - 'polymesh_bob:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
+      - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
         '--bob',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
       ]
+    #     '/var/lib/polymesh',
+    #     '--chain=${CHAIN}',
+    #     '--bob',
+    #     '--validator',
+    #     '--unsafe-rpc-external',
+    #     '--unsafe-ws-external',
+    #     '--rpc-cors=all',
+    #     '--force-authoring',
+    #   ]
 
   charlie:
     build:
@@ -75,18 +69,21 @@ services:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
+      # - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEB #BAD ID #BAD ID
+      - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--charlie',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        '--charlie'
       ]
+      #   '/var/lib/polymesh',
+      #   '--chain=${CHAIN}',
+      #   '--charlie',
+      #   '--validator',
+      #   '--unsafe-rpc-external',
+      #   '--unsafe-ws-external',
+      #   '--rpc-cors=all',
+      #   '--force-authoring',
+      # ]
 
   subquery:
     image: 'polymathnet/polymesh-subquery:${SUBQUERY_TAG}'
@@ -96,13 +93,14 @@ services:
     ports:
       - 3006:3000
     environment:
-      NETWORK_ENDPOINT: ws://alice:9944
+      NETWORK_ENDPOINT: ws://host.docker.internal:9944
       DB_USER: '${PG_USER}'
       DB_PASS: '${PG_PASSWORD}'
       DB_DATABASE: '${PG_DB}'
       DB_PORT: '${PG_PORT}'
       DB_HOST: '${PG_HOST}'
       NODE_ENV: local
+      NETWORK_CHAIN_ID: '0x3aadb0dbb3ea70842d266f2f11865c30eefa8f20bd3eab2e9d63b3dcd6218104'
     command:
       - --batch-size=500
       - -f=/app
