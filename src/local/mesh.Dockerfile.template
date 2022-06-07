@@ -1,5 +1,8 @@
+# Adds libfaketime to Polymesh image. Allows for old snapshots to be alive.
+
 FROM polymathnet/polymesh:{{VERSION}}-debian
 USER root
+RUN apt-get update && apt-get install -y libfaketime
 ENV RUST_BACKTRACE=1
 COPY ./docker-entrypoint.sh ./docker-entrypoint.sh
 ENTRYPOINT ["bash", "./docker-entrypoint.sh"]

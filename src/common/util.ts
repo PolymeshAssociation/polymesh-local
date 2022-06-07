@@ -5,7 +5,7 @@ import path from 'path';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
-import { getMetadata } from '../common/snapshots';
+import { getMetadata, Metadata } from '../common/snapshots';
 import { chain, checkSettings, configFileName, postgres, rest, tooling, uis } from '../consts';
 
 /**
@@ -19,6 +19,8 @@ export interface UserConfig {
   restMnemonics: string;
   restSigners: string;
 }
+
+const millisecondsPerMinute = 60 * 1000;
 
 async function sleep(time: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -88,6 +90,34 @@ export function printInfo(cmd: Command): void {
  */
 export async function downloadFile(url: string, dest: string): Promise<void> {
   await promisify(pipeline)((await fetch(url)).body, fs.createWriteStream(dest));
+}
+
+/**
+ * Calculates the time a node should set its clock to the next time it starts up by adding its run time to its old start time
+ */
+export function containerNow(metadata: Metadata): string {
+  const startedTime = new Date(metadata.time);
+  const upTime = new Date().getTime() - new Date(metadata.startedAt).getTime();
+  const newTime = new Date(+startedTime + upTime);
+  return dateToFakeTime(newTime);
+}
+
+/**
+ * @returns The current moment in fake time format
+ */
+export function hostNow(): string {
+  return dateToFakeTime(new Date());
+}
+
+/**
+ * Converts a JS Date to fake time format
+ * @param date to convert
+ * @returns string as YYYY-MM-DD HH:MM:SS
+ */
+function dateToFakeTime(date: Date): string {
+  // Adjust the date for the timezone since the TZ gets removed
+  const tzAdjusted = new Date(date.getTime() - date.getTimezoneOffset() * millisecondsPerMinute);
+  return tzAdjusted.toISOString().replace(/T/, ' ').replace(/\..*$/, '');
 }
 
 /**

@@ -19,8 +19,8 @@ export const defaultUserConfig = {
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 90 * 1000,
-  iterations: 45,
+  timeout: 120 * 1000,
+  iterations: 60,
 };
 
 export const chain = {

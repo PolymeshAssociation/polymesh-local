@@ -21,6 +21,7 @@ export function prepareDockerfile(version: string, image?: string): void {
 export async function startContainers(
   cmd: Command,
   version: string,
+  timestamp: string,
   log: boolean,
   chain: string,
   services: string[],
@@ -59,6 +60,7 @@ export async function startContainers(
         PG_PASSWORD: postgres.password,
         PG_PORT: postgres.port,
         PG_DB: postgres.db,
+        FAKETIME: `@${timestamp}`,
         CHAIN: chain,
         TOOLING_API_KEY: tooling.apiKey,
         DATA_DIR: appData,
