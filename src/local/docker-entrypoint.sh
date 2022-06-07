@@ -1,7 +1,5 @@
-if [[ -z ${BOOT_NODE_PEER_ID} ]]
+if [[ -n ${BOOT_NODE_PEER_ID} ]]
 then
-  echo "BOOT ID NOT SET!"
-else
   ALICE_IP=$(getent hosts alice | awk '{print $1;}')
   BOOT_NODE=--bootnodes=/ip4/${ALICE_IP}/tcp/30333/p2p/${BOOT_NODE_PEER_ID}
   echo "boot nodes set to: ${BOOT_NODE}"

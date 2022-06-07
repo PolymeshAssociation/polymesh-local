@@ -135,7 +135,7 @@ export default class Start extends Command {
 
     if (version === '5.0.0') {
       this.warn(
-        '5.0.0 is still under active development. Using the flag `--only chain` is recommended as not all services are compatible with 5.0.0 chains yet'
+        '5.0.0 is still under active development. Its recommended to use the flag `--only chain` as not all services are compatible with 5.0.0 chains yet'
       );
     }
 

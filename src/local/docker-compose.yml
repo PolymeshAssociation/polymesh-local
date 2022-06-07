@@ -21,6 +21,8 @@ services:
       - '30333:30333'
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
+    environment:
+      - FAKETIME=${FAKETIME}
     command:
       [
         '--alice --node-key 0000000000000000000000000000000000000000000000000000000000000001 --chain ${CHAIN}',
@@ -39,6 +41,7 @@ services:
       - 'polymesh_bob:/var/lib/polymesh/chains'
     environment:
       - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+      - FAKETIME=${FAKETIME}
     command:
       [
         '--bob --chain ${CHAIN}',
@@ -57,6 +60,7 @@ services:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
     environment:
       - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
+      - FAKETIME=${FAKETIME}
     command:
       [
         '--charlie --chain ${CHAIN}'
@@ -80,6 +84,7 @@ services:
     command:
       - --batch-size=500
       - -f=/app
+      - --local
 
   tooling:
     image: polymathnet/tooling-gql:${TOOLING_TAG}
