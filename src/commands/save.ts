@@ -5,13 +5,13 @@ import { existsSync } from 'fs';
 import Command from '../base';
 import { containersUp, startContainers, stopContainers } from '../common/containers';
 import { getRestEnv } from '../common/rest';
-import { createSnapshot, getMetadata, snapshotPath, writeMetadata } from '../common/snapshots';
-import { containerNow } from '../common/util';
+import { createSnapshot, getMetadata, snapshotPath } from '../common/snapshots';
 import { dataDir, snapshotsDir } from '../consts';
 import { noData } from '../errors';
 
 export default class Save extends Command {
-  static description = 'Saves current chain state into an archive file';
+  static description =
+    'Saves current chain state into an archive file. Note, a snapshot will be read only after it is a few hours old';
 
   static usage = 'save [name]';
 
@@ -44,8 +44,6 @@ export default class Save extends Command {
     const services = await containersUp(this, verbose);
     if (services.length > 0) {
       cli.action.start('Pausing all services');
-      metadata.time = containerNow(metadata);
-      writeMetadata(metadata);
       await stopContainers(this, verbose);
       cli.action.stop();
     }
@@ -60,7 +58,6 @@ export default class Save extends Command {
       await startContainers(
         this,
         metadata.version,
-        metadata.time,
         verbose,
         metadata.chain,
         services,
@@ -70,8 +67,6 @@ export default class Save extends Command {
         restEnvs[3],
         this.userConfig
       );
-      metadata.startedAt = new Date().toISOString();
-      writeMetadata(metadata);
       cli.action.stop();
     }
   }

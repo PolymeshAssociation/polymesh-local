@@ -18,7 +18,7 @@ import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/sn
 import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
-import { hostNow, printInfo, retry } from '../common/util';
+import { printInfo, retry } from '../common/util';
 import { dataDir, supportedChainVersions } from '../consts';
 import { chainRunningError } from '../errors';
 
@@ -65,7 +65,7 @@ export default class Start extends Command {
     }),
     snapshot: flags.string({
       char: 's',
-      description: 'Loads snapshot before starting. Current state used if not passed',
+      description: 'Loads snapshot before starting',
     }),
     clean: flags.boolean({
       char: 'c',
@@ -164,14 +164,17 @@ export default class Start extends Command {
 
     let metadata: Metadata;
     if (snapshot) {
-      cli.action.start('Loading chain snapshot');
+      cli.action.start('Loading chain snapshot. It is likely the chain will be read only');
+      this.warn(
+        'Snapshots are deprecated. Its recommended to use scripts to build up the needed state instead'
+      );
       await loadSnapshot(this, snapshot);
       cli.action.stop();
     }
 
     if (!existsSync(dataDir)) {
       cli.action.start('No previous data found. Initializing data directory');
-      metadata = { version, time: hostNow(), startedAt: '', chain: chain || 'dev' };
+      metadata = { version, chain: chain || 'dev' };
       if (image) {
         metadata.version = image;
       }
@@ -191,7 +194,7 @@ export default class Start extends Command {
         `Polymesh chain ${chain} was specified, but data was for ${metadata.chain}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the chain`
       );
     }
-    metadata.startedAt = new Date().toISOString();
+
     writeMetadata(metadata);
 
     if (only.includes('uis')) {
@@ -224,7 +227,6 @@ export default class Start extends Command {
     await startContainers(
       this,
       version,
-      metadata.time,
       verbose,
       metadata.chain,
       services,
@@ -245,7 +247,7 @@ export default class Start extends Command {
     };
     const checks = typedOnly.map(o => allChecks[o]);
 
-    cli.action.start('Checking service liveness');
+    cli.action.start('Checking service liveness (Ctrl-C to skip check)');
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);

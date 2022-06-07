@@ -93,7 +93,7 @@ export default class Configure extends Command {
         message:
           'Please enter a comma separated list of mnemonics. Provide one for each DID in the same order',
         validate: (input: string, answers) => {
-          return validateMnemonics(input, answers.restDids);
+          return validateMnemonics(input, answers.restSigners);
         },
       },
     ]);
