@@ -12,4 +12,5 @@ scripts/tmp
 /src/local/uis/
 mesh.Dockerfile
 /coverage
+uis.tgz
 tsconfig.tsbuildinfo
