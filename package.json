@@ -1,5 +1,5 @@
 {
-  "name": "polymesh-local",
+  "name": "@polymeshassociation/polymesh-local",
   "description": "Polymesh local environment for development and e2e testing",
   "version": "4.1.0",
   "author": "Jeremias Diaz @monitz87",
