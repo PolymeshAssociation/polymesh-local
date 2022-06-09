@@ -1,3 +1,10 @@
+# [4.3.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.2.0...v4.3.0) (2022-06-09)
+
+
+### Features
+
+* 🎸 Add public access to publishConfig ([#39](https://github.com/PolymathNetwork/polymesh-local/issues/39)) ([84066d5](https://github.com/PolymathNetwork/polymesh-local/commit/84066d5a12925da30832b885cd4f5ce7969b09ff))
+
 # [4.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.1.0...v4.2.0) (2022-06-09)
 
 
