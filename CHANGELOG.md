@@ -1,3 +1,10 @@
+# [4.2.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.1.0...v4.2.0) (2022-06-09)
+
+
+### Features
+
+* 🎸 Publish to association npm ([#38](https://github.com/PolymathNetwork/polymesh-local/issues/38)) ([5899098](https://github.com/PolymathNetwork/polymesh-local/commit/5899098d62b84f7fbdb8522c339d87fad2855b6b))
+
 # [4.1.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.0.0...v4.1.0) (2022-04-07)
 
 
