@@ -18,22 +18,14 @@ services:
     ports:
       - '9944:9944'
       - '9933:9933'
-      - '40333:30333'
+      - '30333:30333'
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
     environment:
       - FAKETIME=${FAKETIME}
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--alice',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        '--alice --node-key 0000000000000000000000000000000000000000000000000000000000000001 --chain ${CHAIN}',
       ]
 
   bob:
@@ -44,22 +36,15 @@ services:
     ports:
       - '8833:9933'
       - '8844:9944'
-      - '30333:30333'
+      - '40333:30333'
     volumes:
       - 'polymesh_bob:/var/lib/polymesh/chains'
     environment:
+      - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
       - FAKETIME=${FAKETIME}
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--bob',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        '--bob --chain ${CHAIN}',
       ]
 
   charlie:
@@ -74,18 +59,11 @@ services:
     volumes:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
     environment:
+      - BOOT_NODE_PEER_ID=12D3KooWEyoppNCUx8Yx66oV9fJnriXwCcXwDDUA2kj6vnc6iDEp
       - FAKETIME=${FAKETIME}
     command:
       [
-        '-d',
-        '/var/lib/polymesh',
-        '--chain=${CHAIN}',
-        '--charlie',
-        '--validator',
-        '--unsafe-rpc-external',
-        '--unsafe-ws-external',
-        '--rpc-cors=all',
-        '--force-authoring',
+        '--charlie --chain ${CHAIN}'
       ]
 
   subquery:

@@ -4,7 +4,7 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
-export const supportedChainVersions = ['4.0.0', '4.1.1'];
+export const supportedChainVersions = ['4.0.0', '4.1.1', '5.0.0'];
 
 export const defaultUserConfig = {
   chainTag: '4.1.1',
@@ -19,8 +19,8 @@ export const defaultUserConfig = {
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 90 * 1000,
-  iterations: 45,
+  timeout: 120 * 1000,
+  iterations: 60,
 };
 
 export const chain = {

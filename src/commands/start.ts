@@ -133,6 +133,12 @@ export default class Start extends Command {
       this.error(chainRunningError);
     }
 
+    if (version === '5.0.0') {
+      this.warn(
+        '5.0.0 is still under active development. Its recommended to use the flag `--only chain` as not all services are compatible with 5.0.0 chains yet'
+      );
+    }
+
     if (clean) {
       cli.action.start('Removing old state');
       removeVolumes();
@@ -185,6 +191,7 @@ export default class Start extends Command {
         `Polymesh chain ${chain} was specified, but data was for ${metadata.chain}. Either use "--clean" to start with a fresh state, or load a snapshot that matches the chain`
       );
     }
+
     metadata.startedAt = new Date().toISOString();
     writeMetadata(metadata);
 
@@ -239,7 +246,7 @@ export default class Start extends Command {
     };
     const checks = typedOnly.map(o => allChecks[o]);
 
-    cli.action.start('Checking service liveness');
+    cli.action.start('Checking service liveness (Ctrl-C to skip)');
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);

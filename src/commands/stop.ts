@@ -31,6 +31,7 @@ export default class Stop extends Command {
     if (!(await anyContainersUp(this, verbose))) {
       this.error('No containers to stop. Did you forget to run the "start" command?');
     }
+
     if (!clean) {
       cli.action.start('Updating metadata');
       const metadata = getMetadata();
