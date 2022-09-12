@@ -17,7 +17,7 @@ mkdirSync(tmpDir);
 
 const apps: Record<string, string> = {
   dashboard: 'git@github.com:PolymathNetwork/dashboard-app.git',
-  bridge: 'git@github.com:PolymathNetwork/bridge-ui.git',
+  bridge: 'git@github.com:PolymeshAssociation/bridge-ui.git',
   governance: 'git@github.com:PolymathNetwork/governance-web.git',
   issuer: 'git@github.com:PolymathNetwork/Polymesh-Issuer.git',
 };
@@ -45,8 +45,8 @@ const envs: Record<string, string> = {
   REACT_APP_BRIDGE_UI_URL: 'http://localhost:3001',
   REACT_APP_GOVERNANCE_URL: 'http://localhost:3002',
   REACT_APP_TOKEN_STUDIO_URL: 'http://localhost:3003',
-  REACT_APP_GQL_ENDPOINT: 'http://localhost:3007/dev/graphql',
-  REACT_APP_GQL_URL: 'http://localhost:3007/dev/graphql',
+  REACT_APP_GQL_ENDPOINT: 'http://localhost:3007/graphql',
+  REACT_APP_GQL_URL: 'http://localhost:3007/graphql',
   REACT_APP_NODE_URL: 'ws://localhost:9944',
   REACT_APP_HTTP_URL: 'http://localhost:9933/',
   REACT_APP_POLY_RPC_URL: 'http://localhost:9933',

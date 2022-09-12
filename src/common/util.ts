@@ -139,7 +139,7 @@ export function saveUserConfig(cmd: Command, config: UserConfig): void {
   fs.mkdirpSync(cmd.config.configDir);
   const contents = JSON.stringify(config, undefined, 2);
   fs.writeFileSync(configPath, contents);
-  cmd.log(`config file was saved at ${configPath}`);
+  cmd.log(`config file was saved at ${configPath} (it can be updated with a text editor)`);
 }
 
 interface DockerTag {

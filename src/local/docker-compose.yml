@@ -75,6 +75,7 @@ services:
       - 3006:3000
     environment:
       NETWORK_ENDPOINT: ws://alice:9944
+      NETWORK_HTTP_ENDPOINT: http://alice:9933
       DB_USER: '${PG_USER}'
       DB_PASS: '${PG_PASSWORD}'
       DB_DATABASE: '${PG_DB}'

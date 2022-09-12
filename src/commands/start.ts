@@ -34,7 +34,7 @@ export default class Start extends Command {
       // Note: The actual value passed to the default function doesn't match its type. We use any so we can access the user config if its present
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
-        return ctx.userConfig?.chainTag || '4.1.1';
+        return ctx.userConfig?.chainTag || '5.0.2';
       },
       description: 'version of the containers to run',
       options: supportedChainVersions,
@@ -131,12 +131,6 @@ export default class Start extends Command {
     const typedOnly = only as ('chain' | 'subquery' | 'gql' | 'rest' | 'uis')[];
     if (await anyContainersUp(this, verbose)) {
       this.error(chainRunningError);
-    }
-
-    if (version === '5.0.0') {
-      this.warn(
-        '5.0.0 is still under active development. Its recommended to use the flag `--only chain` as not all services are compatible with 5.0.0 chains yet'
-      );
     }
 
     if (clean) {

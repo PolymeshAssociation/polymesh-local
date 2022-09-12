@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 import Command from '../base';
 import { validateMnemonics } from '../common/rest';
 import { fetchDockerHubTags, saveUserConfig } from '../common/util';
-import { defaultUserConfig, supportedChainVersions } from '../consts';
+import { bundledConfig, supportedChainVersions, v5Config } from '../consts';
 
 export default class Configure extends Command {
   static description = 'Manages the configuration file for polymesh-local';
@@ -29,18 +29,23 @@ export default class Configure extends Command {
       return;
     }
 
-    this.log('Default config settings: ');
-    this.log(JSON.stringify(defaultUserConfig, undefined, 2));
-    const { useDefault } = await inquirer.prompt([
+    const { preset } = await inquirer.prompt([
       {
-        name: 'useDefault',
-        type: 'confirm',
-        default: !this.userConfig, // default to yes only if there is no config
-        message: 'Do you want to use the default config?',
+        name: 'preset',
+        message:
+          'Select a chain version. Select `Custom` if you are advanced and want a specific combination of services',
+        type: 'list',
+        default: v5Config.chainTag,
+        choices: [...bundledConfig.map(({ chainTag }) => chainTag), 'Custom'],
       },
     ]);
-    if (useDefault) {
-      saveUserConfig(this, defaultUserConfig);
+    if (preset !== 'Custom') {
+      const choice = bundledConfig.find(({ chainTag }) => chainTag === preset);
+      if (!choice) {
+        this.error(`The selected choice ${choice} was not found. Please report this error`);
+      }
+      this.log('Updating configuration with: ', JSON.stringify(choice, undefined, 2));
+      saveUserConfig(this, choice);
       return;
     }
 
