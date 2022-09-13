@@ -4,7 +4,7 @@ import compose from 'docker-compose';
 import fs from 'fs';
 import { copy, mkdirpSync } from 'fs-extra';
 
-import { UserConfig } from '../common/util';
+import { resolveContainerImages, UserConfig } from '../common/util';
 import { dataDir, localDir, postgres, tooling, uis } from '../consts';
 
 export function prepareDockerfile(version: string, image?: string): void {
@@ -13,7 +13,7 @@ export function prepareDockerfile(version: string, image?: string): void {
   // 5+ chain version has migrated to using the association docker hub
   const chainImage = version.startsWith('4')
     ? `polymathnet/polymesh:${version}-debian`
-    : `polymeshassociation/polymesh:${version}-develop-debian`;
+    : `polymeshassociation/polymesh:${version}-mainnet-debian`;
 
   let dockerfile;
   if (image) {
@@ -38,9 +38,7 @@ export async function startContainers(
   userConfig: UserConfig
 ): Promise<void> {
   try {
-    const toolingTag = userConfig.toolingTag || 'latest';
-    const subqueryTag = userConfig.subqueryTag || 'latest';
-    const restTag = userConfig.restTag || 'latest';
+    const { toolingImage, restImage, subqueryImage } = resolveContainerImages(userConfig);
     const appData = cmd.config.dataDir;
 
     await copyContainerData(cmd);
@@ -70,9 +68,9 @@ export async function startContainers(
         CHAIN: chain,
         TOOLING_API_KEY: tooling.apiKey,
         DATA_DIR: appData,
-        TOOLING_TAG: toolingTag,
-        SUBQUERY_TAG: subqueryTag,
-        REST_TAG: restTag,
+        TOOLING_IMAGE: toolingImage,
+        SUBQUERY_IMAGE: subqueryImage,
+        REST_IMAGE: restImage,
         ...restSignerConfig,
       },
     });

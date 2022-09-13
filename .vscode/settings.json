@@ -5,7 +5,9 @@
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "cSpell.words": [
+    "distroless",
     "oclif",
+    "polymathnet",
     "polymeshassociation"
   ]
 }

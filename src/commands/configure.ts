@@ -49,13 +49,7 @@ export default class Configure extends Command {
       return;
     }
 
-    const [restTags, subqueryTags, toolingTags] = await Promise.all([
-      fetchDockerHubTags('polymathnet/polymesh-rest-api'),
-      fetchDockerHubTags('polymathnet/polymesh-subquery'),
-      fetchDockerHubTags('polymathnet/tooling-gql'),
-    ]);
-
-    const responses = await inquirer.prompt([
+    const { chainTag } = await inquirer.prompt([
       {
         name: 'chainTag',
         message: 'Select chain version',
@@ -63,6 +57,24 @@ export default class Configure extends Command {
         default: this.userConfig.chainTag,
         choices: supportedChainVersions.map(v => ({ name: v })),
       },
+    ]);
+
+    let restTags, subqueryTags, toolingTags;
+    if (chainTag.startsWith('4')) {
+      [restTags, subqueryTags, toolingTags] = await Promise.all([
+        fetchDockerHubTags('polymathnet/polymesh-rest-api'),
+        fetchDockerHubTags('polymathnet/polymesh-subquery'),
+        fetchDockerHubTags('polymathnet/tooling-gql'),
+      ]);
+    } else {
+      [restTags, subqueryTags, toolingTags] = await Promise.all([
+        fetchDockerHubTags('polymeshassociation/polymesh-rest-api'),
+        fetchDockerHubTags('polymeshassociation/polymesh-subquery'),
+        fetchDockerHubTags('polymeshassociation/polymesh-tooling-gql'),
+      ]);
+    }
+
+    const responses = await inquirer.prompt([
       {
         name: 'restTag',
         message: 'Select rest api version',
@@ -103,6 +115,6 @@ export default class Configure extends Command {
       },
     ]);
 
-    saveUserConfig(this, responses);
+    saveUserConfig(this, { ...chainTag, responses });
   }
 }

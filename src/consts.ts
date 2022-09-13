@@ -17,11 +17,17 @@ export const v4Config = {
 
 export const v5Config = {
   chainTag: '5.0.2',
-  restTag: 'v0.0.9',
-  subqueryTag: 'v5.3.4',
-  toolingTag: 'v5.0.1',
+  restTag: 'v0.0.10',
+  subqueryTag: 'v5.3.15',
+  toolingTag: 'v5.0.2',
   restSigners: 'alice',
   restMnemonics: '//Alice',
+};
+
+export const earliestAssociationHubImages = {
+  restVersion: '0.0.10',
+  toolingVersion: '5.0.2',
+  subqueryVersion: '5.3.15',
 };
 
 export const bundledConfig = [v4Config, v5Config];
@@ -30,8 +36,8 @@ export const bundledConfig = [v4Config, v5Config];
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 120 * 1000,
-  iterations: 60,
+  timeout: 300 * 1000,
+  iterations: 150,
 };
 
 export const chain = {
@@ -59,6 +65,7 @@ export const rest = {
 export const tooling = {
   apiKey: 'd41d8cd98f00b204e9800998ecf8427e',
   url: 'localhost:3007/graphql',
+  oldUrl: 'localhost:3007/dev/graphql',
 };
 
 export const postgres = {

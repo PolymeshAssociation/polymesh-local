@@ -215,7 +215,7 @@ export default class Start extends Command {
       return [];
     });
 
-    cli.action.start('Starting the containers (this may take a while)');
+    cli.action.start('Starting the containers (this may take a while the first time)');
     await startContainers(
       this,
       version,
@@ -240,7 +240,7 @@ export default class Start extends Command {
     };
     const checks = typedOnly.map(o => allChecks[o]);
 
-    cli.action.start('Checking service liveness (Ctrl-C to skip)');
+    cli.action.start('Checking service liveness. This can take up to 5 minutes (Ctrl-C to skip)');
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);

@@ -2,11 +2,21 @@ import Command from '@oclif/command';
 import * as fs from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
+import semver from 'semver';
 import { pipeline } from 'stream';
 import { promisify } from 'util';
 
 import { getMetadata, Metadata } from '../common/snapshots';
-import { chain, checkSettings, configFileName, postgres, rest, tooling, uis } from '../consts';
+import {
+  chain,
+  checkSettings,
+  configFileName,
+  earliestAssociationHubImages,
+  postgres,
+  rest,
+  tooling,
+  uis,
+} from '../consts';
 
 /**
  * Values a user can set in a config file to control what images to use
@@ -174,4 +184,42 @@ export async function fetchDockerHubTags(repo: string): Promise<DockerTag[]> {
   } while (response?.next);
 
   return options;
+}
+
+/**
+ * A helper function that given UserConfig will resolve images based on their tag.
+ * This is needed to provide backwards compatibility for polymathnet images
+ */
+export function resolveContainerImages(userConfig: UserConfig): {
+  toolingImage: string;
+  restImage: string;
+  subqueryImage: string;
+} {
+  const { toolingTag, restTag, subqueryTag } = userConfig;
+  const { toolingVersion, restVersion, subqueryVersion } = earliestAssociationHubImages;
+  let toolingImage, restImage, subqueryImage;
+  // special case v6.0.0-alpha.1 as the tags got out of order and we used it for older chains
+  if (semver.lt(toolingTag, toolingVersion) || toolingTag === 'v6.0.0-alpha.1') {
+    toolingImage = `polymathnet/tooling-gql:${toolingTag}`;
+  } else {
+    toolingImage = `polymeshassociation/polymesh-tooling-gql:${toolingTag}`;
+  }
+
+  if (semver.lt(restTag, restVersion)) {
+    restImage = `polymathnet/polymesh-rest-api:${restTag}`;
+  } else {
+    restImage = `polymeshassociation/polymesh-rest-api:${restTag}`;
+  }
+
+  if (semver.lt(subqueryTag, subqueryVersion)) {
+    subqueryImage = `polymathnet/polymesh-subquery:${subqueryTag}`;
+  } else {
+    subqueryImage = `polymeshassociation/polymesh-subquery:${subqueryTag}`;
+  }
+
+  return {
+    toolingImage,
+    restImage,
+    subqueryImage,
+  };
 }

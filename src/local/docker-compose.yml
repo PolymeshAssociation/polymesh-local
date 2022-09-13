@@ -67,7 +67,7 @@ services:
       ]
 
   subquery:
-    image: 'polymathnet/polymesh-subquery:${SUBQUERY_TAG}'
+    image: '${SUBQUERY_IMAGE}'
     restart: always
     depends_on:
       - 'postgres'
@@ -88,7 +88,7 @@ services:
       - --local
 
   tooling:
-    image: polymathnet/tooling-gql:${TOOLING_TAG}
+    image: ${TOOLING_IMAGE}
     restart: always
     depends_on:
       - 'postgres'
@@ -101,7 +101,7 @@ services:
       STAGE: dev
 
   rest_api:
-    image: polymathnet/polymesh-rest-api:${REST_TAG}
+    image: ${REST_IMAGE}
     restart: always
     ports:
       - 3004:3000
