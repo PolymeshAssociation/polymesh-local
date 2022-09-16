@@ -4,9 +4,9 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
-export const supportedChainVersions = ['4.0.0', '4.1.1', '5.0.0'];
+export const supportedChainVersions = ['4.0.0', '4.1.1', '5.0.2'];
 
-export const defaultUserConfig = {
+export const v4Config = {
   chainTag: '4.1.1',
   restTag: 'v0.0.6',
   subqueryTag: 'v4.1.0-s3',
@@ -15,12 +15,29 @@ export const defaultUserConfig = {
   restMnemonics: '//Alice',
 };
 
+export const v5Config = {
+  chainTag: '5.0.2',
+  restTag: 'v0.0.10',
+  subqueryTag: 'v5.3.15',
+  toolingTag: 'v5.0.2',
+  restSigners: 'alice',
+  restMnemonics: '//Alice',
+};
+
+export const earliestAssociationHubImages = {
+  restVersion: '0.0.10',
+  toolingVersion: '5.0.2',
+  subqueryVersion: '5.3.15',
+};
+
+export const bundledConfig = [v4Config, v5Config];
+
 // This format is compatible with libfaketime is using
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 120 * 1000,
-  iterations: 60,
+  timeout: 300 * 1000,
+  iterations: 150,
 };
 
 export const chain = {
@@ -47,7 +64,8 @@ export const rest = {
 
 export const tooling = {
   apiKey: 'd41d8cd98f00b204e9800998ecf8427e',
-  url: 'localhost:3007/dev/graphql',
+  url: 'localhost:3007/graphql',
+  oldUrl: 'localhost:3007/dev/graphql',
 };
 
 export const postgres = {

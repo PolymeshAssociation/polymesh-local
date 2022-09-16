@@ -67,7 +67,7 @@ services:
       ]
 
   subquery:
-    image: 'polymathnet/polymesh-subquery:${SUBQUERY_TAG}'
+    image: '${SUBQUERY_IMAGE}'
     restart: always
     depends_on:
       - 'postgres'
@@ -75,6 +75,7 @@ services:
       - 3006:3000
     environment:
       NETWORK_ENDPOINT: ws://alice:9944
+      NETWORK_HTTP_ENDPOINT: http://alice:9933
       DB_USER: '${PG_USER}'
       DB_PASS: '${PG_PASSWORD}'
       DB_DATABASE: '${PG_DB}'
@@ -87,7 +88,7 @@ services:
       - --local
 
   tooling:
-    image: polymathnet/tooling-gql:${TOOLING_TAG}
+    image: ${TOOLING_IMAGE}
     restart: always
     depends_on:
       - 'postgres'
@@ -100,7 +101,7 @@ services:
       STAGE: dev
 
   rest_api:
-    image: polymathnet/polymesh-rest-api:${REST_TAG}
+    image: ${REST_IMAGE}
     restart: always
     ports:
       - 3004:3000

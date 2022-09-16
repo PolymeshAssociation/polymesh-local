@@ -34,7 +34,7 @@ export default class Start extends Command {
       // Note: The actual value passed to the default function doesn't match its type. We use any so we can access the user config if its present
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
-        return ctx.userConfig?.chainTag || '4.1.1';
+        return ctx.userConfig?.chainTag || '5.0.2';
       },
       description: 'version of the containers to run',
       options: supportedChainVersions,
@@ -133,12 +133,6 @@ export default class Start extends Command {
       this.error(chainRunningError);
     }
 
-    if (version === '5.0.0') {
-      this.warn(
-        '5.0.0 is still under active development. Its recommended to use the flag `--only chain` as not all services are compatible with 5.0.0 chains yet'
-      );
-    }
-
     if (clean) {
       cli.action.start('Removing old state');
       removeVolumes();
@@ -221,7 +215,7 @@ export default class Start extends Command {
       return [];
     });
 
-    cli.action.start('Starting the containers (this may take a while)');
+    cli.action.start('Starting the containers (this may take a while the first time)');
     await startContainers(
       this,
       version,
@@ -246,7 +240,7 @@ export default class Start extends Command {
     };
     const checks = typedOnly.map(o => allChecks[o]);
 
-    cli.action.start('Checking service liveness (Ctrl-C to skip)');
+    cli.action.start('Checking service liveness. This can take up to 5 minutes (Ctrl-C to skip)');
     const results = await Promise.all(checks.map(c => retry(c)));
     if (!results.every(Boolean)) {
       const resultMsgs = checks.map((c, i) => `${c.name}: ${results[i]}`);
