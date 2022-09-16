@@ -25,7 +25,7 @@ function pullPolymesh(tag: string) {
   if (fs.existsSync(polymeshPath)) {
     fs.rmSync(polymeshPath, { recursive: true });
   }
-  const POLYMESH_GIT = 'https://github.com/PolymathNetwork/Polymesh.git';
+  const POLYMESH_GIT = 'https://github.com/PolymeshAssociation/Polymesh.git';
   execSync(`git clone --depth 1 --branch ${tag} ${POLYMESH_GIT} ${polymeshPath}`, {
     stdio: 'inherit',
   });

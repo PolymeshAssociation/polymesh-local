@@ -22,7 +22,7 @@
     "test": "jest --detectOpenHandles",
     "format": "cross-env prettier-eslint $PWD\"/src/**/*.{ts,tsx,js,jsx,json,css,md}\" --write"
   },
-  "bugs": "https://github.com/PolymathNetwork/polymesh-local/issues",
+  "bugs": "https://github.com/PolymeshAssociation/polymesh-local/issues",
   "dependencies": {
     "@oclif/command": "^1",
     "@oclif/config": "^1",
@@ -99,7 +99,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/PolymathNetwork/polymesh-local",
+  "homepage": "https://github.com/PolymeshAssociation/polymesh-local",
   "keywords": [
     "oclif"
   ],
@@ -112,7 +112,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "PolymathNetwork/polymesh-local",
+  "repository": "PolymeshAssociation/polymesh-local",
   "config": {
     "commitizen": {
       "path": "./node_modules/cz-conventional-changelog"
