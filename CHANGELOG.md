@@ -1,3 +1,10 @@
+# [4.4.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.3.0...v4.4.0) (2022-09-16)
+
+
+### Features
+
+* 🎸 Add support for 5.0.2 chains ([#40](https://github.com/PolymathNetwork/polymesh-local/issues/40)) ([5991015](https://github.com/PolymathNetwork/polymesh-local/commit/5991015f369428d89ac94da154c142578191af8b))
+
 # [4.3.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.2.0...v4.3.0) (2022-06-09)
 
 
