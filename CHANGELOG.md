@@ -1,3 +1,10 @@
+# [4.5.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.4.0...v4.5.0) (2022-09-16)
+
+
+### Features
+
+* 🎸 update github reference to the new repository ([#41](https://github.com/PolymathNetwork/polymesh-local/issues/41)) ([dedefc6](https://github.com/PolymathNetwork/polymesh-local/commit/dedefc6bfdb38a55c7d12d195a13beff5c062254))
+
 # [4.4.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.3.0...v4.4.0) (2022-09-16)
 
 
