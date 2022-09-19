@@ -1,3 +1,10 @@
+# [4.6.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.5.0...v4.6.0) (2022-09-19)
+
+
+### Features
+
+* 🎸 update github release token env ([#42](https://github.com/PolymathNetwork/polymesh-local/issues/42)) ([1e8abc8](https://github.com/PolymathNetwork/polymesh-local/commit/1e8abc8f375497d106f6b7420edabad8916b529e))
+
 # [4.5.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.4.0...v4.5.0) (2022-09-16)
 
 
