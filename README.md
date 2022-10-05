@@ -3,8 +3,8 @@
 Polymesh local environment for development and e2e testing
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
-[![Version](https://img.shields.io/npm/v/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
-[![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
+[![Version](https://img.shields.io/npm/v/polymesh-local.svg)](https://npmjs.org/package/@polymeshassociation/polymesh-local)
+[![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/@polymeshassociation/polymesh-local)
 [![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymeshAssociation/polymesh-local/blob/master/package.json)
 
 Tool for managing a Polymesh development or CI environment. This environment includes:
