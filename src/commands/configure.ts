@@ -57,8 +57,6 @@ export default class Configure extends Command {
         choices: supportedChainVersions.map(v => ({ name: v })),
       },
     ]);
-    console.log({ chainTag });
-    console.log(chainTag);
 
     const [restTags, subqueryTags, toolingTags] = await Promise.all([
       fetchDockerHubTags('polymeshassociation/polymesh-rest-api'),
