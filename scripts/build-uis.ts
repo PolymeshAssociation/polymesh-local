@@ -18,7 +18,7 @@ mkdirSync(tmpDir);
 const apps: Record<string, string> = {
   dashboard: 'git@github.com:PolymathNetwork/dashboard-app.git',
   bridge: 'git@github.com:PolymeshAssociation/bridge-ui.git',
-  governance: 'git@github.com:PolymathNetwork/governance-web.git',
+  governance: 'git@github.com:PolymeshAssociation/governance-web.git',
   issuer: 'git@github.com:PolymathNetwork/Polymesh-Issuer.git',
 };
 

@@ -51,6 +51,12 @@ yarn pack # produces a .tgz file that can be installed
 npm i -g polymesh-local-v3.0.0.tgz # specify the file created from previous step
 ```
 
+### Updating the UIs
+
+To update the UIs for new chain versions, there is a script `build-uis`, which will produce a set of UIs and place them in the ui directory. Note the dashboard is private, so you will need an SSH key that has access to that repository for it to work.
+
+Once the UIs are confirmed to have been built successfully zip them with: `tar -czvf v?.?.x.tgz -C ./src/local/uis .` and upload the resulting file to the [asset Github release](https://github.com/PolymeshAssociation/polymesh-local/releases/tag/assets)
+
 <!-- toc -->
 
 - [polymesh-local](#polymesh-local)
