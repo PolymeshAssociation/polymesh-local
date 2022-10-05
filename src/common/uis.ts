@@ -7,15 +7,11 @@ import {
   rmSync,
   writeFileSync,
 } from 'fs';
-import fetch from 'node-fetch';
 import path from 'path';
 import tar from 'tar';
-import { Parser } from 'xml2js';
 
 import { downloadFile, returnsExpectedStatus } from '../common/util';
 import { localDir, uis } from '../consts';
-
-const xmlParser = new Parser();
 
 export async function areUIsUp(): Promise<boolean> {
   const results = await Promise.all([
@@ -31,21 +27,22 @@ export async function areUIsUp(): Promise<boolean> {
 /**
  * If the UI directory is empty this will fetch the most recent UI tarball from S3 and unzip it.
  */
-export async function fetchUIs(version: string): Promise<void> {
-  if (checkVersion(version)) {
+export async function fetchUIs(imageVersion: string): Promise<void> {
+  const version = parseVersion(imageVersion);
+  if (isVersionDownloaded(version)) {
     return;
   }
 
-  const fileName = await fetchFileName(version);
-  const dest = path.join(localDir, 'uis.tgz');
-  const s3Path = `${uis.s3}/${fileName}`;
-  await downloadFile(s3Path, dest);
+  const sourcePath = `${uis.remoteAssets}${version}.tgz`;
+  const destinationPath = path.join(localDir, 'uis.tgz');
+
+  await downloadFile(sourcePath, destinationPath);
 
   if (!existsSync(uis.dir)) mkdirSync(uis.dir);
 
   try {
     await tar.x({
-      file: dest,
+      file: destinationPath,
       C: uis.dir,
     });
   } catch (err) {
@@ -54,9 +51,24 @@ export async function fetchUIs(version: string): Promise<void> {
     );
     process.exit(1);
   } finally {
-    rmSync(dest); // no need to keep the tar file around
+    rmSync(destinationPath); // no need to keep the tar file around
   }
   recordVersion(version);
+}
+
+/**
+ * @return patch agnostic version from the given path
+ */
+function parseVersion(imageVersion: string): string {
+  const versionRegex = /(\d+\.\d+)/;
+  const versionMatch = imageVersion.match(versionRegex);
+  if (!versionMatch) {
+    // this can happen if an unofficial image being used. Ideally we'd have "exclude" and say `--exclude ui`
+    throw new Error(
+      `Could not extract version from: ${imageVersion}. The image should have a semver sequence in it. You can try with starting with "--only chain" to avoid this check`
+    );
+  }
+  return `v${versionMatch[0]}.x`;
 }
 
 export function clearUIs(): void {
@@ -69,42 +81,11 @@ function haveUIs(): boolean {
   return existsSync(uis.dir) && readdirSync(uis.dir).length > 0;
 }
 
-interface S3Metadata {
-  Key: string[];
-  LastModified: string;
-}
-/**
- * Fetches the most recent UI tarball from the S3 bucket.
- * Uses the REST API since the official S3 client requires credentials
- * @returns The S3 filename of the most recent UI for the given version
- */
-async function fetchFileName(version: string): Promise<Record<string, unknown> | void> {
-  return fetch(`${uis.s3}/?list-type=2`)
-    .then(response => response.text())
-    .then(xmlString => xmlParser.parseStringPromise(xmlString))
-    .then(response => response?.ListBucketResult?.Contents)
-    .then(contents => {
-      const mostRecent = contents
-        .filter((obj: S3Metadata) => obj.Key[0] !== 'uis/' && obj.Key[0].includes('polymesh-uis')) // filter any non ui file
-        .filter((obj: S3Metadata) => obj.Key[0].includes(version)) // filter down for correct version only
-        .sort((a: S3Metadata, b: S3Metadata) => {
-          return a.LastModified < b.LastModified ? 1 : a.LastModified > b.LastModified ? -1 : 0;
-        })[0];
-      if (!mostRecent) {
-        console.error(
-          `UIs were not found for version ${version}. Please contact the polymath team if the problem persists`
-        );
-        process.exit(1);
-      }
-      return mostRecent.Key[0];
-    });
-}
-
 function recordVersion(version: string): void {
   writeFileSync(`${uis.dir}/version.txt`, version);
 }
 
-function checkVersion(version: string): boolean {
+function isVersionDownloaded(version: string): boolean {
   if (haveUIs()) {
     const uiVersion = readFileSync(uis.versionFile).toString();
     return uiVersion === version;

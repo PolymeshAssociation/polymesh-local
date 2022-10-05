@@ -4,20 +4,11 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
-export const supportedChainVersions = ['4.0.0', '4.1.1', '5.0.2'];
-
-export const v4Config = {
-  chainTag: '4.1.1',
-  restTag: 'v0.0.6',
-  subqueryTag: 'v4.1.0-s3',
-  toolingTag: 'v6.0.0-alpha.1',
-  restSigners: 'alice',
-  restMnemonics: '//Alice',
-};
+export const supportedChainVersions = ['5.0.2'];
 
 export const v5Config = {
-  chainTag: '5.0.2',
-  restTag: 'v0.0.10',
+  chainTag: '5.0.3',
+  restTag: 'v0.1.0',
   subqueryTag: 'v5.3.15',
   toolingTag: 'v5.0.2',
   restSigners: 'alice',
@@ -30,14 +21,14 @@ export const earliestAssociationHubImages = {
   subqueryVersion: '5.3.15',
 };
 
-export const bundledConfig = [v4Config, v5Config];
+export const bundledConfig = [v5Config];
 
 // This format is compatible with libfaketime is using
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
 
 export const checkSettings = {
-  timeout: 300 * 1000,
-  iterations: 150,
+  timeout: 360 * 1000,
+  iterations: 180,
 };
 
 export const chain = {
@@ -47,7 +38,7 @@ export const chain = {
 export const uis = {
   dir: path.resolve(localDir, 'uis'),
   versionFile: path.resolve(localDir, 'uis', 'version.txt'),
-  s3: 'https://polymesh-local.s3.amazonaws.com',
+  remoteAssets: 'https://github.com/PolymeshAssociation/polymesh-local/releases/download/assets/',
   dashboard: 'localhost:3000',
   bridge: 'localhost:3001',
   issuer: 'localhost:3002',

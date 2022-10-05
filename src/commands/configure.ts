@@ -33,7 +33,7 @@ export default class Configure extends Command {
       {
         name: 'preset',
         message:
-          'Select a chain version. Select `Custom` if you are advanced and want a specific combination of services',
+          'Select a chain version. Select `Custom` to specify a individual versions for each service',
         type: 'list',
         default: v5Config.chainTag,
         choices: [...bundledConfig.map(({ chainTag }) => chainTag), 'Custom'],

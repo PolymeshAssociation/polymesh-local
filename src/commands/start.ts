@@ -87,7 +87,7 @@ export default class Start extends Command {
       description: 'Comma separated list of signers available in the rest api. Defaults to `alice`',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
-        return ctx.userConfig?.restDids || 'alice';
+        return ctx.userConfig?.restSigners || 'alice';
       },
     }),
     restMnemonics: flags.string({
