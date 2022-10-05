@@ -1,10 +1,10 @@
 const script = script => ({
   path: './scripts/lifecycle',
   script,
-})
+});
 
 module.exports = {
-  repositoryUrl: 'https://github.com/PolymathNetwork/polymesh-local.git',
+  repositoryUrl: 'https://github.com/PolymeshAssociation/polymesh-local.git',
   branches: [
     'master',
     {
@@ -42,4 +42,4 @@ module.exports = {
     script('postpack'),
     script('postpublish'),
   ],
-}
+};

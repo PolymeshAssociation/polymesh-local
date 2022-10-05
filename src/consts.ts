@@ -4,7 +4,7 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
-export const supportedChainVersions = ['5.0.2'];
+export const supportedChainVersions = ['5.0.3'];
 
 export const v5Config = {
   chainTag: '5.0.3',
@@ -13,12 +13,6 @@ export const v5Config = {
   toolingTag: 'v5.0.2',
   restSigners: 'alice',
   restMnemonics: '//Alice',
-};
-
-export const earliestAssociationHubImages = {
-  restVersion: '0.0.10',
-  toolingVersion: '5.0.2',
-  subqueryVersion: '5.3.15',
 };
 
 export const bundledConfig = [v5Config];

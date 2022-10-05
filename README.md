@@ -5,7 +5,7 @@ Polymesh local environment for development and e2e testing
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
 [![Downloads/week](https://img.shields.io/npm/dw/polymesh-local.svg)](https://npmjs.org/package/polymesh-local)
-[![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymathNetwork/polymesh-local/blob/master/package.json)
+[![License](https://img.shields.io/npm/l/polymesh-local.svg)](https://github.com/PolymeshAssociation/polymesh-local/blob/master/package.json)
 
 Tool for managing a Polymesh development or CI environment. This environment includes:
 
@@ -52,14 +52,16 @@ npm i -g polymesh-local-v3.0.0.tgz # specify the file created from previous step
 ```
 
 <!-- toc -->
-* [polymesh-local](#polymesh-local)
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [polymesh-local](#polymesh-local)
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
+
 ```sh-session
 $ npm install -g @polymeshassociation/polymesh-local
 $ polymesh-local COMMAND
@@ -71,21 +73,23 @@ USAGE
   $ polymesh-local COMMAND
 ...
 ```
+
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-* [`polymesh-local clean`](#polymesh-local-clean)
-* [`polymesh-local configure`](#polymesh-local-configure)
-* [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
-* [`polymesh-local info`](#polymesh-local-info)
-* [`polymesh-local load FILE`](#polymesh-local-load-file)
-* [`polymesh-local ls`](#polymesh-local-ls)
-* [`polymesh-local rm FILE`](#polymesh-local-rm-file)
-* [`polymesh-local save [name]`](#polymesh-local-save-name)
-* [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
-* [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
+
+- [`polymesh-local clean`](#polymesh-local-clean)
+- [`polymesh-local configure`](#polymesh-local-configure)
+- [`polymesh-local help [COMMAND]`](#polymesh-local-help-command)
+- [`polymesh-local info`](#polymesh-local-info)
+- [`polymesh-local load FILE`](#polymesh-local-load-file)
+- [`polymesh-local ls`](#polymesh-local-ls)
+- [`polymesh-local rm FILE`](#polymesh-local-rm-file)
+- [`polymesh-local save [name]`](#polymesh-local-save-name)
+- [`polymesh-local start [OPTIONS]`](#polymesh-local-start-options)
+- [`polymesh-local stop [OPTIONS]`](#polymesh-local-stop-options)
 
 ## `polymesh-local clean`
 
@@ -217,10 +221,10 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -C, 
+  -C,
   --chain=dev|local|testnet-dev|ci-dev|ci-local|testnet-local|testnet-bootstrap|mainnet-dev|mainnet-local|mainnet-bootst
   rap|mainnet|testnet
-      (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than 
+      (Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than
       testnet-dev
 
   -c, --clean
@@ -230,7 +234,7 @@ OPTIONS
       show CLI help
 
   -i, --image=image
-      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and 
+      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and
       have the polymesh node binary set as its entrypoint
 
   -o, --only=chain|subquery|gql|rest|uis
@@ -278,4 +282,5 @@ OPTIONS
 ```
 
 _See code: [src/commands/stop.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v4.6.0/src/commands/stop.ts)_
+
 <!-- commandsstop -->
