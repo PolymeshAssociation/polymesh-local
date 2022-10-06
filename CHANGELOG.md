@@ -1,3 +1,21 @@
+# [5.0.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v4.6.0...v5.0.0) (2022-10-06)
+
+
+### Features
+
+* 🎸 Update default to use chain v5.0.3 ([#43](https://github.com/PolymeshAssociation/polymesh-local/issues/43)) ([8c80c5b](https://github.com/PolymeshAssociation/polymesh-local/commit/8c80c5bd022aa1aebd9d21cbe75917c32753f105))
+
+
+### BREAKING CHANGES
+
+* 🧨 4.x chain support was removed
+
+* refactor: 💡 cleanup polymathnetwork references
+
+* docs: ✏️ add documentation around updating UIs
+
+also removes deprecated build script
+
 # [4.6.0](https://github.com/PolymathNetwork/polymesh-local/compare/v4.5.0...v4.6.0) (2022-09-19)
 
 
