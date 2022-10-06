@@ -10,10 +10,7 @@ import { dataDir, localDir, postgres, tooling, uis } from '../consts';
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
 
-  // 5+ chain version has migrated to using the association docker hub
-  const chainImage = version.startsWith('4')
-    ? `polymathnet/polymesh:${version}-debian`
-    : `polymeshassociation/polymesh:${version}-mainnet-debian`;
+  const chainImage = `polymeshassociation/polymesh:${version}-mainnet-debian`;
 
   let dockerfile;
   if (image) {

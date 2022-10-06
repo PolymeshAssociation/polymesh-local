@@ -32,8 +32,7 @@ export default class Configure extends Command {
     const { preset } = await inquirer.prompt([
       {
         name: 'preset',
-        message:
-          'Select a chain version. Select `Custom` if you are advanced and want a specific combination of services',
+        message: 'Select a chain version. Select `Custom` to specify versions for each service',
         type: 'list',
         default: v5Config.chainTag,
         choices: [...bundledConfig.map(({ chainTag }) => chainTag), 'Custom'],
@@ -59,20 +58,11 @@ export default class Configure extends Command {
       },
     ]);
 
-    let restTags, subqueryTags, toolingTags;
-    if (chainTag.startsWith('4')) {
-      [restTags, subqueryTags, toolingTags] = await Promise.all([
-        fetchDockerHubTags('polymathnet/polymesh-rest-api'),
-        fetchDockerHubTags('polymathnet/polymesh-subquery'),
-        fetchDockerHubTags('polymathnet/tooling-gql'),
-      ]);
-    } else {
-      [restTags, subqueryTags, toolingTags] = await Promise.all([
-        fetchDockerHubTags('polymeshassociation/polymesh-rest-api'),
-        fetchDockerHubTags('polymeshassociation/polymesh-subquery'),
-        fetchDockerHubTags('polymeshassociation/polymesh-tooling-gql'),
-      ]);
-    }
+    const [restTags, subqueryTags, toolingTags] = await Promise.all([
+      fetchDockerHubTags('polymeshassociation/polymesh-rest-api'),
+      fetchDockerHubTags('polymeshassociation/polymesh-subquery'),
+      fetchDockerHubTags('polymeshassociation/polymesh-tooling-gql'),
+    ]);
 
     const responses = await inquirer.prompt([
       {
@@ -115,6 +105,6 @@ export default class Configure extends Command {
       },
     ]);
 
-    saveUserConfig(this, { ...chainTag, responses });
+    saveUserConfig(this, { chainTag, ...responses });
   }
 }
