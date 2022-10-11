@@ -43,8 +43,19 @@ export default class Configure extends Command {
       if (!choice) {
         this.error(`The selected choice ${choice} was not found. Please report this error`);
       }
-      this.log('Updating configuration with: ', JSON.stringify(choice, undefined, 2));
-      saveUserConfig(this, choice);
+
+      const preserveUserSettings = {
+        restSigners: this.userConfig.restSigners,
+        restMnemonics: this.userConfig.restMnemonics,
+      };
+
+      const config = {
+        ...choice,
+        ...preserveUserSettings,
+      };
+
+      this.log('Updating configuration with: ', JSON.stringify(config, undefined, 2));
+      saveUserConfig(this, config);
       return;
     }
 
