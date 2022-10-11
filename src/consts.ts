@@ -8,8 +8,8 @@ export const supportedChainVersions = ['5.0.3'];
 
 export const v5Config = {
   chainTag: '5.0.3',
-  restTag: 'v0.1.0',
-  subqueryTag: 'v5.3.15',
+  restTag: 'v0.1.1',
+  subqueryTag: 'v5.4.2',
   toolingTag: 'v5.0.2',
   restSigners: 'alice',
   restMnemonics: '//Alice',
