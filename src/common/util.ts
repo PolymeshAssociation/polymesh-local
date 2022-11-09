@@ -196,3 +196,5 @@ export function resolveContainerImages(userConfig: UserConfig): {
     subqueryImage,
   };
 }
+
+export const httpRegex = /^https?:\/\//;
