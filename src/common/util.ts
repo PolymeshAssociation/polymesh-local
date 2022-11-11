@@ -1,5 +1,5 @@
 import Command from '@oclif/command';
-import * as fs from 'fs-extra';
+import { createWriteStream, existsSync, mkdirpSync, readJSON, writeFileSync } from 'fs-extra';
 import fetch from 'node-fetch';
 import path from 'path';
 import { pipeline } from 'stream';
@@ -68,7 +68,7 @@ export async function returnsExpectedStatus(
 export function printInfo(cmd: Command): void {
   const metadata = getMetadata();
   const configLocation = path.join(cmd.config.configDir, configFileName);
-  if (fs.existsSync(configLocation)) {
+  if (existsSync(configLocation)) {
     cmd.log(`config file located at: ${configLocation}`);
   }
   cmd.log(`chain version ${metadata.version} running`);
@@ -89,7 +89,9 @@ export function printInfo(cmd: Command): void {
  * @param dest The path to save the file to
  */
 export async function downloadFile(url: string, dest: string): Promise<void> {
-  await promisify(pipeline)((await fetch(url)).body, fs.createWriteStream(dest));
+  const destDir = path.dirname(dest);
+  mkdirpSync(destDir); // ensure dir exists
+  await promisify(pipeline)((await fetch(url)).body, createWriteStream(dest));
 }
 
 /**
@@ -127,8 +129,8 @@ function dateToFakeTime(date: Date): string {
  */
 export async function getUserConfig(cmd: Command): Promise<UserConfig | null> {
   const configPath = path.join(cmd.config.configDir, configFileName);
-  if (fs.existsSync(configPath)) {
-    return fs.readJSON(configPath);
+  if (existsSync(configPath)) {
+    return readJSON(configPath);
   } else {
     return null;
   }
@@ -136,9 +138,9 @@ export async function getUserConfig(cmd: Command): Promise<UserConfig | null> {
 
 export function saveUserConfig(cmd: Command, config: UserConfig): void {
   const configPath = path.join(cmd.config.configDir, configFileName);
-  fs.mkdirpSync(cmd.config.configDir);
+  mkdirpSync(cmd.config.configDir);
   const contents = JSON.stringify(config, undefined, 2);
-  fs.writeFileSync(configPath, contents);
+  writeFileSync(configPath, contents);
   cmd.log(`config file was saved at ${configPath} (it can be updated with a text editor)`);
 }
 
