@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.0.0...v5.1.0) (2022-11-11)
+
+
+### Features
+
+* 🎸 allow passing remote URLs for snapshots ([#46](https://github.com/PolymeshAssociation/polymesh-local/issues/46)) ([2ce9ec8](https://github.com/PolymeshAssociation/polymesh-local/commit/2ce9ec812ba67a3970f35c044d6e295f2a9c03df))
+
 # [5.0.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v4.6.0...v5.0.0) (2022-10-06)
 
 
