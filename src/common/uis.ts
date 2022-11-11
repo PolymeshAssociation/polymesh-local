@@ -33,7 +33,7 @@ export async function fetchUIs(imageVersion: string): Promise<void> {
     return;
   }
 
-  const sourcePath = `${uis.remoteAssets}${version}.tgz`;
+  const sourcePath = `${uis.remoteAssets}${version}-uis.tgz`;
   const destinationPath = path.join(localDir, 'uis.tgz');
 
   await downloadFile(sourcePath, destinationPath);

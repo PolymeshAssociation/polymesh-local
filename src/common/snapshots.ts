@@ -1,10 +1,12 @@
 import Command from '@oclif/command';
 import { existsSync, lstatSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import { mkdirpSync } from 'fs-extra';
+import { parse } from 'path';
 import rimraf from 'rimraf';
 import tar from 'tar';
 
 import { backupVolumes, restoreVolumes } from '../common/containers';
+import { downloadFile, httpRegex } from '../common/util';
 import { dataDir, snapshotsDir } from '../consts';
 
 // A snapshot is a collection of docker volumes for containers along with additional meta data.
@@ -38,9 +40,16 @@ export function writeMetadata(data: Metadata): void {
 }
 
 export async function loadSnapshot(cmd: Command, snapshot: string): Promise<void> {
-  const path = snapshotPath(snapshot);
-  if (!existsSync(path)) {
-    cmd.error(`Snapshot at ${snapshot} does not exist`, { exit: 2 });
+  let path: string;
+  if (snapshot.match(httpRegex)) {
+    const { name } = parse(snapshot);
+    path = snapshotPath(name);
+    await downloadFile(snapshot, path);
+  } else {
+    path = snapshotPath(snapshot);
+    if (!existsSync(path)) {
+      cmd.error(`Snapshot at ${snapshot} does not exist`, { exit: 2 });
+    }
   }
 
   if (existsSync(dataDir)) {

@@ -65,7 +65,8 @@ export default class Start extends Command {
     }),
     snapshot: flags.string({
       char: 's',
-      description: 'Loads snapshot before starting. Current state used if not passed',
+      description:
+        'Loads snapshot before starting. Current state used if not passed. Can be a "name", path to local file or remote URL',
     }),
     clean: flags.boolean({
       char: 'c',
