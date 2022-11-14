@@ -1,3 +1,10 @@
+## [5.1.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.1.0...v5.1.1) (2022-11-14)
+
+
+### Bug Fixes
+
+* 🐛 fix remote snapshots when directory was not present ([#47](https://github.com/PolymeshAssociation/polymesh-local/issues/47)) ([3c4ee80](https://github.com/PolymeshAssociation/polymesh-local/commit/3c4ee80207427e3c63ae2a5989edc0ead85adfb9))
+
 # [5.1.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.0.0...v5.1.0) (2022-11-11)
 
 
