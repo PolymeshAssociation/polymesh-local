@@ -1,8 +1,9 @@
 {
   "name": "@polymeshassociation/polymesh-local",
-  "description": "Polymesh local environment for development and e2e testing",
+  "description": "Polymesh local is a CLI based tool for managing a Polymesh development environment",
   "version": "5.1.1",
-  "author": "Jeremias Diaz @monitz87",
+  "author": "Polymesh Association",
+  "license": "Apache-2.0",
   "bin": {
     "polymesh-local": "./bin/run"
   },
@@ -98,7 +99,6 @@
   "keywords": [
     "oclif"
   ],
-  "license": "MIT",
   "main": "lib/index.js",
   "oclif": {
     "commands": "./lib/commands",
