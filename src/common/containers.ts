@@ -35,7 +35,7 @@ export async function startContainers(
   userConfig: UserConfig
 ): Promise<void> {
   try {
-    const { toolingImage, restImage, subqueryImage } = resolveContainerImages(userConfig);
+    const { toolingImage, restImage, subqueryImage } = resolveContainerImages(version, userConfig);
     const appData = cmd.config.dataDir;
 
     await copyContainerData(cmd);

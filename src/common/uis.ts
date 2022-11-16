@@ -60,6 +60,9 @@ export async function fetchUIs(imageVersion: string): Promise<void> {
  * @return patch agnostic version from the given path
  */
 function parseVersion(imageVersion: string): string {
+  if (imageVersion === 'latest') {
+    return 'latest';
+  }
   const versionRegex = /(\d+\.\d+)/;
   const versionMatch = imageVersion.match(versionRegex);
   if (!versionMatch) {
