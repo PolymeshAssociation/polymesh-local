@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.1.1...v5.2.0) (2022-11-16)
+
+
+### Features
+
+* 🎸 add `latest` as an option to `--version` flag ([#49](https://github.com/PolymeshAssociation/polymesh-local/issues/49)) ([15132f9](https://github.com/PolymeshAssociation/polymesh-local/commit/15132f9e0f1b5c57310e2c3cf9b0ccf63f48a152))
+
 ## [5.1.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.1.0...v5.1.1) (2022-11-14)
 
 
