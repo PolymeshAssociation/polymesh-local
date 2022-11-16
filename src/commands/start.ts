@@ -36,7 +36,7 @@ export default class Start extends Command {
       default: (ctx: any) => {
         return ctx.userConfig?.chainTag || '5.0.3';
       },
-      description: 'version of the containers to run',
+      description: 'version of the containers to run. `latest` may cause changes between starts',
       options: supportedChainVersions,
     }),
     image: flags.string({
@@ -46,14 +46,11 @@ export default class Start extends Command {
     }),
     chain: flags.string({
       char: 'C',
-      description:
-        '(Advanced) Specify a Polymesh runtime. ci-dev has reduced block times letting it process transactions faster than testnet-dev',
+      description: '(Advanced) Specify a Polymesh runtime.',
       options: [
         'dev',
         'local',
         'testnet-dev',
-        'ci-dev',
-        'ci-local',
         'testnet-local',
         'testnet-bootstrap',
         'mainnet-dev',

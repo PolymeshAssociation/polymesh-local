@@ -181,12 +181,23 @@ export async function fetchDockerHubTags(repo: string): Promise<DockerTag[]> {
 /**
  * A helper function that given UserConfig will resolve images based on their tag.
  */
-export function resolveContainerImages(userConfig: UserConfig): {
+export function resolveContainerImages(
+  version: string,
+  userConfig: UserConfig
+): {
   toolingImage: string;
   restImage: string;
   subqueryImage: string;
 } {
-  const { toolingTag, restTag, subqueryTag } = userConfig;
+  let toolingTag: string, restTag: string, subqueryTag: string;
+
+  if (version === 'latest') {
+    toolingTag = version;
+    restTag = version;
+    subqueryTag = version;
+  } else {
+    ({ toolingTag, restTag, subqueryTag } = userConfig);
+  }
 
   const toolingImage = `polymeshassociation/polymesh-tooling-gql:${toolingTag}`;
   const restImage = `polymeshassociation/polymesh-rest-api:${restTag}`;
