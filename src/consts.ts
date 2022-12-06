@@ -4,7 +4,6 @@ export const localDir = path.resolve(__dirname, 'local');
 export const dataDir = path.resolve(localDir, 'data');
 export const snapshotsDir = path.resolve(localDir, 'snapshots');
 export const configFileName = 'config.json';
-export const supportedChainVersions = ['5.0.3', 'latest'];
 
 const defaultRestSigners = {
   restSigners: 'alice,bob,charlie',
@@ -19,7 +18,15 @@ export const latestConfig = {
   ...defaultRestSigners,
 };
 
-export const v5Config = {
+export const fiveOneZeroConfig = {
+  chainTag: '5.1.0',
+  restTag: 'v2.3.0',
+  subqueryTag: 'v8.4.2',
+  toolingTag: 'v5.0.2',
+  ...defaultRestSigners,
+};
+
+export const fiveZeroThreeConfig = {
   chainTag: '5.0.3',
   restTag: 'v0.1.1',
   subqueryTag: 'v5.4.2',
@@ -27,7 +34,9 @@ export const v5Config = {
   ...defaultRestSigners,
 };
 
-export const bundledConfig = [v5Config, latestConfig];
+export const bundledConfig = [fiveOneZeroConfig, fiveZeroThreeConfig, latestConfig];
+
+export const supportedChainVersions = bundledConfig.map(config => config.chainTag);
 
 // This format is compatible with libfaketime is using
 export const dateFmt = '+%Y-%m-%d %H:%M:%S';
