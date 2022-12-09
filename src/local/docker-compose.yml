@@ -19,6 +19,8 @@ services:
       - '9944:9944'
       - '9933:9933'
       - '30333:30333'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     volumes:
       - 'polymesh_alice:/var/lib/polymesh/chains'
     environment:
@@ -37,6 +39,8 @@ services:
       - '8833:9933'
       - '8844:9944'
       - '40333:30333'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     volumes:
       - 'polymesh_bob:/var/lib/polymesh/chains'
     environment:
@@ -56,6 +60,8 @@ services:
       - '7733:9933'
       - '7744:9944'
       - '50333:30333'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     volumes:
       - 'polymesh_charlie:/var/lib/polymesh/chains'
     environment:
@@ -73,6 +79,8 @@ services:
       - 'postgres'
     ports:
       - 3006:3000
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     environment:
       NETWORK_ENDPOINT: ws://alice:9944
       NETWORK_HTTP_ENDPOINT: http://alice:9933
@@ -103,6 +111,8 @@ services:
   rest_api:
     image: ${REST_IMAGE}
     restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     ports:
       - 3004:3000
     environment:
