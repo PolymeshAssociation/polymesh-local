@@ -103,6 +103,8 @@ services:
   rest_api:
     image: ${REST_IMAGE}
     restart: always
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     ports:
       - 3004:3000
     environment:
