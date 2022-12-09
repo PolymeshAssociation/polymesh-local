@@ -1,3 +1,10 @@
+# [5.4.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.3.0...v5.4.0) (2022-12-09)
+
+
+### Features
+
+* 🎸 allow rest api to use host.docker.internal on linux ([#53](https://github.com/PolymeshAssociation/polymesh-local/issues/53)) ([b8d94af](https://github.com/PolymeshAssociation/polymesh-local/commit/b8d94afa42533611350e9e96b1d5d4b9fb756b73))
+
 # [5.3.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.2.0...v5.3.0) (2022-12-07)
 
 
