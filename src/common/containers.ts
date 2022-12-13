@@ -49,27 +49,35 @@ export async function startContainers(
         LOCAL_MNEMONICS: restMnemonics.replace(/, /g, ','),
       };
     }
+
+    const env = {
+      ...process.env,
+      POLYMESH_VERSION: version,
+      PG_USER: postgres.user,
+      PG_HOST: postgres.host,
+      PG_PASSWORD: postgres.password,
+      PG_PORT: postgres.port,
+      PG_DB: postgres.db,
+      FAKETIME: `@${timestamp}`,
+      CHAIN: chain,
+      TOOLING_API_KEY: tooling.apiKey,
+      DATA_DIR: appData,
+      TOOLING_IMAGE: toolingImage,
+      SUBQUERY_IMAGE: subqueryImage,
+      REST_IMAGE: restImage,
+      ...restSignerConfig,
+    };
+
+    // without an explicit pull the local `latest` images may be stale
+    if (version === 'latest') {
+      await compose.pullMany(services, { cwd: localDir, env, log });
+    }
+
     await compose.upMany(services, {
       cwd: localDir,
       log,
       commandOptions: ['--build'],
-      env: {
-        ...process.env,
-        POLYMESH_VERSION: version,
-        PG_USER: postgres.user,
-        PG_HOST: postgres.host,
-        PG_PASSWORD: postgres.password,
-        PG_PORT: postgres.port,
-        PG_DB: postgres.db,
-        FAKETIME: `@${timestamp}`,
-        CHAIN: chain,
-        TOOLING_API_KEY: tooling.apiKey,
-        DATA_DIR: appData,
-        TOOLING_IMAGE: toolingImage,
-        SUBQUERY_IMAGE: subqueryImage,
-        REST_IMAGE: restImage,
-        ...restSignerConfig,
-      },
+      env,
     });
   } catch (err) {
     if (await anyContainersUp(cmd, log)) {
