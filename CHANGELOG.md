@@ -1,3 +1,10 @@
+## [5.4.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.4.0...v5.4.1) (2022-12-13)
+
+
+### Bug Fixes
+
+* 🐛 pull in images when using `latest` version flag ([#54](https://github.com/PolymeshAssociation/polymesh-local/issues/54)) ([7489a25](https://github.com/PolymeshAssociation/polymesh-local/commit/7489a2568133f9b9d588427781bb9570ca2e853e))
+
 # [5.4.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.3.0...v5.4.0) (2022-12-09)
 
 
