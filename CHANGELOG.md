@@ -1,3 +1,10 @@
+## [5.4.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.4.1...v5.4.2) (2022-12-13)
+
+
+### Bug Fixes
+
+* 🐛 add pg extensions so newer SubQuery version work ([#55](https://github.com/PolymeshAssociation/polymesh-local/issues/55)) ([040e80a](https://github.com/PolymeshAssociation/polymesh-local/commit/040e80ab16b2e879ba8d008b795723445da85ff5))
+
 ## [5.4.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.4.0...v5.4.1) (2022-12-13)
 
 
