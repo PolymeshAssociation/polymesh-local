@@ -1,3 +1,10 @@
+# [5.5.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.4.2...v5.5.0) (2023-01-20)
+
+
+### Features
+
+* 🎸 add 5.1.3 and pull from develop for latest ([#56](https://github.com/PolymeshAssociation/polymesh-local/issues/56)) ([fc1315f](https://github.com/PolymeshAssociation/polymesh-local/commit/fc1315f9639b228032d27a1a5a9727d37d427e28))
+
 ## [5.4.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.4.1...v5.4.2) (2022-12-13)
 
 
