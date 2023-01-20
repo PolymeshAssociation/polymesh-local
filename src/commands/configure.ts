@@ -4,7 +4,7 @@ import * as inquirer from 'inquirer';
 import Command from '../base';
 import { validateMnemonics } from '../common/rest';
 import { fetchDockerHubTags, saveUserConfig } from '../common/util';
-import { bundledConfig, fiveOneZeroConfig,supportedChainVersions } from '../consts';
+import { bundledConfig, defaultConfig, supportedChainVersions } from '../consts';
 
 export default class Configure extends Command {
   static description = 'Manages the configuration file for polymesh-local';
@@ -34,7 +34,7 @@ export default class Configure extends Command {
         name: 'preset',
         message: 'Select a chain version. Select `Custom` to specify versions for each service',
         type: 'list',
-        default: fiveOneZeroConfig.chainTag,
+        default: defaultConfig.chainTag,
         choices: [...bundledConfig.map(({ chainTag }) => chainTag), 'Custom'],
       },
     ]);
