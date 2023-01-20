@@ -19,7 +19,7 @@ import { isSubqueryUp } from '../common/subquery';
 import { isToolingUp } from '../common/tooling';
 import { areUIsUp, clearUIs, fetchUIs } from '../common/uis';
 import { hostNow, printInfo, retry } from '../common/util';
-import { dataDir, supportedChainVersions } from '../consts';
+import { dataDir, defaultConfig, supportedChainVersions } from '../consts';
 import { chainRunningError } from '../errors';
 
 export default class Start extends Command {
@@ -34,7 +34,7 @@ export default class Start extends Command {
       // Note: The actual value passed to the default function doesn't match its type. We use any so we can access the user config if its present
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       default: (ctx: any) => {
-        return ctx.userConfig?.chainTag || '5.1.0';
+        return ctx.userConfig?.chainTag || defaultConfig.chainTag;
       },
       description: 'version of the containers to run. `latest` may cause changes between starts',
       options: supportedChainVersions,

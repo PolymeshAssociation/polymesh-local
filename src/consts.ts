@@ -18,6 +18,14 @@ export const latestConfig = {
   ...defaultRestSigners,
 };
 
+export const fiveOneThreeConfig = {
+  chainTag: '5.1.3',
+  restTag: 'v2.4.0',
+  subqueryTag: 'v8.5.2',
+  toolingTag: 'v5.0.2',
+  ...defaultRestSigners,
+};
+
 export const fiveOneZeroConfig = {
   chainTag: '5.1.0',
   restTag: 'v2.3.0',
@@ -34,7 +42,14 @@ export const fiveZeroThreeConfig = {
   ...defaultRestSigners,
 };
 
-export const bundledConfig = [fiveOneZeroConfig, fiveZeroThreeConfig, latestConfig];
+export const bundledConfig = [
+  fiveOneThreeConfig,
+  fiveOneZeroConfig,
+  fiveZeroThreeConfig,
+  latestConfig,
+];
+
+export const defaultConfig = bundledConfig[0];
 
 export const supportedChainVersions = bundledConfig.map(config => config.chainTag);
 

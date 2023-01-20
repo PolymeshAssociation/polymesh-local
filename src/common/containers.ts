@@ -10,7 +10,11 @@ import { dataDir, localDir, postgres, tooling, uis } from '../consts';
 export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
 
-  const chainImage = `polymeshassociation/polymesh:${version}-mainnet-debian`;
+  let branch = 'mainnet';
+  if (version === 'latest') {
+    branch = 'develop';
+  }
+  const chainImage = `polymeshassociation/polymesh:${version}-${branch}-debian`;
 
   let dockerfile;
   if (image) {
