@@ -18,6 +18,14 @@ export const latestConfig = {
   ...defaultRestSigners,
 };
 
+export const fiveTwoZeroConfig = {
+  chainTag: '5.2.0',
+  restTag: 'v2.5.1',
+  subqueryTag: 'v9.1.0-alpha.1',
+  toolingTag: 'v5.0.2',
+  ...defaultRestSigners,
+};
+
 export const fiveOneThreeConfig = {
   chainTag: '5.1.3',
   restTag: 'v2.4.0',
@@ -44,6 +52,7 @@ export const fiveZeroThreeConfig = {
 
 export const bundledConfig = [
   fiveOneThreeConfig,
+  fiveTwoZeroConfig,
   fiveOneZeroConfig,
   fiveZeroThreeConfig,
   latestConfig,
