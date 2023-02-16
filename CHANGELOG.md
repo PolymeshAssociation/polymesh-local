@@ -1,3 +1,10 @@
+## [5.6.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.6.0...v5.6.1) (2023-02-16)
+
+
+### Bug Fixes
+
+* 🐛 Use develop branch for v5.2.0 ([d2b4c94](https://github.com/PolymeshAssociation/polymesh-local/commit/d2b4c944dad750705c2e6e5ff5222de564e3508a))
+
 # [5.6.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.5.0...v5.6.0) (2023-02-13)
 
 
