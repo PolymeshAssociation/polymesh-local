@@ -11,7 +11,7 @@ export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
 
   let branch = 'mainnet';
-  if (version === 'latest' || version === '5.2.0') {
+  if (version === 'latest') {
     branch = 'develop';
   }
   const chainImage = `polymeshassociation/polymesh:${version}-${branch}-debian`;
