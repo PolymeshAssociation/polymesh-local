@@ -1186,12 +1186,13 @@
       "ticker": "Ticker",
       "ids": "Vec<NFTId>"
     },
+    "FungibleToken": {
+      "ticker": "Ticker",
+      "amount": "Balance"
+    },
     "LegAsset": {
       "_enum": {
-        "Fungible": {
-          "ticker": "Ticker",
-          "amount": "Balance"
-        },
+        "Fungible": "FungibleToken",
         "NonFungible": "NFTs"
       }
     },
@@ -1202,10 +1203,7 @@
     },
     "FundDescription": {
       "_enum": {
-        "Fungible": {
-          "ticker": "Ticker",
-          "amount": "Balance"
-        },
+        "Fungible": "FungibleToken",
         "NonFungible": "NFTs"
       }
     },
