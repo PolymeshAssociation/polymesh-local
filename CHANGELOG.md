@@ -1,3 +1,10 @@
+# [5.7.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.6.1...v5.7.0) (2023-03-02)
+
+
+### Features
+
+* 🎸 Add config values for 5.3.0 chain ([059dd23](https://github.com/PolymeshAssociation/polymesh-local/commit/059dd230456dc10a5b605cf90716000f493b74ca))
+
 ## [5.6.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.6.0...v5.6.1) (2023-02-16)
 
 
