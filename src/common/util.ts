@@ -92,10 +92,10 @@ export async function downloadFile(url: string, dest: string): Promise<void> {
   const destDir = path.dirname(dest);
   mkdirpSync(destDir); // ensure dir exists
   const response = await fetch(url);
-  if (response.status === 200) {
-    await promisify(pipeline)(response?.body, createWriteStream(dest));
+  if (response.status === 200 && response.body) {
+    await promisify(pipeline)(response.body, createWriteStream(dest));
   } else {
-    throw new Error('Could not download file');
+    throw new Error(`Could not download file: ${url}`);
   }
 }
 
