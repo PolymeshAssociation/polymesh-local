@@ -1,3 +1,15 @@
+# [5.8.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.7.0...v5.8.0) (2023-03-07)
+
+
+### Bug Fixes
+
+* 🐛 Use latest UIs if version specific UIs are missing ([e6dc9ab](https://github.com/PolymeshAssociation/polymesh-local/commit/e6dc9ab03d0d249406cca40adabc5c74e562cd1b))
+
+
+### Features
+
+* 🎸 Make 5.2.0 version as default version ([bcb11a1](https://github.com/PolymeshAssociation/polymesh-local/commit/bcb11a1a95bf8e258eb1802ac3160b13c7ac409c))
+
 # [5.7.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.6.1...v5.7.0) (2023-03-02)
 
 

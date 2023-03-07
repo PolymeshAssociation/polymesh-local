@@ -1,7 +1,7 @@
 {
   "name": "@polymeshassociation/polymesh-local",
   "description": "Polymesh local is a CLI based tool for managing a Polymesh development environment",
-  "version": "5.7.0",
+  "version": "5.8.0",
   "author": "Polymesh Association",
   "license": "Apache-2.0",
   "bin": {
