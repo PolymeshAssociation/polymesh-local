@@ -36,7 +36,13 @@ export async function fetchUIs(imageVersion: string): Promise<void> {
   const sourcePath = `${uis.remoteAssets}${version}-uis.tgz`;
   const destinationPath = path.join(localDir, 'uis.tgz');
 
-  await downloadFile(sourcePath, destinationPath);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  await downloadFile(sourcePath, destinationPath).catch(async _ => {
+    console.log(
+      `Could not find UIs specific to version ${imageVersion}. Checking for latest UIs now`
+    );
+    await downloadFile(`${uis.remoteAssets}latest-uis.tgz`, destinationPath);
+  });
 
   if (!existsSync(uis.dir)) mkdirSync(uis.dir);
 

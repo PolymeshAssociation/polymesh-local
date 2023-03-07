@@ -5,9 +5,13 @@
   "editor.tabSize": 2,
   "editor.formatOnSave": true,
   "cSpell.words": [
+    "consts",
     "distroless",
+    "libfaketime",
     "oclif",
     "polymathnet",
-    "polymeshassociation"
+    "Polymesh",
+    "polymeshassociation",
+    "Subquery"
   ]
 }
