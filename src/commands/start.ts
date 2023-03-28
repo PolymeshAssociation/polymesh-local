@@ -13,6 +13,7 @@ import {
   startContainers,
   stopContainers,
 } from '../common/containers';
+import { isGraphQlUp } from '../common/graphql';
 import { isRestUp, validateMnemonics } from '../common/rest';
 import { getMetadata, loadSnapshot, Metadata, writeMetadata } from '../common/snapshots';
 import { isSubqueryUp } from '../common/subquery';
@@ -204,7 +205,7 @@ export default class Start extends Command {
         case 'subquery':
           return ['subquery'];
         case 'gql':
-          return ['tooling'];
+          return ['tooling', 'graphql'];
         case 'rest':
           return ['rest_api'];
         case 'uis':
@@ -233,6 +234,7 @@ export default class Start extends Command {
       chain: isChainUp,
       subquery: isSubqueryUp,
       gql: isToolingUp,
+      graphql: isGraphQlUp,
       rest: isRestUp,
       uis: areUIsUp,
     };
