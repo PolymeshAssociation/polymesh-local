@@ -74,7 +74,7 @@ services:
       ]
 
   subquery:
-    image: '${SUBQUERY_IMAGE}'
+    image: '${SUBQUERY_IMAGE:-polymeshassociation/polymesh-subquery:latest}'
     restart: always
     depends_on:
       - 'postgres'
@@ -97,7 +97,7 @@ services:
       - --local
 
   tooling:
-    image: ${TOOLING_IMAGE}
+    image: ${TOOLING_IMAGE:-polymeshassociation/polymesh-tooling-gql:latest}
     restart: always
     depends_on:
       - 'postgres'
@@ -110,7 +110,7 @@ services:
       STAGE: dev
 
   rest_api:
-    image: ${REST_IMAGE}
+    image: ${REST_IMAGE:-polymeshassociation/polymesh-rest-api}
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
