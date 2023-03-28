@@ -138,8 +138,7 @@ services:
       - 3004:3000
     environment:
       POLYMESH_NODE_URL: 'ws://alice:9944'
-      POLYMESH_MIDDLEWARE_URL: 'http://tooling:3000'
-      POLYMESH_MIDDLEWARE_API_KEY: '${TOOLING_API_KEY}'
+      POLYMESH_MIDDLEWARE_V2_URL: 'http://graphql:3000'
       LOCAL_SIGNERS: ${LOCAL_SIGNERS}
       LOCAL_MNEMONICS: ${LOCAL_MNEMONICS}
       VAULT_URL: '${VAULT_URL}'
