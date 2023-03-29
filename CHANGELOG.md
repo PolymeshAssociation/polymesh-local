@@ -1,3 +1,10 @@
+## [5.8.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.8.0...v5.8.1) (2023-03-29)
+
+
+### Bug Fixes
+
+* 🐛 error when using compose v2 ([#64](https://github.com/PolymeshAssociation/polymesh-local/issues/64)) ([0d3ece7](https://github.com/PolymeshAssociation/polymesh-local/commit/0d3ece7923d4f9d46e2adb2e551944d042446331))
+
 # [5.8.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.7.0...v5.8.0) (2023-03-07)
 
 
