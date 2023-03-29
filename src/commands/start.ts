@@ -203,9 +203,9 @@ export default class Start extends Command {
         case 'chain':
           return ['alice', 'bob', 'charlie', 'schema'];
         case 'subquery':
-          return ['subquery'];
+          return ['subquery', 'graphql'];
         case 'gql':
-          return ['tooling', 'graphql'];
+          return ['tooling'];
         case 'rest':
           return ['rest_api'];
         case 'uis':

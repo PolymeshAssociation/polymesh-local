@@ -4,8 +4,10 @@ import { subquery } from '../consts';
 export async function isGraphQlUp(): Promise<boolean> {
   const query = `query {
     blocks(first: 1) {
-      totalCount
-    }
+        nodes {
+          id
+        }
+      }
    }`;
 
   const headers = { 'Content-Type': 'application/json' };
