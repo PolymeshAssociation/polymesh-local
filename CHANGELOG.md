@@ -1,3 +1,10 @@
+# [5.9.0-alpha.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.0-alpha.1...v5.9.0-alpha.2) (2023-03-30)
+
+
+### Features
+
+* 🎸 Update latest SQ compatible with 5.3.0 chain ([b263d47](https://github.com/PolymeshAssociation/polymesh-local/commit/b263d473d70b6b785cd24d63a4bd52f23933fdb5))
+
 # [5.9.0-alpha.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.8.0...v5.9.0-alpha.1) (2023-03-22)
 
 
