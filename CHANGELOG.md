@@ -1,3 +1,15 @@
+# [5.9.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.8.1...v5.9.0) (2023-03-31)
+
+
+### Bug Fixes
+
+* 🐛 error when using compose v2 ([adbb060](https://github.com/PolymeshAssociation/polymesh-local/commit/adbb060a1d6566b560b3b32dddd38e6780042c96))
+
+
+### Features
+
+* 🎸 add SQ native GraphQL on :3009 ([bae13a0](https://github.com/PolymeshAssociation/polymesh-local/commit/bae13a0b3c8c356c49a0ea42f40bdc9a0da83529))
+
 ## [5.8.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.8.0...v5.8.1) (2023-03-29)
 
 
