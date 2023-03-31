@@ -95,6 +95,7 @@ export const uis = {
 
 export const subquery = {
   url: 'localhost:3006',
+  graphql: 'localhost:3009',
 };
 
 export const rest = {
