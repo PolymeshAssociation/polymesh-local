@@ -172,7 +172,7 @@ export async function fetchDockerHubTags(repo: string): Promise<DockerTag[]> {
         page_size: '100',
       })}`;
     const rawResponse = await fetch(url);
-    response = await rawResponse.json();
+    response = (await rawResponse.json()) as DockerTagResponse;
     options.push(
       ...response.results.map(r => {
         return { name: r.name };
