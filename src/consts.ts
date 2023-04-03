@@ -28,8 +28,8 @@ export const fiveTwoZeroConfig = {
 
 export const fiveThreeZeroConfig = {
   chainTag: '5.3.0',
-  restTag: 'v2.6.0',
-  subqueryTag: 'v9.2.0-alpha.5',
+  restTag: 'v3.0.0',
+  subqueryTag: 'v9.3.1',
   toolingTag: 'v5.0.2',
   ...defaultRestSigners,
 };
@@ -59,8 +59,8 @@ export const fiveZeroThreeConfig = {
 };
 
 export const bundledConfig = [
-  fiveTwoZeroConfig,
   fiveThreeZeroConfig,
+  fiveTwoZeroConfig,
   fiveOneThreeConfig,
   fiveOneZeroConfig,
   fiveZeroThreeConfig,
