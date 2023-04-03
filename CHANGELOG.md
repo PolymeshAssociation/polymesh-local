@@ -1,3 +1,10 @@
+# [5.9.0-alpha.3](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.0-alpha.2...v5.9.0-alpha.3) (2023-04-03)
+
+
+### Features
+
+* 🎸 Update latest REST API and SQ version with 5.3 version ([ee15964](https://github.com/PolymeshAssociation/polymesh-local/commit/ee159643285c79fc25351db556bfd47729093ea8))
+
 # [5.9.0-alpha.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.0-alpha.1...v5.9.0-alpha.2) (2023-03-30)
 
 
