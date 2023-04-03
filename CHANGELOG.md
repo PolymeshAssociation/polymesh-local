@@ -1,3 +1,11 @@
+## [5.9.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.0...v5.9.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* 🐛 Bump dependencies ([318612f](https://github.com/PolymeshAssociation/polymesh-local/commit/318612f1f115335f0fd344f268bd1639f04b551a))
+* 🐛 Downgrade node-fetch to 2.6.9 ([6fd6a1d](https://github.com/PolymeshAssociation/polymesh-local/commit/6fd6a1dfd13cb0d3b68c4634e8dd2042766ddd0d))
+
 # [5.9.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.8.1...v5.9.0) (2023-03-31)
 
 
