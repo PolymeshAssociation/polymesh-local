@@ -1,3 +1,18 @@
+# [5.10.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.1...v5.10.0) (2023-04-03)
+
+
+### Bug Fixes
+
+* 🐛 Update commitlint ignore regex to exclude release commit ([ed9895e](https://github.com/PolymeshAssociation/polymesh-local/commit/ed9895e63c741a9020351aea6899fca57e2ac23f))
+
+
+### Features
+
+* 🎸 Make 5.3.0 as default version ([62b2de0](https://github.com/PolymeshAssociation/polymesh-local/commit/62b2de07a6431a174b2a9e3bfefff123c93c863e))
+* 🎸 Update compatible REST API and SQ version for 5.3.0 ([a4b994d](https://github.com/PolymeshAssociation/polymesh-local/commit/a4b994d9401f1a44235d3742a29ad6c53d02e8d4))
+* 🎸 Update latest REST API and SQ version with 5.3 version ([ee15964](https://github.com/PolymeshAssociation/polymesh-local/commit/ee159643285c79fc25351db556bfd47729093ea8))
+* 🎸 Update latest SQ compatible with 5.3.0 chain ([b263d47](https://github.com/PolymeshAssociation/polymesh-local/commit/b263d473d70b6b785cd24d63a4bd52f23933fdb5))
+
 ## [5.9.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.0...v5.9.1) (2023-04-03)
 
 ### Bug Fixes
