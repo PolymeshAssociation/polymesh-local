@@ -59,8 +59,8 @@ export const fiveZeroThreeConfig = {
 };
 
 export const bundledConfig = [
-  fiveTwoZeroConfig,
   fiveThreeZeroConfig,
+  fiveTwoZeroConfig,
   fiveOneThreeConfig,
   fiveOneZeroConfig,
   fiveZeroThreeConfig,
