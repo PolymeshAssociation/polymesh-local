@@ -1,14 +1,9 @@
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  preset: 'ts-jest',
-  testEnvironment: 'node',
-  transform: {
-    '^.+\\.(ts|tsx)?$': 'ts-jest',
-    '^.+\\.(js|jsx)$': 'babel-jest',
-  },
+  preset: 'ts-jest/presets/js-with-babel',
   transformIgnorePatterns: [
-    '<rootDir>/dist/*',
-    '<rootDir>/scripts/*',
-    'node_modules/(?!(node-fetch|@babel)/)',
+    '<rootDir>/node_modules/(?!node-fetch|data-uri-to-buffer|fetch-blob|formdata-polyfill|@babel/runtime/helpers/esm/)',
   ],
+  testEnvironment: 'node',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  testPathIgnorePatterns: ['dist'],
 };
