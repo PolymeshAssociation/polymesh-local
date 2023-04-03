@@ -253,8 +253,8 @@ OPTIONS
   -u, --uiLatest
       Clears saved UIs so the latest can be fetched
 
-  -v, --version=5.2.0|5.3.0|5.1.3|5.1.0|5.0.3|latest
-      [default: 5.2.0] version of the containers to run. `latest` may cause changes between starts
+  -v, --version=5.3.0|5.2.0|5.1.3|5.1.0|5.0.3|latest
+      [default: 5.3.0] version of the containers to run. `latest` may cause changes between starts
 
   --restMnemonics=restMnemonics
       [default: //Alice] Comma separated list of signer mnemonics. Defaults to `//Alice`
