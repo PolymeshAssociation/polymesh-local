@@ -1,3 +1,10 @@
+# [5.11.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.10.0...v5.11.0) (2023-04-13)
+
+
+### Features
+
+* 🎸 add 5.4 support, also include wal flag for chain ([#72](https://github.com/PolymeshAssociation/polymesh-local/issues/72)) ([f5680f6](https://github.com/PolymeshAssociation/polymesh-local/commit/f5680f6d8ddaad1d004635639ea7cddedbee5217))
+
 # [5.10.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.9.1...v5.10.0) (2023-04-03)
 
 
