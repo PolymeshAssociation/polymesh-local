@@ -143,7 +143,7 @@ services:
       LOCAL_MNEMONICS: ${LOCAL_MNEMONICS}
       VAULT_URL: '${VAULT_URL}'
       VAULT_TOKEN: '${VAULT_TOKEN}'
-      AUTH_STRATEGY: 'apiKey,open'
+      AUTH_STRATEGY: 'open'
       DEVELOPER_UTILS: 'true'
 
   dashboard:
