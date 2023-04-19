@@ -629,14 +629,7 @@
     },
     "PipId": "u32",
     "ProposalState": {
-      "_enum": [
-        "Pending",
-        "Rejected",
-        "Scheduled",
-        "Failed",
-        "Executed",
-        "Expired"
-      ]
+      "_enum": ["Pending", "Rejected", "Scheduled", "Failed", "Executed", "Expired"]
     },
     "Pip": {
       "id": "PipId",

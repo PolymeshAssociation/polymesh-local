@@ -74,7 +74,7 @@ services:
       ]
 
   subquery:
-    image: '${SUBQUERY_IMAGE}'
+    image: '${SUBQUERY_IMAGE:-polymeshassociation/polymesh-subquery:latest}'
     restart: always
     depends_on:
       - 'postgres'
@@ -96,8 +96,28 @@ services:
       - -f=/app
       - --local
 
+  graphql:
+    image: onfinality/subql-query:v1.0.0
+    ports:
+      - 3009:3000
+    depends_on:
+      - 'postgres'
+      - 'subquery'
+    restart: always
+    environment:
+      DB_DATABASE: postgres
+      DB_USER: '${PG_USER}'
+      DB_PASS: '${PG_PASSWORD}'
+      DB_PORT: '${PG_PORT}'
+      DB_HOST: '${PG_HOST}'
+    command:
+      - --name=public
+      - --playground
+      - --indexer=http://subquery:3000
+
+# note "tooling" is deprecated - new integrations should use "graphql"
   tooling:
-    image: ${TOOLING_IMAGE}
+    image: ${TOOLING_IMAGE:-polymeshassociation/polymesh-tooling-gql:latest}
     restart: always
     depends_on:
       - 'postgres'
@@ -110,7 +130,7 @@ services:
       STAGE: dev
 
   rest_api:
-    image: ${REST_IMAGE}
+    image: ${REST_IMAGE:-polymeshassociation/polymesh-rest-api}
     restart: always
     extra_hosts:
       - 'host.docker.internal:host-gateway'
@@ -118,13 +138,12 @@ services:
       - 3004:3000
     environment:
       POLYMESH_NODE_URL: 'ws://alice:9944'
-      POLYMESH_MIDDLEWARE_URL: 'http://tooling:3000'
-      POLYMESH_MIDDLEWARE_API_KEY: '${TOOLING_API_KEY}'
+      POLYMESH_MIDDLEWARE_V2_URL: 'http://graphql:3000'
       LOCAL_SIGNERS: ${LOCAL_SIGNERS}
       LOCAL_MNEMONICS: ${LOCAL_MNEMONICS}
       VAULT_URL: '${VAULT_URL}'
       VAULT_TOKEN: '${VAULT_TOKEN}'
-      AUTH_STRATEGY: 'apiKey,open'
+      AUTH_STRATEGY: 'open'
       DEVELOPER_UTILS: 'true'
 
   dashboard:
