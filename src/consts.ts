@@ -36,8 +36,8 @@ export const fiveThreeZeroConfig = {
 
 export const fiveFourZeroConfig = {
   chainTag: '5.4.0',
-  restTag: 'v3.0.0',
-  subqueryTag: 'v9.3.1',
+  restTag: 'v3.0.0-alpha.2',
+  subqueryTag: 'v9.4.0-alpha.3 ',
   toolingTag: 'v5.0.2',
   ...defaultRestSigners,
 };
