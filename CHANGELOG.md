@@ -1,3 +1,10 @@
+# [5.12.0-alpha.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.11.0...v5.12.0-alpha.1) (2023-04-24)
+
+
+### Features
+
+* 🎸 add 5.4.0 schema file ([c40b684](https://github.com/PolymeshAssociation/polymesh-local/commit/c40b6846b86d3ac945195a82b9fbeb84814d83d1))
+
 # [5.11.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.10.0...v5.11.0) (2023-04-13)
 
 
