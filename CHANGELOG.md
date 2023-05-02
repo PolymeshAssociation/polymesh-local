@@ -1,3 +1,10 @@
+# [5.12.0-alpha.3](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0-alpha.2...v5.12.0-alpha.3) (2023-05-02)
+
+
+### Features
+
+* 🎸 bump versions to latest stable releases ([9bb6c43](https://github.com/PolymeshAssociation/polymesh-local/commit/9bb6c4385d035045049232b3da094c0ab3de6603))
+
 # [5.12.0-alpha.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0-alpha.1...v5.12.0-alpha.2) (2023-04-24)
 
 
