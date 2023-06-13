@@ -1,3 +1,17 @@
+# [5.12.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.11.0...v5.12.0) (2023-06-13)
+
+
+### Bug Fixes
+
+* 🐛 update REST and SQ to support 5.4 Polymesh ([1e2e5bd](https://github.com/PolymeshAssociation/polymesh-local/commit/1e2e5bd956341e658c9367397a5f9b72b1aded64))
+
+
+### Features
+
+* 🎸 add 5.4.0 schema file ([c40b684](https://github.com/PolymeshAssociation/polymesh-local/commit/c40b6846b86d3ac945195a82b9fbeb84814d83d1))
+* 🎸 bump versions to latest stable releases ([9bb6c43](https://github.com/PolymeshAssociation/polymesh-local/commit/9bb6c4385d035045049232b3da094c0ab3de6603))
+* 🎸 Make 5.4.0 as default version ([23e082d](https://github.com/PolymeshAssociation/polymesh-local/commit/23e082d229bd31fa397442a3feef36dbae712791))
+
 # [5.12.0-alpha.4](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0-alpha.3...v5.12.0-alpha.4) (2023-06-13)
 
 
