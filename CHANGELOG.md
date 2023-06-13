@@ -1,3 +1,10 @@
+# [5.12.0-alpha.4](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0-alpha.3...v5.12.0-alpha.4) (2023-06-13)
+
+
+### Features
+
+* 🎸 Make 5.4.0 as default version ([23e082d](https://github.com/PolymeshAssociation/polymesh-local/commit/23e082d229bd31fa397442a3feef36dbae712791))
+
 # [5.12.0-alpha.3](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0-alpha.2...v5.12.0-alpha.3) (2023-05-02)
 
 
