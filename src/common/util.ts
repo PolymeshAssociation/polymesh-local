@@ -40,7 +40,7 @@ export async function retry(check: () => Promise<boolean>): Promise<boolean> {
     } else if (new Date().getTime() - startTime > timeout) {
       return false;
     }
-    await sleep(2000);
+    await sleep(3000);
   }
   return false;
 }
@@ -62,6 +62,7 @@ export async function returnsExpectedStatus(
     }
     throw err;
   });
+
   return status === expectedStatus;
 }
 
