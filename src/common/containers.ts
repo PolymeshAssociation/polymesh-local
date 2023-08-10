@@ -54,6 +54,19 @@ export async function startContainers(
       };
     }
 
+    let walArgs = '--db-max-total-wal-size 1024';
+
+    if (version !== 'latest') {
+      const specVersion = +version
+        .split('.')
+        .map(miniVersion => miniVersion.padStart(3, '0'))
+        .join('');
+
+      if (specVersion < 5001001) {
+        walArgs = '';
+      }
+    }
+
     const env = {
       ...process.env,
       POLYMESH_VERSION: version,
@@ -64,6 +77,7 @@ export async function startContainers(
       PG_DB: postgres.db,
       FAKETIME: `@${timestamp}`,
       CHAIN: chain,
+      WAL_ARGS: walArgs,
       TOOLING_API_KEY: tooling.apiKey,
       DATA_DIR: appData,
       TOOLING_IMAGE: toolingImage,
