@@ -1,3 +1,10 @@
+## [5.12.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0...v5.12.1) (2023-08-10)
+
+
+### Bug Fixes
+
+* 🐛 Remove `db-max-total-wal-size` arg for older chain ([3174171](https://github.com/PolymeshAssociation/polymesh-local/commit/3174171239511ca51599f25e90128d53ee32e9c7))
+
 # [5.12.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.11.0...v5.12.0) (2023-06-13)
 
 
