@@ -15,5 +15,4 @@ LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1 \
 --unsafe-ws-external --unsafe-rpc-external --wasm-execution=compiled \
 --no-prometheus --no-telemetry --pruning=archive --no-mdns \
 --validator --rpc-cors=all --rpc-methods=unsafe --force-authoring \
---db-max-total-wal-size 1024 \
---port 30333 $1 ${BOOT_NODE}
+${WAL_ARGS} --port 30333 $1 ${BOOT_NODE}
