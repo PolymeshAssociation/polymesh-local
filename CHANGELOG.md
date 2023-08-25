@@ -1,3 +1,12 @@
+# [5.13.0-alpha.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0...v5.13.0-alpha.1) (2023-08-25)
+
+
+### Features
+
+* 🎸 add 6.0 chain ([221179e](https://github.com/PolymeshAssociation/polymesh-local/commit/221179e38ce6d5016e553411cd742ae0d1f0d578))
+* 🎸 add 6.0 schema ([48560b0](https://github.com/PolymeshAssociation/polymesh-local/commit/48560b0a1ef553d00adfafb16fdd06d212d72a4b))
+* 🎸 update subquery + add health check ([2f70cd4](https://github.com/PolymeshAssociation/polymesh-local/commit/2f70cd4b046e767c7723f0347aa55a736308de6e))
+
 # [5.12.0](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.11.0...v5.12.0) (2023-06-13)
 
 

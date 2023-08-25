@@ -80,7 +80,7 @@ $ npm install -g @polymeshassociation/polymesh-local
 $ polymesh-local COMMAND
 running command...
 $ polymesh-local (-v|--version|version)
-@polymeshassociation/polymesh-local/5.12.0 linux-x64 node-v18.16.0
+@polymeshassociation/polymesh-local/5.13.0-alpha.1 linux-x64 node-v18.17.1
 $ polymesh-local --help [COMMAND]
 USAGE
   $ polymesh-local COMMAND
@@ -115,7 +115,7 @@ OPTIONS
   --verbose   enables verbose logging
 ```
 
-_See code: [src/commands/clean.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/clean.ts)_
+_See code: [src/commands/clean.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/clean.ts)_
 
 ## `polymesh-local configure`
 
@@ -129,7 +129,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/configure.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/configure.ts)_
+_See code: [src/commands/configure.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/configure.ts)_
 
 ## `polymesh-local help [COMMAND]`
 
@@ -160,7 +160,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/info.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/info.ts)_
+_See code: [src/commands/info.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/info.ts)_
 
 ## `polymesh-local load FILE`
 
@@ -175,7 +175,7 @@ OPTIONS
   --verbose   enables verbose logging
 ```
 
-_See code: [src/commands/load.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/load.ts)_
+_See code: [src/commands/load.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/load.ts)_
 
 ## `polymesh-local ls`
 
@@ -189,7 +189,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/ls.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/ls.ts)_
+_See code: [src/commands/ls.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/ls.ts)_
 
 ## `polymesh-local rm FILE`
 
@@ -203,7 +203,7 @@ OPTIONS
   -h, --help  show CLI help
 ```
 
-_See code: [src/commands/rm.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/rm.ts)_
+_See code: [src/commands/rm.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/rm.ts)_
 
 ## `polymesh-local save [name]`
 
@@ -221,7 +221,7 @@ OPTIONS
   --verbose   enables verbose logging
 ```
 
-_See code: [src/commands/save.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/save.ts)_
+_See code: [src/commands/save.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/save.ts)_
 
 ## `polymesh-local start [OPTIONS]`
 
@@ -232,7 +232,7 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -C,
+  -C, 
   --chain=dev|local|testnet-dev|testnet-local|testnet-bootstrap|mainnet-dev|mainnet-local|mainnet-bootstrap|mainnet|test
   net
       (Advanced) Specify a Polymesh runtime.
@@ -244,7 +244,7 @@ OPTIONS
       show CLI help
 
   -i, --image=image
-      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and
+      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and 
       have the polymesh node binary set as its entrypoint
 
   -o, --only=chain|subquery|gql|rest|uis
@@ -256,8 +256,8 @@ OPTIONS
   -u, --uiLatest
       Clears saved UIs so the latest can be fetched
 
-  -v, --version=5.4.0|5.3.0|5.2.0|5.1.3|5.1.0|5.0.3|latest
-      [default: 5.4.0] version of the containers to run. `latest` may cause changes between starts
+  -v, --version=6.0.0|5.4.0|5.3.0|5.2.0|5.1.3|5.1.0|5.0.3|latest
+      [default: 6.0.0] version of the containers to run. `latest` may cause changes between starts
 
   --restMnemonics=restMnemonics
       [default: //Alice] Comma separated list of signer mnemonics. Defaults to `//Alice`
@@ -275,7 +275,7 @@ OPTIONS
       enables verbose logging
 ```
 
-_See code: [src/commands/start.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/start.ts)_
+_See code: [src/commands/start.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/start.ts)_
 
 ## `polymesh-local stop [OPTIONS]`
 
@@ -291,5 +291,5 @@ OPTIONS
   --verbose    enables verbose logging
 ```
 
-_See code: [src/commands/stop.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.12.0/src/commands/stop.ts)_
+_See code: [src/commands/stop.ts](https://github.com/PolymeshAssociation/polymesh-local/blob/v5.13.0-alpha.1/src/commands/stop.ts)_
 <!-- commandsstop -->
