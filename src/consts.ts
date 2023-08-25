@@ -20,8 +20,8 @@ export const latestConfig = {
 
 export const sixZeroZeroConfig = {
   chainTag: '6.0.0',
-  restTag: 'v3.0.0-alpha.5',
-  subqueryTag: 'v9.7.0-alpha.11',
+  restTag: 'v3.0.0-alpha.9',
+  subqueryTag: 'v9.8.0',
   toolingTag: 'v5.0.2',
   ...defaultRestSigners,
 };

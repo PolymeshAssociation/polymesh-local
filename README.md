@@ -1,4 +1,7 @@
 # polymesh-local
+## Sunset Notice
+
+Instead of using polymesh-local, it is recommended to use `docker compose` directly. You should look at [this repo](https://github.com/PolymeshAssociation/polymesh-dev-env) for a replacement to this project.
 
 Polymesh local environment for development and e2e testing
 
@@ -229,7 +232,7 @@ USAGE
   $ polymesh-local start [OPTIONS]
 
 OPTIONS
-  -C, 
+  -C,
   --chain=dev|local|testnet-dev|testnet-local|testnet-bootstrap|mainnet-dev|mainnet-local|mainnet-bootstrap|mainnet|test
   net
       (Advanced) Specify a Polymesh runtime.
@@ -241,7 +244,7 @@ OPTIONS
       show CLI help
 
   -i, --image=image
-      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and 
+      (Advanced) Specify a local docker image to use for Polymesh containers. Such an image should be debian based and
       have the polymesh node binary set as its entrypoint
 
   -o, --only=chain|subquery|gql|rest|uis
