@@ -13,8 +13,7 @@ export function prepareDockerfile(version: string, image?: string): void {
   let branch = 'mainnet';
   const platform = process.arch === 'arm64' ? '-arm64' : '';
   if (version === 'latest' || version === '6.0.0') {
-    branch = 'develop';
-    version = '99dc6cc1b2'; // latest release candidate
+    branch = 'staging';
   }
   const chainImage = `polymeshassociation/polymesh${platform}:${version}-${branch}-debian`;
 
