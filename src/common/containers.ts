@@ -11,10 +11,11 @@ export function prepareDockerfile(version: string, image?: string): void {
   const template = fs.readFileSync(`${localDir}/mesh.Dockerfile.template`).toString();
 
   let branch = 'mainnet';
-  if (version === 'latest') {
+  const platform = process.arch === 'arm64' ? '-arm64' : '';
+  if (version === 'latest' || version === '6.0.0') {
     branch = 'staging';
   }
-  const chainImage = `polymeshassociation/polymesh:${version}-${branch}-debian`;
+  const chainImage = `polymeshassociation/polymesh${platform}:${version}-${branch}-debian`;
 
   let dockerfile;
   if (image) {
