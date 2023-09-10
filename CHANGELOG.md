@@ -1,3 +1,20 @@
+# [5.13.0-alpha.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.13.0-alpha.1...v5.13.0-alpha.2) (2023-09-10)
+
+
+### Features
+
+* 🎸 Update SDK and REST-API image versions ([942ce66](https://github.com/PolymeshAssociation/polymesh-local/commit/942ce667387270f18d2c13b06fedc81897a66136))
+* 🎸 use staging branch for 6.0 ([d85be99](https://github.com/PolymeshAssociation/polymesh-local/commit/d85be9994dcf2e32962d4ff1ac09906a0f9d73b4))
+
+# [5.13.0-alpha.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0...v5.13.0-alpha.1) (2023-08-25)
+
+
+### Features
+
+* 🎸 add 6.0 chain ([221179e](https://github.com/PolymeshAssociation/polymesh-local/commit/221179e38ce6d5016e553411cd742ae0d1f0d578))
+* 🎸 add 6.0 schema ([48560b0](https://github.com/PolymeshAssociation/polymesh-local/commit/48560b0a1ef553d00adfafb16fdd06d212d72a4b))
+* 🎸 update subquery + add health check ([2f70cd4](https://github.com/PolymeshAssociation/polymesh-local/commit/2f70cd4b046e767c7723f0347aa55a736308de6e))
+
 ## [5.12.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0...v5.12.1) (2023-08-10)
 
 

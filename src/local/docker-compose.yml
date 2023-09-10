@@ -76,6 +76,12 @@ services:
   subquery:
     image: '${SUBQUERY_IMAGE:-polymeshassociation/polymesh-subquery:latest}'
     restart: always
+    healthcheck:
+      test: curl --fail http://localhost:3000/meta || exit 1
+      interval: 20s
+      retries: 10
+      start_period: 20s
+      timeout: 10s
     depends_on:
       - 'postgres'
     ports:
@@ -97,12 +103,14 @@ services:
       - --local
 
   graphql:
-    image: onfinality/subql-query:v1.0.0
+    image: onfinality/subql-query:v2.5.0
     ports:
       - 3009:3000
     depends_on:
-      - 'postgres'
-      - 'subquery'
+      postgres:
+        condition: service_started
+      subquery:
+        condition: service_healthy
     restart: always
     environment:
       DB_DATABASE: postgres
