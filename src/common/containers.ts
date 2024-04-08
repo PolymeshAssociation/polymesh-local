@@ -145,9 +145,12 @@ export async function containersUp(cmd: Command, verbose: boolean): Promise<stri
       return matches![1];
     });
   } else if (composeVersion === 2) {
-    const services = JSON.parse(
-      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
-    );
+    const serviceResponse = execSync('docker-compose ps --format json', {
+      cwd: localDir,
+      stdio: 'pipe',
+    }).toString();
+
+    const services = serviceResponse ? JSON.parse(serviceResponse) : [];
     return services.map((s: psServiceV2) => s.Service);
   } else {
     cmd.error(
