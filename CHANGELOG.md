@@ -1,3 +1,10 @@
+## [5.12.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.1...v5.12.2) (2024-04-12)
+
+
+### Bug Fixes
+
+* 🐛 handle no service case with compose v2 ([3d697b4](https://github.com/PolymeshAssociation/polymesh-local/commit/3d697b41b231ee42773b0dcfd9b3f757e077d12e))
+
 ## [5.12.1](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.12.0...v5.12.1) (2023-08-10)
 
 
