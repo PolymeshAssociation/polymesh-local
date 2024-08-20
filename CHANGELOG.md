@@ -1,3 +1,10 @@
+# [5.13.0-alpha.3](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.13.0-alpha.2...v5.13.0-alpha.3) (2024-08-20)
+
+
+### Bug Fixes
+
+* 🐛 Replace `docker-compose` with `docker compose` ([5346080](https://github.com/PolymeshAssociation/polymesh-local/commit/5346080ad858edecdc95fac67303e2955e99dff4))
+
 # [5.13.0-alpha.2](https://github.com/PolymeshAssociation/polymesh-local/compare/v5.13.0-alpha.1...v5.13.0-alpha.2) (2023-09-10)
 
 
