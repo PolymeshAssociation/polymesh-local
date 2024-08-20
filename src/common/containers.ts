@@ -1,6 +1,6 @@
 import { Command } from '@oclif/command';
 import { execSync } from 'child_process';
-import compose from 'docker-compose';
+import { v2 as compose } from 'docker-compose';
 import fs from 'fs';
 import { copy, mkdirpSync } from 'fs-extra';
 
@@ -12,8 +12,8 @@ export function prepareDockerfile(version: string, image?: string): void {
 
   let branch = 'mainnet';
   const platform = process.arch === 'arm64' ? '-arm64' : '';
-  if (version === 'latest' || version === '6.0.0') {
-    branch = 'staging';
+  if (version === 'latest' || version === '7.0.0') {
+    branch = 'develop';
   }
   const chainImage = `polymeshassociation/polymesh${platform}:${version}-${branch}-debian`;
 
@@ -115,7 +115,6 @@ interface psServiceV2 {
 }
 const serviceRegex = /local_(.+)_1/;
 export async function containersUp(cmd: Command, verbose: boolean): Promise<string[]> {
-  // The docker-compose library 0.23.13 doesn't fully support docker-compose V2.
   // With `ps` the library would truncate the first service with V2.
   const composeVersion = composeMajorVersion();
   if (composeVersion === 1) {
@@ -133,19 +132,19 @@ export async function containersUp(cmd: Command, verbose: boolean): Promise<stri
     });
   } else if (composeVersion === 2) {
     const services = JSON.parse(
-      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+      execSync('docker compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
     );
     return services.map((s: psServiceV2) => s.Service);
   } else {
     cmd.error(
-      `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
+      `docker compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
     );
   }
 }
 
 function composeMajorVersion(): number {
   const versionRegex = /(\d+)\.\d+\.\d+/;
-  const result = execSync('docker-compose --version').toString();
+  const result = execSync('docker compose version').toString();
   const versionMatches = versionRegex.exec(result);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return Number(versionMatches![1]);
@@ -167,13 +166,13 @@ export async function containerName(cmd: Command, serviceName: string): Promise<
     return service?.name || '';
   } else if (composeVersion === 2) {
     const services = JSON.parse(
-      execSync('docker-compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
+      execSync('docker compose ps --format json', { cwd: localDir, stdio: 'pipe' }).toString()
     );
     const service = services.find((s: psServiceV2) => s.Service === serviceName);
     return service?.Name || '';
   } else {
     cmd.error(
-      `docker-compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
+      `docker compose version: ${composeVersion} detected. Only v1 and v2 are currently supported`
     );
   }
 }
